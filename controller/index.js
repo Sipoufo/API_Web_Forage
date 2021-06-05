@@ -1,0 +1,1 @@
+module.exports.authAdmin = require('./admin/auth.controller')

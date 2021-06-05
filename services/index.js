@@ -1,0 +1,1 @@
+module.exports.adminAuth = require('./admin/auth.service')

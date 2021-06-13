@@ -16,6 +16,10 @@ const adminSchema = new model({
         type: String,
         required: false
     },
+    password: {
+        type: String,
+        required: false
+    },
     email: {
         type: String,
         require: false,

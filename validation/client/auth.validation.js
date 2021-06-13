@@ -5,7 +5,6 @@ const register = {
     query: Joi.object().keys({
         name: Joi.string().required(),
         phone: Joi.number().required(),
-        email: Joi.string().required(),
         password: Joi.custom(password).required(),
         localisation: Joi.string().required()
     })

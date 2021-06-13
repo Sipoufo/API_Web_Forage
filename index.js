@@ -9,8 +9,8 @@ const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
 const cookieParse = require('cookie-parser')
 const compression = require('compression');
-const flash = require('connect-flash');
 const adminroutes = require('./router/admin/index')
+    // const routes = require('./router/client/index')
 
 dotenv.config({ path: './.env' })
 const PORT = process.env.PORT
@@ -48,20 +48,24 @@ app.use(cors())
 
 app.options('*', cors())
 
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    next();
-});
+// app.use(function(req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header(
+//         "Access-Control-Allow-Headers",
+//         "Origin, X-Requested-With, Content-Type, Accept"
+//     );
+//     next();
+// });
 
 
 // client api routes
 // app.use('/client', routes);
 // admin routes
-app.use('/admin', adminroutes);
+app.use('/admin', adminroutes)
+
+app.get('*', (req, res) => {
+    res.status(500).json({ status: 500, error: "This route don't existe" })
+})
 
 app.listen(PORT, () => {
     console.log(`We listening with the port ${PORT}`)

@@ -102,6 +102,20 @@ const userSchema = new model({
     }]
 })
 
+userSchema.methods.isPasswordMatch = async function(password) {
+    const user = this;
+    return bcrypt.compare(password, user.password);
+};
+
+userSchema.pre('save', async function(next) {
+    const user = this;
+    if (user.isModified('password')) {
+        user.password = await bcrypt.hash(admin.password, 8);
+    }
+    next();
+});
+
+
 const users = mongoose.model('user', userSchema)
 
 module.exports = users

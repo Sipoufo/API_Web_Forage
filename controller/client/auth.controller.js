@@ -1,13 +1,13 @@
 const httpStatus = require('http-status');
 const ApiError = require('../../utils/ApiError');
 const catchAsync = require('../../utils/catchAsync');
-const admin = require('../../models/administrateur.model')
+const Client = require('../../models/client.model')
 const jwt = require('jsonwebtoken')
 
 const maxAge = 3 * 24 * 60 * 60
 
 const createToken = (id) => {
-    return jwt.sign({ id }, 'Admin web forage', {
+    return jwt.sign({ id }, 'client web forage', {
         expiresIn: maxAge
     })
 }
@@ -19,10 +19,10 @@ const register = catchAsync(async(req, res) => {
     const password = req.query.password
     const localisation = req.query.localisation
 
-    return admin.findOne({ phone })
+    return Client.findOne({ phone })
         .then(async number => {
             if (!number) {
-                const result = await admin.create({ name, phone: phone, email, password, localisation })
+                const result = await Client.create({ name, phone: phone, email, password, localisation })
                 if (result) {
                     const token = createToken(result._id)
                     res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })
@@ -41,11 +41,11 @@ const login = catchAsync(async(req, res) => {
     const phone = req.query.phone
     const password = req.query.password
     console.log(req)
-    return admin.findOne({ phone })
+    return Client.findOne({ phone })
         .then(async admin => {
             if (admin) {
                 console.log(admin);
-                const result = await admin.isPasswordMatch(password)
+                const result = await Client.isPasswordMatch(password)
                 console.log(result);
                 if (result) {
                     const token = createToken(result._id)

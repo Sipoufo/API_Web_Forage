@@ -1,33 +1,41 @@
+const validator = require('validator');
 const mongoose = require('mongoose')
 const model = mongoose.Schema
 
 const userSchema = new model({
-    nom: {
+    name: {
         type: String,
         required: true
     },
-    number: {
+    phone: {
         type: Number,
         require: true
     },
     localisation: {
-        type: String,
-        require: true
+        longitude: {
+            type: Number,
+            required: true
+        },
+        latitude: {
+            type: Number,
+            required: true
+        },
     },
     email: {
         type: String,
         require: false,
-        lowercase: true,
-        unique: true,
         validate(value) {
             if (!validator.isEmail(value)) {
                 throw new Error('Invalid email');
             }
-        },
+        }
     },
     profile: {
         type: String,
         required: false
+    },
+    IdCompteur: {
+        type: String,
     },
     status: {
         type: Boolean,

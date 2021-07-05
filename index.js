@@ -1,16 +1,20 @@
 const express = require('express')
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 const helmet = require('helmet');
 const app = express()
 const dotenv = require('dotenv');
-const path = require('path')
-const cors = require('cors')
+const httpStatus = require('http-status');
+const path = require('path');
+const ApiError = require('./utils/ApiError');
+const cors = require('cors');
 const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
-const cookieParse = require('cookie-parser')
-const compression = require('compression');
-const adminroutes = require('./router/admin/index')
-    // const routes = require('./router/client/index')
+const cookieParse = require('cookie-parser');
+const compression = require('compression');;
+const adminroutes = require('./router/admin/index');
+const userRoutes = require('./router/client/index');
+const { errorConverter, errorHandler } = require('./middlewares/error');
+// const routes = require('./router/client/index')
 
 dotenv.config({ path: './.env' })
 const PORT = process.env.PORT
@@ -59,13 +63,25 @@ app.options('*', cors())
 
 
 // client api routes
-// app.use('/client', routes);
+app.use('/client', userRoutes);
+
 // admin routes
 app.use('/admin', adminroutes)
 
-app.get('*', (req, res) => {
-    res.status(500).json({ status: 500, error: "This route don't existe" })
-})
+// app.get('*', (req, res) => {
+//     res.status(500).json({ status: 500, error: "This route don't existe" })
+// })
+
+// send back a 404 error for any unknown api request
+app.use((req, res, next) => {
+    next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
+});
+
+// convert error to ApiError, if needed
+app.use(errorConverter);
+
+// handle error
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     console.log(`We listening with the port ${PORT}`)

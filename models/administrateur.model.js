@@ -13,8 +13,14 @@ const adminSchema = new model({
         required: true
     },
     localisation: {
-        type: String,
-        required: false
+        longitude: {
+            type: Number,
+            required: true
+        },
+        latitude: {
+            type: Number,
+            required: true
+        },
     },
     password: {
         type: String,

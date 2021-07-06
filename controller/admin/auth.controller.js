@@ -16,6 +16,7 @@ const register = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email
+    const birthday = req.body.birthday
     const password = req.body.password
     const longitude = req.body.longitude
     const latitude = req.body.latitude
@@ -24,7 +25,7 @@ const register = catchAsync(async(req, res) => {
     return admin.findOne({ phone })
         .then(async number => {
             if (!number) {
-                const result = await admin.create({ name, phone: phone, email, password, localisation: { longitude, latitude } })
+                const result = await admin.create({ name, phone: phone, email, birthday, password, localisation: { longitude, latitude } })
                 if (result) {
                     const token = createToken(result._id)
                     res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })

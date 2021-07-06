@@ -12,6 +12,11 @@ const adminSchema = new model({
         type: Number,
         required: true
     },
+    birthday: {
+        type: String,
+        required: true,
+        trim: true,
+    },
     localisation: {
         longitude: {
             type: Number,

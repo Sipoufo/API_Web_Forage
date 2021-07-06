@@ -12,6 +12,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const cookieParse = require('cookie-parser');
 const compression = require('compression');;
 const adminroutes = require('./router/admin/index');
+const docs = require('./router/docs/docs.route');
 const userRoutes = require('./router/client/index');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 // const routes = require('./router/client/index')
@@ -67,6 +68,9 @@ app.use('/client', userRoutes);
 
 // admin routes
 app.use('/admin', adminroutes)
+
+// admin routes
+app.use('/docs', docs)
 
 // app.get('*', (req, res) => {
 //     res.status(500).json({ status: 500, error: "This route don't existe" })

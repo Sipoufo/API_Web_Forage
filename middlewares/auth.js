@@ -13,7 +13,7 @@
 /* eslint-disable no-param-reassign */
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken')
 
 const tokenVerifieAdmin = (req, res, next) => {
     const token = req.cookies.pwftoken;

@@ -11,7 +11,14 @@ const router = express.Router();
  * @swagger
  * tags:
  *  name: Admin
- *  description: Part of API to manage the annonceur
+ *  description: Part of API to manage the admin
+ */
+
+/**
+ * @swagger
+ * tags:
+ *  name: login
+ *  description: Part of API to manage the login for admin and user
  */
 
 //Admin Authentification
@@ -56,7 +63,7 @@ const router = express.Router();
  *          responses:
  *              '201':
  *                  description: >
- *                      Save your new annonceur and return the information about it
+ *                      Save your new admin and return the information about it
  *                                    
  */
 router
@@ -66,9 +73,9 @@ router
 /**
  * @swagger
  *  /admin/auth/login:
- *      get: 
+ *      post: 
  *          summary: Admin connection
- *          tags: [Admin]
+ *          tags: [login]
  *          requestBody:
  *              required: true
  *              content:
@@ -93,7 +100,7 @@ router
  */
 router
     .route('/login')
-    .get(validate(adminAuth.login), login.login)
+    .post(validate(adminAuth.login), login.login)
 
 /**
  * @swagger

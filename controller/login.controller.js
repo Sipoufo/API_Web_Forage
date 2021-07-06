@@ -16,6 +16,8 @@ const login = catchAsync(async(req, res) => {
     const phone = req.body.phone
     const password = req.body.password
 
+    console.log("Je passe");
+
     return Admin.findOne({ phone })
         .then(async admin => {
             if (admin) {
@@ -48,7 +50,13 @@ const login = catchAsync(async(req, res) => {
                             res.status(500).json({ status: 500, error: "Your are not register <0_0>" })
                         }
                     })
+                    .catch((err) => {
+                        console.log(err);
+                    })
             }
+        })
+        .catch((err) => {
+            console.log(err);
         })
 })
 

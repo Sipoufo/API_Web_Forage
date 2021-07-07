@@ -35,6 +35,8 @@ const router = express.Router();
  *                                  type: string
  *                              email:
  *                                  type: string
+ *                              IdCompteur:
+ *                                  type: string
  *                              password:
  *                                  type: string
  *                                  format: password
@@ -48,6 +50,7 @@ const router = express.Router();
  *                              birthday: 2002-01-29
  *                              phone: "695914926"
  *                              password: Azerty12
+ *                              IdCompteur: 12A
  *                              email: sipoufoTest@gmail.com
  *                              longitude: 12
  *                              latitude: 12

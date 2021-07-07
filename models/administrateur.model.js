@@ -40,6 +40,10 @@ const adminSchema = new model({
             }
         },
     },
+    status: {
+        type: Boolean,
+        default: true
+    },
     signature: {
         type: String,
         required: false

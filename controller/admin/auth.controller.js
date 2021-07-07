@@ -41,8 +41,8 @@ const register = catchAsync(async(req, res) => {
 })
 
 const login = catchAsync(async(req, res) => {
-    const phone = req.query.phone
-    const password = req.query.password
+    const phone = req.body.phone
+    const password = req.body.password
     console.log(req)
     return admin.findOne({ phone })
         .then(async admin => {

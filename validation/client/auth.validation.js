@@ -9,8 +9,8 @@ const register = {
         birthday: Joi.string().required(),
         IdCompteur: Joi.string().required(),
         password: Joi.custom(password).required(),
-        longitude: Joi.number().required(),
-        latitude: Joi.number().required()
+        longitude: Joi.number(),
+        latitude: Joi.number()
     })
 }
 

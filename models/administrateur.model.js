@@ -52,48 +52,48 @@ const adminSchema = new model({
         type: String,
         required: false
     },
-    facture: [{
-        prixUnitaire: {
-            type: Number,
-            required: true
-        },
-        montanConsommation: {
-            type: Number,
-            required: true
-        },
-        fraisEntretien: {
-            type: Number,
-            required: true
-        },
-        amount: {
-            type: Number,
-            required: true
-        },
-        amountPayed: {
-            type: Number,
-            required: true
-        },
-        amountLeft: {
-            type: Number,
-            required: true
-        },
-        dataLimitePaid: {
-            type: Date,
-            required: true
-        },
-        facturePay: {
-            type: Boolean,
-            required: true
-        },
-        factureNotPay: {
-            type: Boolean,
-            required: true
-        },
-        factureAdvance: {
-            type: Boolean,
-            required: true
-        },
-    }]
+    // facture: [{
+    //     prixUnitaire: {
+    //         type: Number,
+    //         required: true
+    //     },
+    //     montanConsommation: {
+    //         type: Number,
+    //         required: true
+    //     },
+    //     fraisEntretien: {
+    //         type: Number,
+    //         required: true
+    //     },
+    //     amount: {
+    //         type: Number,
+    //         required: true
+    //     },
+    //     amountPayed: {
+    //         type: Number,
+    //         required: true
+    //     },
+    //     amountLeft: {
+    //         type: Number,
+    //         required: true
+    //     },
+    //     dataLimitePaid: {
+    //         type: Date,
+    //         required: true
+    //     },
+    //     facturePay: {
+    //         type: Boolean,
+    //         required: true
+    //     },
+    //     factureNotPay: {
+    //         type: Boolean,
+    //         required: true
+    //     },
+    //     factureAdvance: {
+    //         type: Boolean,
+    //         required: true
+    //     },
+    // }]
 })
 
 adminSchema.methods.isPasswordMatch = async function(password) {

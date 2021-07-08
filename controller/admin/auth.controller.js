@@ -18,8 +18,8 @@ const register = catchAsync(async(req, res) => {
     const email = req.body.email
     const birthday = req.body.birthday
     const password = req.body.password
-    const longitude = req.body.longitude
-    const latitude = req.body.latitude
+    const longitude = (req.body.longitude) ? req.body.longitude : undefined
+    const latitude = (req.body.latitude) ? req.body.longitude : undefined
 
     console.log(req)
     return admin.findOne({ phone })
@@ -40,36 +40,37 @@ const register = catchAsync(async(req, res) => {
         })
 })
 
-const login = catchAsync(async(req, res) => {
-    const phone = req.body.phone
-    const password = req.body.password
-    console.log(req)
-    return admin.findOne({ phone })
-        .then(async admin => {
-            if (admin) {
-                console.log(admin);
-                const result = await admin.isPasswordMatch(password)
-                console.log(result);
-                if (result) {
-                    const token = createToken(result._id)
-                    res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })
-                    res.status(200).json({ status: 200, result: admin })
-                } else {
-                    res.status(500).json({ status: 500, error: "Phone/Password Error" })
-                }
-            } else {
-                res.status(500).json({ status: 500, error: "Your are not register <0_0>" })
-            }
-        })
-})
+// const login = catchAsync(async(req, res) => {
+//     const phone = req.body.phone
+//     const password = req.body.password
+//     console.log(req)
+//     return admin.findOne({ phone })
+//         .then(async admin => {
+//             if (admin) {
+//                 console.log(admin);
+//                 const result = await admin.isPasswordMatch(password)
+//                 console.log(result);
+//                 if (result) {
+//                     const token = createToken(result._id)
+//                     res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })
+//                     res.status(200).json({ status: 200, result: admin })
+//                 } else {
+//                     res.status(500).json({ status: 500, error: "Phone/Password Error" })
+//                 }
+//             } else {
+//                 res.status(500).json({ status: 500, error: "Your are not register <0_0>" })
+//             }
+//         })
+// })
 
 const logout = (req, res) => {
     res.cookie('pwftoken', '', { maxAge: 1 })
     res.status(200).json({ status: 200, result: "You are log out" })
 }
 
+
 module.exports = {
     register,
-    login,
+    // login,
     logout,
 }

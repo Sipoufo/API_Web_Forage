@@ -19,9 +19,9 @@ const register = catchAsync(async(req, res) => {
     const birthday = req.body.birthday
     const IdCompteur = req.body.IdCompteur
     const password = req.body.password
-    const longitude = req.body.longitude
-    const latitude = req.body.latitude
-    console.log(email);
+    const longitude = (req.body.longitude) ? req.body.longitude : undefined
+    const latitude = (req.body.latitude) ? req.body.longitude : undefined
+
     return Client.findOne({ phone })
         .then(number => {
             if (!number) {

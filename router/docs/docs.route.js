@@ -20,13 +20,13 @@ const swaggerDef = {
         },
     },
     servers: [{
-        url: `http://localhost:4000`,
+        url: `http://localhost:3000`,
     }, ],
 };
 
 const specs = swaggerJsdoc({
     swaggerDefinition: swaggerDef,
-    apis: ['router/client/*.js', 'router/admin/*.js'],
+    apis: ['router/client/*.js', 'router/admin/*.js', 'router/login/*.js'],
 });
 
 router.use('/', swaggerUi.serve);

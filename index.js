@@ -12,6 +12,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const cookieParse = require('cookie-parser');
 const compression = require('compression');;
 const adminroutes = require('./router/admin/index');
+const login = require('./router/login/index');
 const docs = require('./router/docs/docs.route');
 const userRoutes = require('./router/client/index');
 const { errorConverter, errorHandler } = require('./middlewares/error');
@@ -68,6 +69,9 @@ app.use('/client', userRoutes);
 
 // admin routes
 app.use('/admin', adminroutes)
+
+// log routes
+app.use('/login', login)
 
 // admin routes
 app.use('/docs', docs)

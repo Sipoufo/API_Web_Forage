@@ -8,8 +8,8 @@ const register = {
         email: Joi.string().required(),
         birthday: Joi.string().required(),
         password: Joi.custom(password).required(),
-        longitude: Joi.number().required(),
-        latitude: Joi.number().required()
+        longitude: Joi.number(),
+        latitude: Joi.number()
     })
 }
 

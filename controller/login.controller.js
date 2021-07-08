@@ -16,8 +16,6 @@ const login = catchAsync(async(req, res) => {
     const phone = req.body.phone
     const password = req.body.password
 
-    console.log("Je passe");
-
     return Admin.findOne({ phone })
         .then(async admin => {
             if (admin) {
@@ -60,6 +58,41 @@ const login = catchAsync(async(req, res) => {
         })
 })
 
+const localisation = catchAsync(async(req, res) => {
+    const id = req.params.id
+    const longitude = req.body.longitude
+    const latitude = req.body.latitude
+
+    return Admin.findById(id)
+        .then(admin => {
+            if (admin) {
+                return Admin.findByIdAndUpdate(id, { localisation: { longitude, latitude } })
+                    .then(res => {
+                        res.status(200).json({ status: 200, result: res })
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+            } else {
+                return Client.findById(id)
+                    .then(client => {
+                        if (client) {
+                            return Client.findByIdAndUpdate(id, { localisation: { longitude, latitude } })
+                                .then(response => {
+                                    res.status(200).json({ status: 200, result: response })
+                                })
+                                .catch(err => {
+                                    console.log(err);
+                                })
+                        } else {
+                            res.status(500).json({ status: 500, error: "Your are not register <0_0>" })
+                        }
+                    })
+            }
+        })
+})
+
 module.exports = {
-    login
+    login,
+    localisation
 }

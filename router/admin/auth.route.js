@@ -14,13 +14,6 @@ const router = express.Router();
  *  description: Part of API to manage the admin
  */
 
-/**
- * @swagger
- * tags:
- *  name: login
- *  description: Part of API to manage the login for admin and user
- */
-
 //Admin Authentification
 /**
  * @swagger
@@ -69,38 +62,6 @@ const router = express.Router();
 router
     .route('/register')
     .post(validate(adminAuth.register), authAdmin.register)
-
-/**
- * @swagger
- *  /admin/auth/login:
- *      post: 
- *          summary: Admin connection
- *          tags: [login]
- *          requestBody:
- *              required: true
- *              content:
- *                  application/json:  
- *                      schema:
- *                          type: object
- *                          properties:
- *                              phone:
- *                                  type: string
- *                              password:
- *                                  type: String
- *                          example:
- *                              phone: "695914926"
- *                              password: Azerty12
- *          security: []
- *          responses:
- *              '201':
- *                  description: >
- *                      return all the information of user login
- *                      Successfully authenticated.
- *                      The session ID is returned in a cookie name 'jwt'
- */
-router
-    .route('/login')
-    .post(validate(adminAuth.login), login.login)
 
 /**
  * @swagger

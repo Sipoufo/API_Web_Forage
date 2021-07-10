@@ -19,11 +19,11 @@ const login = catchAsync(async(req, res) => {
     return Admin.findOne({ phone })
         .then(async admin => {
             if (admin) {
-                console.log(admin);
-                const result = await admin.isPasswordMatch(password)
-                console.log(result);
-                if (result) {
-                    const token = createToken(result._id)
+                console.log("Admin : " + admin.name);
+                const resultAdmin = await admin.isPasswordMatch(password)
+                console.log(admin._id);
+                if (resultAdmin) {
+                    const token = createToken(admin._id)
                     res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })
                     res.status(200).json({ status: 200, result: admin })
                 } else {
@@ -34,11 +34,9 @@ const login = catchAsync(async(req, res) => {
                 return Client.findOne({ phone })
                     .then(async(client) => {
                         if (client) {
-                            console.log(client);
                             const result = await client.isPasswordMatch(password)
-                            console.log(result);
                             if (result) {
-                                const token = createToken(result._id)
+                                const token = createToken(client._id)
                                 res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })
                                 res.status(200).json({ status: 200, result: client })
                             } else {

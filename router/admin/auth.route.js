@@ -2,7 +2,6 @@ const express = require('express');
 const validate = require('../../middlewares/validate');
 const { adminAuth } = require('../../validation/index');
 const { authAdmin } = require('../../controller/index');
-const { login } = require('../../controller/index');
 const { tokenVerifieAdmin } = require('../../middlewares/auth')
 
 const router = express.Router();
@@ -72,7 +71,7 @@ router
  *      responses: 
  *          200:
  *              description: logout successfully
- *          400:
+ *          500:
  *              description: Error during the logout
  */
 router

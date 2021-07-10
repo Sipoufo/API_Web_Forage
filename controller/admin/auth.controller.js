@@ -68,7 +68,6 @@ const logout = (req, res) => {
     res.status(200).json({ status: 200, result: "You are log out" })
 }
 
-
 module.exports = {
     register,
     // login,

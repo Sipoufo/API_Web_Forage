@@ -1,17 +1,19 @@
 const express = require('express');
-const router = express.Router();
 
-const authRoute = require('./auth.route')
+const authRoute = require('./auth.route');
+const factureRoute = require('./facture.route');
+
+const router = express.Router();
 
 const adminRoute = [{
         path: '/auth',
         route: authRoute,
     },
-    // {
-    //     path: '/auth',
-    //     route: authAdminRoute,
-    // }
-]
+    {
+        path: '/facture',
+        route: factureRoute,
+    }
+];
 
 adminRoute.forEach((route) => {
     router.use(route.path, route.route);

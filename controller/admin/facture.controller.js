@@ -46,10 +46,24 @@ const getFactures = catchAsync((req, res) => {
         .find()
         .sort({ createdAt: -1 })
         .then(factures => {
-            if (factures) {
+            if (factures.length > 0) {
                 res.status(200).json({ status: 200, result: factures })
             } else {
                 res.status(500).json({ status: 500, error: "Error while the find factures" })
+            }
+        })
+})
+
+const getClientFactures = catchAsync((req, res) => {
+    const idClient = req.params.idClient
+    Facture
+        .find({ idClient })
+        .sort({ createdAt: -1 })
+        .then(factures => {
+            if (factures.length > 0) {
+                res.status(200).json({ status: 200, result: factures })
+            } else {
+                res.status(500).json({ status: 500, error: "Error during the find factures" })
             }
         })
 })
@@ -124,6 +138,7 @@ const statusPaidFacture = catchAsync(async(req, res) => {
 module.exports = {
     addFacture,
     getFactures,
+    getClientFactures,
     getFacture,
     updateFacture,
     statusPaidFacture

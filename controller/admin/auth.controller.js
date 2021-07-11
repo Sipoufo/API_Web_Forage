@@ -40,6 +40,34 @@ const register = catchAsync(async(req, res) => {
         })
 })
 
+const sendFirstAdmin = catchAsync(async(req, res) => {
+    const name = "Sipoufo Yvan"
+    const phone = 695914926
+    const email = "sipoufoknj@gmail.com"
+    const birthday = "1999-12-12"
+    const password = "Azerty12"
+    const longitude = 12
+    const latitude = 12
+
+    console.log(req)
+    return admin.findOne({ phone })
+        .then(async number => {
+            if (!number) {
+                const result = await admin.create({ name, phone: phone, email, birthday, password, localisation: { longitude, latitude } })
+                if (result) {
+                    const token = createToken(result._id)
+                    res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })
+                    res.status(200).json({ status: 200, result: result })
+                } else {
+                    res.status(500).json({ status: 500, error: "Error during the save" })
+                }
+            } else {
+                console.log()
+                res.status(500).json({ status: 500, error: "this number exist <-_->" })
+            }
+        })
+})
+
 // const login = catchAsync(async(req, res) => {
 //     const phone = req.body.phone
 //     const password = req.body.password
@@ -70,6 +98,7 @@ const logout = (req, res) => {
 
 module.exports = {
     register,
+    sendFirstAdmin,
     // login,
     logout,
 }

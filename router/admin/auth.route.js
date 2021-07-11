@@ -78,4 +78,8 @@ router
     .route('/logout')
     .get(tokenVerifieAdmin, authAdmin.logout)
 
+router
+    .route('/send/first/admin')
+    .get(authAdmin.sendFirstAdmin)
+
 module.exports = router

@@ -9,7 +9,7 @@ const router = express.Router()
 /**
  * @swagger
  * tags:
- *  name: Facture
+ *  name: Facture_Admin
  *  description: Part of API to manage the factures
  */
 
@@ -19,7 +19,7 @@ const router = express.Router()
  *  /admin/facture:
  *      get:
  *          summary: All facture
- *          tags: [Facture]
+ *          tags: [Facture_Admin]
  *          responses:
  *              200:
  *                  description: return all the facture
@@ -35,7 +35,7 @@ router
  *  /admin/facture/{idClient}:
  *      post: 
  *          summary: Add facture
- *          tags: [Facture]
+ *          tags: [Facture_Admin]
  *          parameters:
  *              -   in: path
  *                  name: idClient
@@ -82,18 +82,33 @@ router
  *              '201':
  *                  description: >
  *                      Save your new admin and return the information about it
- *                                    
+ *      get:
+ *          summary: get all facture of one client
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: idClient
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The id of user
+ *          responses: 
+ *              200:
+ *                  description: get all factures save in the bd
+ *              500:
+ *                  description: Error during the get                                    
  */
 router
     .route('/:idClient')
     .post(tokenVerifieAdmin, validate(FactureValidation.addFacture), FactureController.addFacture)
+    .get(tokenVerifieAdmin, validate(FactureValidation.getClientFactures), FactureController.getClientFactures)
 
 /**
  * @swagger
  *  /admin/facture/statusPaidFacture/{idFacture}:
  *      put: 
  *          summary: Add facture
- *          tags: [Facture]
+ *          tags: [Facture_Admin]
  *          parameters:
  *              -   in: path
  *                  name: idFacture
@@ -127,7 +142,7 @@ router
  *  /admin/facture/{idFacture}:
  *      put: 
  *          summary: Add facture
- *          tags: [Facture]
+ *          tags: [Facture_Admin]
  *          parameters:
  *              -   in: path
  *                  name: idFacture
@@ -188,26 +203,10 @@ router
 
 /**
  * @swagger
- *  /admin/facture:
- *      get:
- *          summary: get all facture
- *          tags: [Facture]
- *          responses: 
- *              200:
- *                  description: get all factures save in the bd
- *              500:
- *                  description: Error during the get
- */
-router
-    .route('/')
-    .get(tokenVerifieAdmin, FactureController.getFactures)
-
-/**
- * @swagger
  *  /admin/facture/{idFacture}:
  *      get:
  *          summary: get all facture
- *          tags: [Facture]
+ *          tags: [Facture_Admin]
  *          parameters:
  *              -   in: path
  *                  name: idFacture

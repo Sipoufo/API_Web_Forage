@@ -2,6 +2,7 @@ const express = require('express');
 const validate = require('../../middlewares/validate');
 const { LoginValidation } = require('../../validation/index');
 const { loginController } = require('../../controller/index');
+const { tokenVerifie } = require('../../middlewares/auth')
 
 const router = express.Router();
 
@@ -46,17 +47,10 @@ router
 
 /**
  * @swagger
- *  /login/localisation/{id}:
+ *  /login/localisation:
  *      post: 
  *          summary: Admin connection
  *          tags: [login]
- *          parameters:
- *              -   in: path
- *                  name: id
- *                  schema: 
- *                      type: string
- *                  required: true
- *                  description: The id of user
  *          requestBody:
  *              required: true
  *              content:
@@ -79,6 +73,6 @@ router
  *                      Successfully authenticated.
  */
 router
-    .route('/localisation/:id')
-    .post(validate(LoginValidation.localisation), loginController.localisation)
+    .route('/localisation')
+    .post(tokenVerifie, validate(LoginValidation.localisation), loginController.localisation)
 module.exports = router

@@ -2,9 +2,6 @@ const Joi = require('joi')
 const { password, objectId } = require('../custom.validation');
 
 const localisation = {
-    params: Joi.object().keys({
-        id: Joi.required().custom(objectId),
-    }),
     body: Joi.object().keys({
         longitude: Joi.number().required(),
         latitude: Joi.number().required()

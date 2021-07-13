@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const ApiError = require('../../utils/ApiError');
 const catchAsync = require('../../utils/catchAsync');
 const Client = require('../../models/client.model')
+const Admin = require('../../models/administrateur.model')
 const jwt = require('jsonwebtoken')
 
 const maxAge = 3 * 24 * 60 * 60
@@ -22,30 +23,39 @@ const register = catchAsync(async(req, res) => {
     const longitude = (req.body.longitude) ? req.body.longitude : undefined
     const latitude = (req.body.latitude) ? req.body.longitude : undefined
 
-    return Client.findOne({ phone })
-        .then(number => {
-            if (!number) {
-                return Client.findOne({ email })
-                    .then(async(mail) => {
-                        if (!mail) {
-                            const result = await Client.create({ name, phone, IdCompteur, email, birthday, password, localisation: { longitude, latitude } })
-                            if (result) {
-                                const token = createToken(result._id)
-                                res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })
-                                res.status(200).json({ status: 200, result: result })
-                            } else {
-                                res.status(500).json({ status: 500, error: "Error during the save" })
-                            }
-                        } else {
-                            res.status(500).json({ status: 500, error: "this email exist <-_->" })
-                        }
 
+    return Admin.findOne({ phone })
+        .then(admin => {
+            if (!admin) {
+                return Client.findOne({ phone })
+                    .then(number => {
+                        if (!number) {
+                            return Client.findOne({ email })
+                                .then(async(mail) => {
+                                    if (!mail) {
+                                        const result = await Client.create({ name, phone, IdCompteur, email, birthday, profile: "user", password, localisation: { longitude, latitude } })
+                                        if (result) {
+                                            const token = createToken(result._id)
+                                            res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })
+                                            res.status(200).json({ status: 200, result: result })
+                                        } else {
+                                            res.status(500).json({ status: 500, error: "Error during the save" })
+                                        }
+                                    } else {
+                                        res.status(500).json({ status: 500, error: "this email exist <-_->" })
+                                    }
+
+                                })
+                        } else {
+                            console.log()
+                            res.status(500).json({ status: 500, error: "this number exist <-_->" })
+                        }
                     })
             } else {
-                console.log()
-                res.status(500).json({ status: 500, error: "this number exist <-_->" })
+                res.status(500).json({ status: 500, error: "This phone existe" })
             }
         })
+
 })
 
 // const login = catchAsync(async(req, res) => {

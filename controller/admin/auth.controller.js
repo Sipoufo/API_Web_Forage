@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const ApiError = require('../../utils/ApiError');
 const catchAsync = require('../../utils/catchAsync');
 const admin = require('../../models/administrateur.model')
+const client = require('../../models/client.model')
 const jwt = require('jsonwebtoken')
 
 const maxAge = 3 * 24 * 60 * 60
@@ -22,20 +23,27 @@ const register = catchAsync(async(req, res) => {
     const latitude = (req.body.latitude) ? req.body.longitude : undefined
 
     console.log(req)
-    return admin.findOne({ phone })
-        .then(async number => {
-            if (!number) {
-                const result = await admin.create({ name, phone: phone, email, birthday, password, localisation: { longitude, latitude } })
-                if (result) {
-                    const token = createToken(result._id)
-                    res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })
-                    res.status(200).json({ status: 200, result: result })
-                } else {
-                    res.status(500).json({ status: 500, error: "Error during the save" })
-                }
+    return client.findOne({ phone })
+        .then(client => {
+            if (!client) {
+                return admin.findOne({ phone })
+                    .then(async number => {
+                        if (!number) {
+                            const result = await admin.create({ name, phone: phone, email, birthday, profile: "admin", password, localisation: { longitude, latitude } })
+                            if (result) {
+                                const token = createToken(result._id)
+                                res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })
+                                res.status(200).json({ status: 200, result: result })
+                            } else {
+                                res.status(500).json({ status: 500, error: "Error during the save" })
+                            }
+                        } else {
+                            console.log()
+                            res.status(500).json({ status: 500, error: "this number exist <-_->" })
+                        }
+                    })
             } else {
-                console.log()
-                res.status(500).json({ status: 500, error: "this number exist <-_->" })
+                res.status(500).json({ status: 500, error: "One User have this phone" })
             }
         })
 })
@@ -53,7 +61,7 @@ const sendFirstAdmin = catchAsync(async(req, res) => {
     return admin.findOne({ phone })
         .then(async number => {
             if (!number) {
-                const result = await admin.create({ name, phone: phone, email, birthday, password, localisation: { longitude, latitude } })
+                const result = await admin.create({ name, phone: phone, email, birthday, profile: "admin", password, localisation: { longitude, latitude } })
                 if (result) {
                     const token = createToken(result._id)
                     res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })

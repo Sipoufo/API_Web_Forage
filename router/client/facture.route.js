@@ -33,7 +33,7 @@ router
 /**
  * @swagger
  *  /client/facture/paid/{idFacture}:
- *      post: 
+ *      put: 
  *          summary: Add facture
  *          tags: [Facture_Client]
  *          parameters:
@@ -52,8 +52,11 @@ router
  *                          properties:
  *                              status:
  *                                  type: boolean
+ *                              montant:
+ *                                  type: integer
  *                          example:
  *                              status: true
+ *                              montant: 28000
  *          responses:
  *              '201':
  *                  description: >
@@ -62,7 +65,44 @@ router
  */
 router
     .route('/paid/:idFacture')
-    .post(tokenVerifieClient, validate(ClientFactureValidation.statusPaidFacture), ClientFactureController.statusPaidFacture)
+    .put(tokenVerifieClient, validate(ClientFactureValidation.statusPaidFacture), ClientFactureController.statusPaidFacture)
+
+/**
+ * @swagger
+ *  /client/facture/advance/{idFacture}:
+ *      put: 
+ *          summary: Add facture
+ *          tags: [Facture_Client]
+ *          parameters:
+ *              -   in: path
+ *                  name: idFacture
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The id of facture
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              AdvanceCount:
+ *                                  type: integer
+ *                              advanceDate:
+ *                                  type: string
+ *                          example:
+ *                              AdvanceCount: 5000
+ *                              advanceDate: 2012-07-14
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      Update the status of facture 
+ *                                    
+ */
+router
+    .route('/advance/:idFacture')
+    .put(tokenVerifieClient, validate(ClientFactureValidation.advanceFacture), ClientFactureController.advanceFacture)
 
 
 module.exports = router

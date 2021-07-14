@@ -31,8 +31,6 @@ const register = catchAsync(async(req, res) => {
                         if (!number) {
                             const result = await admin.create({ name, phone: phone, email, birthday, profile: "admin", password, localisation: { longitude, latitude } })
                             if (result) {
-                                const token = createToken(result._id)
-                                res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })
                                 res.status(200).json({ status: 200, result: result })
                             } else {
                                 res.status(500).json({ status: 500, error: "Error during the save" })

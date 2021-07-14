@@ -60,10 +60,6 @@ router
  *                                  type: integer
  *                              montantTotal:
  *                                  type: integer
- *                              montantImpaye:
- *                                  type: integer
- *                              montantVerse:
- *                                  type: integer
  *                              dataLimitePaid:
  *                                  type: string
  *                              dateReleveOldIndex:
@@ -74,8 +70,6 @@ router
  *                              consommation: 32
  *                              montantConsommation: 16000
  *                              montantTotal: 28000
- *                              montantImpaye: 11000
- *                              montantVerse: 17000
  *                              dataLimitePaid: 2021-07-12
  *                              dateReleveOldIndex: 2021-06-02
  *          responses:
@@ -171,10 +165,6 @@ router
  *                                  type: integer
  *                              montantTotal:
  *                                  type: integer
- *                              montantImpaye:
- *                                  type: integer
- *                              montantVerse:
- *                                  type: integer
  *                              dataLimitePaid:
  *                                  type: string
  *                              dateReleveOldIndex:
@@ -187,8 +177,6 @@ router
  *                              montantConsommation: 16000
  *                              fraisEntretien: 1000
  *                              montantTotal: 28000
- *                              montantImpaye: 11000
- *                              montantVerse: 17000
  *                              dataLimitePaid: 2021-07-12
  *                              dateReleveOldIndex: 2021-06-02
  *          responses:

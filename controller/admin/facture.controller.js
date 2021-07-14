@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 
 const addFacture = catchAsync(async(req, res) => {
     const token = req.cookies.pwftoken
-    return jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    await jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err)
         } else {
@@ -18,18 +18,16 @@ const addFacture = catchAsync(async(req, res) => {
                 montantConsommation: req.body.montantConsommation,
                 fraisEntretien: req.body.fraisEntretien,
                 montantTotal: req.body.montantTotal,
-                montantImpaye: req.body.montantImpaye,
-                montantVerse: req.body.amountPayed,
                 dataLimitePaid: req.body.dataLimitePaid,
                 dateReleveOldIndex: req.body.dateReleveOldIndex,
             }
-            return Admin.findById(decodedToken.id)
-                .then(res => {
-                    if (res) {
-                        return Facture.create(facture)
-                            .then(res => {
-                                if (res) {
-                                    res.status(200).json({ status: 200, result: res })
+            await Admin.findById(decodedToken.id)
+                .then(async admin => {
+                    if (admin) {
+                        await Facture.create(facture)
+                            .then(resp => {
+                                if (resp) {
+                                    res.status(200).json({ status: 200, result: resp })
                                 } else {
                                     res.status(500).json({ status: 200, error: "Error during the update" })
                                 }
@@ -84,7 +82,7 @@ const updateFacture = catchAsync(async(req, res) => {
     const idFacture = req.params.idFacture
     console.log(idFacture);
     const token = req.cookies.pwftoken
-    return jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    await jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err)
         } else {
@@ -98,15 +96,13 @@ const updateFacture = catchAsync(async(req, res) => {
                 montantConsommation: req.body.montantConsommation,
                 fraisEntretien: req.body.fraisEntretien,
                 montantTotal: req.body.montantTotal,
-                montantImpaye: req.body.montantImpaye,
-                montantVerse: req.body.amountPayed,
                 dataLimitePaid: req.body.dataLimitePaid,
                 dateReleveOldIndex: req.body.dateReleveOldIndex,
             }
-            return Admin.findById(decodedToken.id)
-                .then(res => {
+            await Admin.findById(decodedToken.id)
+                .then(async res => {
                     if (res) {
-                        return Facture.findByIdAndUpdate(idFacture, facture)
+                        await Facture.findByIdAndUpdate(idFacture, facture)
                             .then(res => {
                                 if (res) {
                                     res.status(200).json({ status: 200, result: res })
@@ -125,7 +121,7 @@ const statusPaidFacture = catchAsync(async(req, res) => {
     const idFacture = req.params.idFacture
     const status = req.body.status
 
-    Facture.findByIdAndUpdate(idFacture, { facturePay: status })
+    await Facture.findByIdAndUpdate(idFacture, { facturePay: status })
         .then(facture => {
             if (facture) {
                 res.status(200).json({ status: 200, result: facture })

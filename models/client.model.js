@@ -8,6 +8,14 @@ const userSchema = new model({
             type: String,
             required: true
         },
+        password: {
+            type: String,
+            required: false
+        },
+        descriptionLocalisation: {
+            type: String,
+            required: false
+        },
         phone: {
             type: Number,
             require: true
@@ -72,6 +80,26 @@ const userSchema = new model({
             },
             dateReception: {
                 type: Date,
+                required: true
+            }
+        }],
+        advanceFacture: [{
+            idFacture: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "facture",
+                required: true,
+                trim: true,
+            },
+            AdvanceCount: {
+                type: Number,
+                required: true
+            },
+            advanceDate: {
+                type: String,
+                required: true
+            },
+            reset: {
+                type: Number,
                 required: true
             }
         }],

@@ -36,7 +36,7 @@ const factureSchema = new model({
         // Prix de la consommation
         montantConsommation: {
             type: Number,
-            required: true
+            required: true,
         },
         fraisEntretien: {
             type: Number,
@@ -49,7 +49,8 @@ const factureSchema = new model({
         },
         montantImpaye: {
             type: Number,
-            required: true
+            required: false,
+            default: 0
         },
         montantVerse: {
             type: Number,

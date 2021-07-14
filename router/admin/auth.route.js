@@ -60,7 +60,7 @@ const router = express.Router();
  */
 router
     .route('/register')
-    .post(validate(adminAuth.register), authAdmin.register)
+    .post(tokenVerifieAdmin, validate(adminAuth.register), authAdmin.register)
 
 /**
  * @swagger

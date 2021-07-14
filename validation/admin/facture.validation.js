@@ -13,8 +13,6 @@ const addFacture = {
         montantConsommation: Joi.number().required(),
         fraisEntretien: Joi.number(),
         montantTotal: Joi.number().required(),
-        montantImpaye: Joi.number().required(),
-        montantVerse: Joi.number().required(),
         dataLimitePaid: Joi.date().required(),
         dateReleveOldIndex: Joi.date().required(),
     })
@@ -32,8 +30,6 @@ const updateFacture = {
         montantConsommation: Joi.number().required(),
         fraisEntretien: Joi.number(),
         montantTotal: Joi.number().required(),
-        montantImpaye: Joi.number().required(),
-        montantVerse: Joi.number().required(),
         dataLimitePaid: Joi.date().required(),
         dateReleveOldIndex: Joi.date().required(),
     })

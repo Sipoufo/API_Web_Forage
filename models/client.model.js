@@ -12,10 +12,6 @@ const userSchema = new model({
             type: String,
             required: false
         },
-        descriptionLocalisation: {
-            type: String,
-            required: false
-        },
         phone: {
             type: Number,
             require: true
@@ -33,6 +29,10 @@ const userSchema = new model({
             latitude: {
                 type: Number,
                 required: true
+            },
+            description: {
+                type: String,
+                required: false
             },
         },
         email: {

@@ -8,10 +8,6 @@ const adminSchema = new model({
             type: String,
             required: true
         },
-        descriptionLocalisation: {
-            type: String,
-            required: false
-        },
         phone: {
             type: Number,
             required: true
@@ -31,6 +27,10 @@ const adminSchema = new model({
                 type: Number,
                 required: false,
                 default: null
+            },
+            description: {
+                type: String,
+                required: false
             },
         },
         password: {

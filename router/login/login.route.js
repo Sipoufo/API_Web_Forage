@@ -67,7 +67,7 @@ router
  *                          example:
  *                              longitude: 12
  *                              latitude: 12
- *                              descriptionLocalisation: TPO
+ *                              description: TPO
  *          security: []
  *          responses:
  *              '201':

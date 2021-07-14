@@ -68,7 +68,7 @@ const localisation = catchAsync(async(req, res) => {
             return Admin.findById(decodedToken.id)
                 .then(admin => {
                     if (admin) {
-                        return Admin.findByIdAndUpdate(decodedToken.id, { description, localisation: { longitude, latitude } })
+                        return Admin.findByIdAndUpdate(decodedToken.id, { localisation: { longitude, latitude, description } })
                             .then(res => {
                                 res.status(200).json({ status: 200, result: res })
                             })
@@ -79,7 +79,7 @@ const localisation = catchAsync(async(req, res) => {
                         return Client.findById(decodedToken.id)
                             .then(client => {
                                 if (client) {
-                                    return Client.findByIdAndUpdate(decodedToken.id, { description, localisation: { longitude, latitude } })
+                                    return Client.findByIdAndUpdate(decodedToken.id, { localisation: { longitude, latitude, description } })
                                         .then(response => {
                                             res.status(200).json({ status: 200, result: response })
                                         })

@@ -51,7 +51,6 @@ const router = express.Router();
  *                              email: sipoufoTest@gmail.com
  *                              longitude: 12
  *                              latitude: 12
- *          security: []
  *          responses:
  *              '201':
  *                  description: >

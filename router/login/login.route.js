@@ -33,7 +33,6 @@ const router = express.Router();
  *                          example:
  *                              phone: "695914926"
  *                              password: Azerty12
- *          security: []
  *          responses:
  *              '201':
  *                  description: >
@@ -68,7 +67,6 @@ router
  *                              longitude: 12
  *                              latitude: 12
  *                              description: TPO
- *          security: []
  *          responses:
  *              '201':
  *                  description: >

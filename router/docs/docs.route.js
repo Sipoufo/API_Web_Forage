@@ -19,8 +19,21 @@ const swaggerDef = {
             url: 'https://github.com/hagopj13/node-express-boilerplate/blob/master/LICENSE',
         },
     },
+    components: {
+        securitySchemes: {
+            Authorization: {
+                type: "http",
+                scheme: "bearer",
+                in: 'header',
+                bearerFormat: "Authorization"
+            }
+        }
+    },
+    security: [{
+        Authorization: []
+    }],
     servers: [{
-        url: `http://localhost:3000`,
+        url: `http://localhost:4000`,
     }, ],
 };
 

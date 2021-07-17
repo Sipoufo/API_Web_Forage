@@ -2,11 +2,16 @@ const catchAsync = require('../../utils/catchAsync');
 const { Admin, Facture } = require('../../models/index');
 const jwt = require('jsonwebtoken')
 
+const authorization = (req) => {
+    return req.headers.authorization.split(" ")[1]
+}
+
 const addFacture = catchAsync(async(req, res) => {
-    const token = req.cookies.pwftoken
-    await jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    // const token = req.cookies.pwftoken
+    const token = authorization(req)
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
-            console.log(err)
+            console.log(err);
         } else {
             const facture = {
                 idClient: req.params.idClient,
@@ -20,20 +25,20 @@ const addFacture = catchAsync(async(req, res) => {
                 montantTotal: req.body.montantTotal,
                 dataLimitePaid: req.body.dataLimitePaid,
                 dateReleveOldIndex: req.body.dateReleveOldIndex,
-            }
+            };
             await Admin.findById(decodedToken.id)
-                .then(async admin => {
+                .then(async(admin) => {
                     if (admin) {
                         await Facture.create(facture)
                             .then(resp => {
                                 if (resp) {
-                                    res.status(200).json({ status: 200, result: resp })
+                                    res.status(200).json({ status: 200, result: resp });
                                 } else {
-                                    res.status(500).json({ status: 200, error: "Error during the update" })
+                                    res.status(500).json({ status: 200, error: "Error during the update" });
                                 }
-                            })
+                            });
                     }
-                })
+                });
 
         }
     })
@@ -81,10 +86,10 @@ const getFacture = catchAsync((req, res) => {
 const updateFacture = catchAsync(async(req, res) => {
     const idFacture = req.params.idFacture
     console.log(idFacture);
-    const token = req.cookies.pwftoken
-    await jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    const token = authorization(req)
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
-            console.log(err)
+            console.log(err);
         } else {
             const facture = {
                 idClient: req.params.idClient,
@@ -98,20 +103,20 @@ const updateFacture = catchAsync(async(req, res) => {
                 montantTotal: req.body.montantTotal,
                 dataLimitePaid: req.body.dataLimitePaid,
                 dateReleveOldIndex: req.body.dateReleveOldIndex,
-            }
+            };
             await Admin.findById(decodedToken.id)
-                .then(async res => {
+                .then(async(res) => {
                     if (res) {
                         await Facture.findByIdAndUpdate(idFacture, facture)
                             .then(res => {
                                 if (res) {
-                                    res.status(200).json({ status: 200, result: res })
+                                    res.status(200).json({ status: 200, result: res });
                                 } else {
-                                    res.status(500).json({ status: 500, error: "Error during the update" })
+                                    res.status(500).json({ status: 500, error: "Error during the update" });
                                 }
-                            })
+                            });
                     }
-                })
+                });
 
         }
     })

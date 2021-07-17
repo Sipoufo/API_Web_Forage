@@ -17,7 +17,9 @@ const jwt = require('jsonwebtoken')
 const { Admin, Client } = require('../models/index')
 
 const tokenVerifie = (req, res, next) => {
-    const token = req.cookies.pwftoken;
+    // const token = req.cookies.pwftoken;
+    console.log(req.headers.authorization)
+    const token = req.headers.authorization.split(" ")[1];
 
     // Check if the token exist
     if (token) {
@@ -25,19 +27,21 @@ const tokenVerifie = (req, res, next) => {
             // Verified token
             if (err) {
                 console.log(err)
-                res.status(401).json({ status: httpStatus.UNAUTHORIZED, error: "Please login" })
+                res.status(500).json({ status: 500, error: "Please login" })
             } else {
                 console.log(decodedToken);
                 next()
             }
         })
     } else {
-        res.status(401).json({ status: httpStatus.UNAUTHORIZED, error: "Please login" })
+        res.status(500).json({ status: 500, error: "Please login" })
     }
 }
 
 const tokenVerifieAdmin = (req, res, next) => {
-    const token = req.cookies.pwftoken;
+    // const token = req.cookies.pwftoken;
+    console.log(req.headers)
+    const token = req.headers.authorization.split(" ")[1];
 
     // Check if the token exist
     if (token) {
@@ -67,7 +71,8 @@ const tokenVerifieAdmin = (req, res, next) => {
 }
 
 const tokenVerifieClient = (req, res, next) => {
-    const token = req.cookies.pwftoken;
+    // const token = req.cookies.pwftoken;
+    const token = req.headers.authorization.split(" ")[1];
 
     // Check if the token exist
     if (token) {

@@ -6,6 +6,10 @@ const jwt = require('jsonwebtoken')
 
 const maxAge = 3 * 24 * 60 * 60
 
+const authorization = (req) => {
+    return req.headers.authorization.split(" ")[1]
+}
+
 const createToken = (id) => {
     return jwt.sign({ id }, 'Admin web forage', {
         expiresIn: maxAge
@@ -57,7 +61,7 @@ const login = catchAsync(async(req, res) => {
 })
 
 const localisation = catchAsync(async(req, res) => {
-    const token = req.cookies.pwftoken
+    const token = authorization(req)
     const longitude = req.body.longitude
     const latitude = req.body.latitude
     const description = req.body.description

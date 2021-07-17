@@ -108,13 +108,13 @@ router
  * @swagger
  *  /client/facture/getFactureAdvance:
  *      get:
- *          summary: get all facture advance
- *          tags: [Facture_Admin]
- *          responses: 
+ *          summary: All facture advance
+ *          tags: [Facture_Client]
+ *          responses:
  *              200:
- *                  description: get advance facture save in the bd
+ *                  description: return all the facture for all
  *              500:
- *                  description: Error during the get
+ *                  description: Error while the get all the facture
  */
 router
     .route('/getFactureAdvance')

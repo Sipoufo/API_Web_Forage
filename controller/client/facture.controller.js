@@ -52,11 +52,12 @@ const statusPaidFacture = catchAsync(async(req, res) => {
 
 const getFactureAdvance = catchAsync(async(req, res) => {
     const token = authorization(req)
-
+    console.log(token)
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err);
         } else {
+            console.log(decodedToken.id)
             Facture
                 .find({ idClient: decodedToken.id })
                 .sort({ createdAt: -1 })

@@ -83,13 +83,13 @@ const getFacture = catchAsync((req, res) => {
         })
 })
 
-const getFactureAdvance = catchAsync((req, res) => {
+const getFactureAdvance = catchAsync(async(req, res) => {
     const EndFactureAdvance = []
-    Facture
+    await Facture
         .find()
         .sort({ createdAt: -1 })
         .then(factures => {
-            if (factures > 0) {
+            if (factures.length > 0) {
                 for (let i = 0; i < factures.length; i++) {
                     if (factures[i].montantImpaye == 0) {
                         EndFactureAdvance.push(factures[i])

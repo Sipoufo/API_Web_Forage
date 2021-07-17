@@ -104,5 +104,20 @@ router
     .route('/advance/:idFacture')
     .put(tokenVerifieClient, validate(ClientFactureValidation.advanceFacture), ClientFactureController.advanceFacture)
 
+/**
+ * @swagger
+ *  /client/facture/getFactureAdvance:
+ *      get:
+ *          summary: get all facture advance
+ *          tags: [Facture_Admin]
+ *          responses: 
+ *              200:
+ *                  description: get advance facture save in the bd
+ *              500:
+ *                  description: Error during the get
+ */
+router
+    .route('/getFactureAdvance')
+    .get(tokenVerifieClient, ClientFactureController.getFactureAdvance)
 
 module.exports = router

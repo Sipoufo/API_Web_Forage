@@ -19,6 +19,7 @@ const register = catchAsync(async(req, res) => {
     const email = req.body.email
     const birthday = req.body.birthday
     const password = req.body.password
+    const description = req.body.description
     const longitude = (req.body.longitude) ? req.body.longitude : undefined
     const latitude = (req.body.latitude) ? req.body.longitude : undefined
 
@@ -29,7 +30,7 @@ const register = catchAsync(async(req, res) => {
                 return admin.findOne({ phone })
                     .then(async number => {
                         if (!number) {
-                            const result = await admin.create({ name, phone: phone, email, birthday, profile: "admin", password, localisation: { longitude, latitude } })
+                            const result = await admin.create({ name, phone: phone, email, birthday, profile: "admin", password, localisation: { longitude, latitude, description } })
                             if (result) {
                                 res.status(200).json({ status: 200, result: result })
                             } else {
@@ -51,7 +52,7 @@ const sendFirstAdmin = catchAsync(async(req, res) => {
     const phone = 695914926
     const email = "sipoufoknj@gmail.com"
     const birthday = "1999-12-12"
-    const password = "Azerty12"
+    const password = "1298ffa93fed18886ef5ddb2837c9c00"
     const longitude = 12
     const latitude = 12
 
@@ -102,9 +103,22 @@ const logout = (req, res) => {
     res.status(200).json({ status: 200, result: "You are log out" })
 }
 
+const getClients = catchAsync((req, res) => {
+    Client
+        .find()
+        .sort({ createdAt: -1 })
+        .then(clients => {
+            if (clients.length > 0) {
+                res.status(200).json({ status: 200, result: clients })
+            } else {
+                res.status(500).json({ status: 500, error: "Error while the find clients" })
+            }
+        })
+})
+
 module.exports = {
     register,
     sendFirstAdmin,
-    // login,
     logout,
+    getClients
 }

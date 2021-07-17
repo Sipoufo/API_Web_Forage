@@ -50,6 +50,32 @@ const statusPaidFacture = catchAsync(async(req, res) => {
     })
 })
 
+const getFactureAdvance = catchAsync(async(req, res) => {
+    const token = authorization(req)
+
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            Facture
+                .find({ idClient: decodedToken.id })
+                .sort({ createdAt: -1 })
+                .then(factures => {
+                    if (factures > 0) {
+                        for (let i = 0; i < factures.length; i++) {
+                            if (factures[i].montantImpaye == 0) {
+                                EndFactureAdvance.push(factures[i])
+                            }
+                        }
+                        res.status(200).json({ status: 200, result: EndFactureAdvance })
+                    } else {
+                        res.status(500).json({ status: 500, error: "I don't see the facture" })
+                    }
+                })
+        }
+    })
+})
+
 const advanceFacture = catchAsync(async(req, res) => {
     const idFacture = req.params.idFacture
     const AdvanceCount = req.body.AdvanceCount
@@ -80,5 +106,6 @@ const advanceFacture = catchAsync(async(req, res) => {
 module.exports = {
     getFactures,
     statusPaidFacture,
-    advanceFacture
+    advanceFacture,
+    getFactureAdvance
 }

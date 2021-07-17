@@ -192,6 +192,33 @@ router
 /**
  * @swagger
  *  /admin/facture/{idFacture}:
+ *      put: 
+ *          summary: Add facture
+ *          tags: [Facture_Admin]
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              status:
+ *                                  type: boolean
+ *                          example:
+ *                              status: true
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      get factures
+ *                                    
+ */
+router
+    .route('/getWithStatus')
+    .put(tokenVerifieAdmin, validate(FactureValidation.getWithStatus), FactureController.getWithStatus)
+
+/**
+ * @swagger
+ *  /admin/facture/{idFacture}:
  *      get:
  *          summary: get all facture
  *          tags: [Facture_Admin]
@@ -211,5 +238,21 @@ router
 router
     .route('/:idFacture')
     .get(tokenVerifieAdmin, FactureController.getFacture)
+
+/**
+ * @swagger
+ *  /admin/facture/getFactureAdvance:
+ *      get:
+ *          summary: get all facture advance
+ *          tags: [Facture_Admin]
+ *          responses: 
+ *              200:
+ *                  description: get advance facture save in the bd
+ *              500:
+ *                  description: Error during the get
+ */
+router
+    .route('/getFactureAdvance')
+    .get(tokenVerifieAdmin, FactureController.getFactureAdvance)
 
 module.exports = router

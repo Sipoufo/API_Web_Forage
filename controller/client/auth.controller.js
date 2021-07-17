@@ -18,6 +18,7 @@ const register = catchAsync(async(req, res) => {
     const phone = req.body.phone
     const email = req.body.email
     const birthday = req.body.birthday
+    const description = req.body.description
     const IdCompteur = req.body.IdCompteur
     const password = req.body.password
     const longitude = (req.body.longitude) ? req.body.longitude : undefined
@@ -33,7 +34,7 @@ const register = catchAsync(async(req, res) => {
                             return Client.findOne({ email })
                                 .then(async(mail) => {
                                     if (!mail) {
-                                        const result = await Client.create({ name, phone, IdCompteur, email, birthday, profile: "user", password, localisation: { longitude, latitude } })
+                                        const result = await Client.create({ name, phone, IdCompteur, email, birthday, profile: "user", password, localisation: { longitude, latitude, description } })
                                         if (result) {
                                             res.status(200).json({ status: 200, result: result })
                                         } else {

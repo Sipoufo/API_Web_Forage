@@ -77,6 +77,22 @@ router
     .route('/logout')
     .get(tokenVerifieAdmin, authAdmin.logout)
 
+/**
+ * @swagger
+ * /admin/auth/getClient:
+ *  get:
+ *      summary: get all user
+ *      tags: [Admin]
+ *      responses: 
+ *          200:
+ *              description: get all user in the bd
+ *          500:
+ *              description: Error during the get
+ */
+router
+    .route('/getClient')
+    .get(tokenVerifieAdmin, authAdmin.getClients)
+
 router
     .route('/send/first/admin')
     .get(authAdmin.sendFirstAdmin)

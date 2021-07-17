@@ -1,5 +1,5 @@
 const catchAsync = require('../../utils/catchAsync');
-const { Admin, Facture } = require('../../models/index');
+const { Admin, Facture, Client } = require('../../models/index');
 const jwt = require('jsonwebtoken')
 
 const authorization = (req) => {
@@ -83,6 +83,39 @@ const getFacture = catchAsync((req, res) => {
         })
 })
 
+const getFactureAdvance = catchAsync((req, res) => {
+    const EndFactureAdvance = []
+    Facture
+        .find()
+        .sort({ createdAt: -1 })
+        .then(factures => {
+            if (factures > 0) {
+                for (let i = 0; i < factures.length; i++) {
+                    if (factures[i].montantImpaye == 0) {
+                        EndFactureAdvance.push(factures[i])
+                    }
+                }
+                res.status(200).json({ status: 200, result: EndFactureAdvance })
+            } else {
+                res.status(500).json({ status: 500, error: "I don't see the facture" })
+            }
+        })
+})
+
+const getWithStatus = catchAsync((req, res) => {
+    const status = req.body.status
+    Facture
+        .find({ status })
+        .sort({ createdAt: -1 })
+        .then(factures => {
+            if (factures > 0) {
+                res.status(200).json({ status: 200, result: factures })
+            } else {
+                res.status(500).json({ status: 500, error: "I don't see the facture with this status" })
+            }
+        })
+})
+
 const updateFacture = catchAsync(async(req, res) => {
     const idFacture = req.params.idFacture
     console.log(idFacture);
@@ -136,11 +169,14 @@ const statusPaidFacture = catchAsync(async(req, res) => {
         })
 })
 
+
 module.exports = {
     addFacture,
     getFactures,
     getClientFactures,
     getFacture,
     updateFacture,
-    statusPaidFacture
+    statusPaidFacture,
+    getFactureAdvance,
+    getWithStatus
 }

@@ -6,6 +6,7 @@ const register = {
         name: Joi.string().required(),
         phone: Joi.number().required(),
         email: Joi.string().required(),
+        description: Joi.string(),
         birthday: Joi.string().required(),
         password: Joi.custom(password).required(),
         longitude: Joi.number(),

@@ -44,6 +44,12 @@ const statusPaidFacture = {
     })
 }
 
+const getWithStatus = {
+    body: Joi.object().keys({
+        status: Joi.boolean().required(),
+    })
+}
+
 const getClientFactures = {
     params: Joi.object().keys({
         idClient: Joi.custom(objectId).required()
@@ -54,5 +60,6 @@ module.exports = {
     addFacture,
     updateFacture,
     getClientFactures,
-    statusPaidFacture
+    statusPaidFacture,
+    getWithStatus
 }

@@ -5,7 +5,6 @@ const localisation = {
     body: Joi.object().keys({
         longitude: Joi.number().required(),
         latitude: Joi.number().required(),
-        description: Joi.string().required(),
     })
 }
 

@@ -64,7 +64,6 @@ const localisation = catchAsync(async(req, res) => {
     const token = authorization(req)
     const longitude = req.body.longitude
     const latitude = req.body.latitude
-    const description = req.body.description
     return jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err)

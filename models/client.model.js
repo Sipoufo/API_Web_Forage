@@ -24,11 +24,11 @@ const userSchema = new model({
         localisation: {
             longitude: {
                 type: Number,
-                required: true
+                required: false
             },
             latitude: {
                 type: Number,
-                required: true
+                required: false
             },
             description: {
                 type: String,

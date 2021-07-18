@@ -33,7 +33,7 @@ const swaggerDef = {
         Authorization: []
     }],
     servers: [{
-        url: `http://localhost:4000`,
+        url: `http://localhost:3000`,
     }, ],
 };
 

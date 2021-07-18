@@ -107,7 +107,7 @@ router
  *              description: Error during the get
  */
 router
-    .route('/getClient')
+    .route('/getAdmin')
     .get(tokenVerifieAdmin, authAdmin.getAdmins)
 
 router

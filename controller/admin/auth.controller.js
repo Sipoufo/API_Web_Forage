@@ -104,7 +104,7 @@ const logout = (req, res) => {
 }
 
 const getClients = catchAsync((req, res) => {
-    Client
+    client
         .find()
         .sort({ createdAt: -1 })
         .then(clients => {
@@ -122,7 +122,7 @@ const getAdmins = catchAsync((req, res) => {
         .sort({ createdAt: -1 })
         .then(admins => {
             if (admins.length > 0) {
-                res.status(200).json({ status: 200, result: clients })
+                res.status(200).json({ status: 200, result: admins })
             } else {
                 res.status(500).json({ status: 500, error: "Error while the find clients" })
             }

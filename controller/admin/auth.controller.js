@@ -116,9 +116,23 @@ const getClients = catchAsync((req, res) => {
         })
 })
 
+const getAdmins = catchAsync((req, res) => {
+    admin
+        .find()
+        .sort({ createdAt: -1 })
+        .then(admins => {
+            if (admins.length > 0) {
+                res.status(200).json({ status: 200, result: clients })
+            } else {
+                res.status(500).json({ status: 500, error: "Error while the find clients" })
+            }
+        })
+})
+
 module.exports = {
     register,
     sendFirstAdmin,
     logout,
-    getClients
+    getClients,
+    getAdmins
 }

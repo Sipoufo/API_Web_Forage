@@ -93,6 +93,23 @@ router
     .route('/getClient')
     .get(tokenVerifieAdmin, authAdmin.getClients)
 
+
+/**
+ * @swagger
+ * /admin/auth/getAdmin:
+ *  get:
+ *      summary: get all admin
+ *      tags: [Admin]
+ *      responses: 
+ *          200:
+ *              description: get all admin in the bd
+ *          500:
+ *              description: Error during the get
+ */
+router
+    .route('/getClient')
+    .get(tokenVerifieAdmin, authAdmin.getAdmins)
+
 router
     .route('/send/first/admin')
     .get(authAdmin.sendFirstAdmin)

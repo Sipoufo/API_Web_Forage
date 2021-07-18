@@ -61,12 +61,9 @@ router
  *                                  type: string
  *                              latitude:
  *                                  type: String
- *                              descriptionLocalisation:
- *                                  type: String
  *                          example:
  *                              longitude: 12
  *                              latitude: 12
- *                              description: TPO
  *          responses:
  *              '201':
  *                  description: >

@@ -50,11 +50,19 @@ const adminSchema = new model({
             type: Boolean,
             default: true
         },
+        isDelete: {
+            type: Boolean,
+            default: true
+        },
         signature: {
             type: String,
             required: false
         },
         profile: {
+            type: String,
+            required: false
+        },
+        profileImage: {
             type: String,
             required: false
         },

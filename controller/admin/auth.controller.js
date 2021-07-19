@@ -20,6 +20,7 @@ const register = catchAsync(async(req, res) => {
     const birthday = req.body.birthday
     const password = req.body.password
     const description = req.body.description
+    const profileImage = req.body.profileImage
     const longitude = (req.body.longitude) ? req.body.longitude : undefined
     const latitude = (req.body.latitude) ? req.body.longitude : undefined
 
@@ -30,7 +31,7 @@ const register = catchAsync(async(req, res) => {
                 return admin.findOne({ phone })
                     .then(async number => {
                         if (!number) {
-                            const result = await admin.create({ name, phone: phone, email, birthday, profile: "admin", password, localisation: { longitude, latitude, description } })
+                            const result = await admin.create({ name, phone: phone, profileImage, email, birthday, profile: "admin", password, localisation: { longitude, latitude, description } })
                             if (result) {
                                 res.status(200).json({ status: 200, result: result })
                             } else {

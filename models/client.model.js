@@ -48,10 +48,18 @@ const userSchema = new model({
             type: String,
             required: false
         },
+        profileImage: {
+            type: String,
+            required: false
+        },
         IdCompteur: {
             type: String,
         },
         status: {
+            type: Boolean,
+            default: true
+        },
+        isDelete: {
             type: Boolean,
             default: true
         },

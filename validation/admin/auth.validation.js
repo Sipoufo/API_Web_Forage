@@ -7,6 +7,7 @@ const register = {
         phone: Joi.number().required(),
         email: Joi.string().required(),
         description: Joi.string(),
+        profileImage: Joi.string(),
         birthday: Joi.string().required(),
         password: Joi.custom(password).required(),
         longitude: Joi.number(),

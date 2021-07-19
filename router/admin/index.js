@@ -2,6 +2,7 @@ const express = require('express');
 
 const authRoute = require('./auth.route');
 const factureRoute = require('./facture.route');
+const manageCompteRoute = require('./gestionCompte.route');
 
 const router = express.Router();
 
@@ -12,6 +13,9 @@ const adminRoute = [{
     {
         path: '/facture',
         route: factureRoute,
+    }, {
+        path: '/manageCompte',
+        route: manageCompteRoute,
     }
 ];
 

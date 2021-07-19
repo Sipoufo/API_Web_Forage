@@ -46,7 +46,8 @@ const userSchema = new model({
         },
         profile: {
             type: String,
-            required: false
+            required: false,
+            default: 'user'
         },
         profileImage: {
             type: String,
@@ -61,7 +62,7 @@ const userSchema = new model({
         },
         isDelete: {
             type: Boolean,
-            default: true
+            default: false
         },
         compteur: [{
             oldIndex: {

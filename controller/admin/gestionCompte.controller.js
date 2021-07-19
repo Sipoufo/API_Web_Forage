@@ -7,7 +7,7 @@ const authorization = (req) => {
 }
 
 const deleteCompteClient = catchAsync(async(req, res) => {
-    const idClient = req.body.idClient
+    const idClient = req.params.idClient
     const isDelete = req.body.isDelete
     await Client.findById(idClient)
         .then(async result => {
@@ -27,23 +27,196 @@ const deleteCompteClient = catchAsync(async(req, res) => {
 const deleteCompteAdmin = catchAsync(async(req, res) => {
     const idAdmin = req.params.idAdmin
     const isDelete = req.body.isDelete
-    await Admin.findById(idAdmin)
-        .then(async result => {
-            if (result) {
-                const adminResult = await Admin.findByIdAndUpdate(result._id, { isDelete })
-                if (adminResult) {
-                    res.status(200).json({ status: 200, result: adminResult });
-                } else {
-                    res.status(500).json({ status: 500, error: "Error during the update" });
-                }
+    const token = authorization(req)
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            await Admin.findOne({ _id: decodedToken.id, profile: "superAdmin" })
+                .then(async result => {
+                    if (result) {
+                        const adminResult = await Admin.findByIdAndUpdate(idAdmin, { isDelete })
+                        if (adminResult) {
+                            res.status(200).json({ status: 200, result: adminResult });
+                        } else {
+                            res.status(500).json({ status: 500, error: "Error during the update" });
+                        }
+                    } else {
+                        res.status(500).json({ status: 500, error: "Your are not super administrator" });
+                    }
+                })
+        }
+    })
+
+})
+
+const updateAdmin = catchAsync(async(req, res) => {
+    const idAdmin = req.params.idAdmin
+    const name = req.body.name
+    const phone = req.body.phone
+    const email = req.body.email
+    const birthday = req.body.birthday
+    const password = req.body.password
+    const description = req.body.description
+    const profileImage = req.body.profileImage
+    const longitude = req.body.longitude
+    const latitude = req.body.latitude
+    const token = authorization(req)
+
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(req)
+            await Admin.findOne({ _id: decodedToken.id, profile: "superAdmin" })
+                .then(async adminResult => {
+                    if (adminResult) {
+                        await Client.findOne({ phone })
+                            .then(async client => {
+                                if (!client) {
+                                    await Admin.findOne({ phone })
+                                        .then(async number => {
+                                            if ((number && number._id === idAdmin) || !number) {
+                                                const emailAdmin = await Admin.findOne({ email })
+                                                const emailClient = await Client.findOne({ email })
+                                                if (!emailAdmin && !emailClient) {
+                                                    const result = await Admin.findByIdAndUpdate(idAdmin, { name, phone: phone, profileImage, email, birthday, password, localisation: { longitude, latitude, description } })
+                                                    if (result) {
+                                                        res.status(200).json({ status: 200, result: result })
+                                                    } else {
+                                                        res.status(500).json({ status: 500, error: "This admin don't exist" })
+                                                    }
+                                                } else {
+                                                    res.status(500).json({ status: 500, error: "This email don't exist" })
+                                                }
+                                            } else {
+                                                console.log()
+                                                res.status(500).json({ status: 500, error: "this number exist <-_->" })
+                                            }
+                                        })
+                                } else {
+                                    res.status(500).json({ status: 500, error: "One User have this phone" })
+                                }
+                            })
+                    } else {
+                        res.status(500).json({ status: 500, error: "Your are not a super administrator" })
+                    }
+                })
+        }
+    })
+})
+
+const updateClient = catchAsync(async(req, res) => {
+    const idClient = req.params.idClient
+    const name = req.body.name
+    const phone = req.body.phone
+    const email = req.body.email
+    const birthday = req.body.birthday
+    const password = req.body.password
+    const description = req.body.description
+    const profileImage = req.body.profileImage
+    const longitude = req.body.longitude
+    const latitude = req.body.latitude
+    const token = authorization(req)
+
+    await Admin.findOne({ phone })
+        .then(async admin => {
+            if (!admin) {
+                await Client.findOne({ phone })
+                    .then(async number => {
+                        console.log(number._id == idClient);
+                        if ((number && number._id == idClient) || !number) {
+                            const emailAdmin = await Admin.findOne({ email })
+                            const emailClient = await Client.findOne({ email })
+                            if (!emailAdmin && !emailClient) {
+                                const result = await Client.findByIdAndUpdate(idClient, { name, phone: phone, profileImage, email, birthday, password, localisation: { longitude, latitude, description } })
+                                if (result) {
+                                    res.status(200).json({ status: 200, result: result })
+                                } else {
+                                    res.status(500).json({ status: 500, error: "This admin don't exist" })
+                                }
+                            } else {
+                                res.status(500).json({ status: 500, error: "This email don't exist" })
+                            }
+
+                        } else {
+                            console.log()
+                            res.status(500).json({ status: 500, error: "this number exist <-_->" })
+                        }
+                    })
             } else {
-                res.status(500).json({ status: 500, error: "I don't see this admin" });
+                res.status(500).json({ status: 500, error: "One User have this phone" })
             }
         })
 })
 
+const BlockCompteClient = catchAsync(async(req, res) => {
+    const isBlock = req.body.isBlock
+    const idClient = req.params.idClient
+    const token = authorization(req)
+
+    await Client.findById(idClient)
+        .then(async client => {
+            if (client) {
+                if (client.isDelete === false) {
+                    const block = await Client.findByIdAndUpdate(idClient, { status: isBlock })
+                    if (block) {
+                        res.status(200).json({ status: 200, result: block })
+                    } else {
+                        res.status(500).json({ status: 500, error: "Error during the update" })
+                    }
+                } else {
+                    res.status(500).json({ status: 500, error: "This user is already deleted" })
+                }
+            } else {
+                res.status(500).json({ status: 500, error: "I don't see this user" })
+            }
+        })
+})
+
+const BlockCompteAdmin = catchAsync(async(req, res) => {
+    const isBlock = req.body.isBlock
+    const idAdmin = req.params.idAdmin
+    const token = authorization(req)
+
+    jwt.verify(token, 'Admin web forage', async(err, decodeToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            await Admin.findOne({ _id: decodeToken.id, profile: "superAdmin" })
+                .then(async superAdmin => {
+                    if (superAdmin) {
+                        await Admin.findById(idAdmin)
+                            .then(async admin => {
+                                if (admin) {
+                                    if (admin.isDelete === false) {
+                                        const block = await Admin.findByIdAndUpdate(idAdmin, { status: isBlock })
+                                        if (block) {
+                                            res.status(200).json({ status: 200, result: block })
+                                        } else {
+                                            res.status(500).json({ status: 500, error: "Error during the update" })
+                                        }
+                                    } else {
+                                        res.status(500).json({ status: 500, error: "This admin is already deleted" })
+                                    }
+
+                                } else {
+                                    res.status(500).json({ status: 500, error: "I don't see this admin" })
+                                }
+                            })
+                    } else {
+                        res.status(500).json({ status: 500, error: "Your are not a super administrator" })
+                    }
+                })
+        }
+    })
+})
 
 module.exports = {
     deleteCompteClient,
     deleteCompteAdmin,
+    updateAdmin,
+    updateClient,
+    BlockCompteClient,
+    BlockCompteAdmin
 }

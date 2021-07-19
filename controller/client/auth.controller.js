@@ -5,14 +5,6 @@ const Client = require('../../models/client.model')
 const Admin = require('../../models/administrateur.model')
 const jwt = require('jsonwebtoken')
 
-const maxAge = 3 * 24 * 60 * 60
-
-const createToken = (id) => {
-    return jwt.sign({ id }, 'client web forage', {
-        expiresIn: maxAge
-    })
-}
-
 const register = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
@@ -35,7 +27,7 @@ const register = catchAsync(async(req, res) => {
                             return Client.findOne({ email })
                                 .then(async(mail) => {
                                     if (!mail) {
-                                        const result = await Client.create({ name, phone, IdCompteur, profileImage, email, birthday, profile: "user", password, localisation: { longitude, latitude, description } })
+                                        const result = await Client.create({ name, phone, IdCompteur, profileImage, email, birthday, password, localisation: { longitude, latitude, description } })
                                         if (result) {
                                             res.status(200).json({ status: 200, result: result })
                                         } else {
@@ -56,6 +48,52 @@ const register = catchAsync(async(req, res) => {
             }
         })
 
+})
+
+const update = catchAsync(async(req, res) => {
+    const name = req.body.name
+    const phone = req.body.phone
+    const email = req.body.email
+    const birthday = req.body.birthday
+    const password = req.body.password
+    const description = req.body.description
+    const profileImage = req.body.profileImage
+    const longitude = req.body.longitude
+    const latitude = req.body.latitude
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            return Admin.findOne({ phone })
+                .then(admin => {
+                    if (!admin) {
+                        return Client.findOne({ phone })
+                            .then(async number => {
+                                if ((number && number._id === idAdmin) || !number) {
+                                    const emailAdmin = await Admin.findOne({ email })
+                                    const emailClient = await Client.findOne({ email })
+                                    if (!emailAdmin && !emailClient) {
+                                        const result = await Client.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday, password, localisation: { longitude, latitude, description } })
+                                        if (result) {
+                                            res.status(200).json({ status: 200, result: result })
+                                        } else {
+                                            res.status(500).json({ status: 500, error: "Error during the save" })
+                                        }
+                                    } else {
+                                        res.status(500).json({ status: 500, error: "This email don't exist" })
+                                    }
+
+                                } else {
+                                    console.log()
+                                    res.status(500).json({ status: 500, error: "this number exist <-_->" })
+                                }
+                            })
+                    } else {
+                        res.status(500).json({ status: 500, error: "One Client have this phone" })
+                    }
+                })
+        }
+    })
 })
 
 // const login = catchAsync(async(req, res) => {
@@ -89,4 +127,5 @@ const logout = (req, res) => {
 module.exports = {
     register,
     logout,
+    update
 }

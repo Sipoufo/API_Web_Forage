@@ -31,7 +31,7 @@ const register = catchAsync(async(req, res) => {
                 return admin.findOne({ phone })
                     .then(async number => {
                         if (!number) {
-                            const result = await admin.create({ name, phone: phone, profileImage, email, birthday, profile: "admin", password, localisation: { longitude, latitude, description } })
+                            const result = await admin.create({ name, phone: phone, profileImage, email, birthday, password, localisation: { longitude, latitude, description } })
                             if (result) {
                                 res.status(200).json({ status: 200, result: result })
                             } else {
@@ -48,6 +48,51 @@ const register = catchAsync(async(req, res) => {
         })
 })
 
+const update = catchAsync(async(req, res) => {
+    const name = req.body.name
+    const phone = req.body.phone
+    const email = req.body.email
+    const birthday = req.body.birthday
+    const password = req.body.password
+    const description = req.body.description
+    const profileImage = req.body.profileImage
+    const longitude = req.body.longitude
+    const latitude = req.body.latitude
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            return client.findOne({ phone })
+                .then(client => {
+                    if (!client) {
+                        return admin.findOne({ phone })
+                            .then(async number => {
+                                if ((number && number._id === idAdmin) || !number) {
+                                    const emailAdmin = await Admin.findOne({ email })
+                                    const emailClient = await Client.findOne({ email })
+                                    if (!emailAdmin && !emailClient) {
+                                        const result = await admin.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday, password, localisation: { longitude, latitude, description } })
+                                        if (result) {
+                                            res.status(200).json({ status: 200, result: result })
+                                        } else {
+                                            res.status(500).json({ status: 500, error: "Error during the save" })
+                                        }
+                                    } else {
+                                        res.status(500).json({ status: 500, error: "This email don't exist" })
+                                    }
+                                } else {
+                                    console.log()
+                                    res.status(500).json({ status: 500, error: "this number exist <-_->" })
+                                }
+                            })
+                    } else {
+                        res.status(500).json({ status: 500, error: "One User have this phone" })
+                    }
+                })
+        }
+    })
+})
+
 const sendFirstAdmin = catchAsync(async(req, res) => {
     const name = "Sipoufo Yvan"
     const phone = 695914926
@@ -61,7 +106,7 @@ const sendFirstAdmin = catchAsync(async(req, res) => {
     return admin.findOne({ phone })
         .then(async number => {
             if (!number) {
-                const result = await admin.create({ name, phone: phone, email, birthday, profile: "admin", password, localisation: { longitude, latitude } })
+                const result = await admin.create({ name, phone: phone, email, birthday, profile: "superAdmin", password, localisation: { longitude, latitude } })
                 if (result) {
                     const token = createToken(result._id)
                     res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })
@@ -135,5 +180,6 @@ module.exports = {
     sendFirstAdmin,
     logout,
     getClients,
-    getAdmins
+    getAdmins,
+    update
 }

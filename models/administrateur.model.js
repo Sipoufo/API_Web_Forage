@@ -52,7 +52,7 @@ const adminSchema = new model({
         },
         isDelete: {
             type: Boolean,
-            default: true
+            default: false
         },
         signature: {
             type: String,
@@ -60,7 +60,8 @@ const adminSchema = new model({
         },
         profile: {
             type: String,
-            required: false
+            required: false,
+            default: 'admin'
         },
         profileImage: {
             type: String,

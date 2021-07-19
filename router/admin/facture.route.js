@@ -25,10 +25,29 @@ const router = express.Router()
  *                  description: return all the facture
  *              500:
  *                  description: Error while the get all the facture
+ *      put: 
+ *          summary: Add facture
+ *          tags: [Facture_Admin]
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              status:
+ *                                  type: boolean
+ *                          example:
+ *                              status: true
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      get factures
  */
 router
     .route('/')
     .get(tokenVerifieAdmin, FactureController.getFactures)
+    .put(tokenVerifieAdmin, validate(FactureValidation.getWithStatus), FactureController.getWithStatus)
 
 
 /**
@@ -200,44 +219,9 @@ router
  *              '201':
  *                  description: >
  *                      update a facture
- *                                    
- */
-router
-    .route('/:idFacture')
-    .put(tokenVerifieAdmin, validate(FactureValidation.updateFacture), FactureController.updateFacture)
-
-/**
- * @swagger
- *  /admin/facture/{idFacture}:
- *      put: 
- *          summary: Add facture
- *          tags: [Facture_Admin]
- *          requestBody:
- *              required: true
- *              content:
- *                  application/json:  
- *                      schema:
- *                          type: object
- *                          properties:
- *                              status:
- *                                  type: boolean
- *                          example:
- *                              status: true
- *          responses:
- *              '201':
- *                  description: >
- *                      get factures
- *                                    
- */
-router
-    .route('/')
-    .put(tokenVerifieAdmin, validate(FactureValidation.getWithStatus), FactureController.getWithStatus)
-
-/**
- * @swagger
- *  /admin/facture/{idFacture}:
+ * 
  *      get:
- *          summary: get all facture
+ *          summary: get one facture
  *          tags: [Facture_Admin]
  *          parameters:
  *              -   in: path
@@ -251,10 +235,12 @@ router
  *                  description: get on facture save in the bd
  *              500:
  *                  description: Error during the get
+ *                                    
  */
 router
     .route('/:idFacture')
     .get(tokenVerifieAdmin, FactureController.getFacture)
+    .put(tokenVerifieAdmin, validate(FactureValidation.updateFacture), FactureController.updateFacture)
 
 
 module.exports = router

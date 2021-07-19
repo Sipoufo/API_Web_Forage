@@ -45,6 +45,8 @@ const router = express.Router();
  *                                  type: string
  *                              profileImage:
  *                                  type: string
+ *                              description:
+ *                                  type: string
  *                          example:
  *                              name: Sipoufo Yvan
  *                              birthday: 2002-01-29
@@ -54,8 +56,9 @@ const router = express.Router();
  *                              longitude: 12
  *                              latitude: 12
  *                              profileImage: /test/test.png
+ *                              description: Bafoussam TPO
  *          responses:
- *              '201':
+ *              '200':
  *                  description: >
  *                      Save your new admin and return the information about it
  *                                    
@@ -63,6 +66,59 @@ const router = express.Router();
 router
     .route('/register')
     .post(tokenVerifieAdmin, validate(adminAuth.register), authAdmin.register)
+
+/**
+ * @swagger
+ *  /admin/auth/update:
+ *      put: 
+ *          summary: Admin update
+ *          tags: [Admin]
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  type: string
+ *                              birthday:
+ *                                  type: string
+ *                              phone:
+ *                                  type: string
+ *                              email:
+ *                                  type: string
+ *                              password:
+ *                                  type: string
+ *                                  format: password
+ *                                  minLength: 8
+ *                              longitude:
+ *                                  type: string
+ *                              latitude:
+ *                                  type: string
+ *                              profileImage:
+ *                                  type: string
+ *                              description:
+ *                                  type: string
+ *                          example:
+ *                              name: Sipoufo Yvan
+ *                              birthday: 2002-01-29
+ *                              phone: "695914926"
+ *                              password: Azerty12
+ *                              email: sipoufoTest@gmail.com
+ *                              longitude: 12
+ *                              latitude: 12
+ *                              profileImage: /test/test.png
+ *                              description: Bafoussam TPO
+ *          responses:
+ *              '200':
+ *                  description: >
+ *                      Save your new admin and return the information about it
+ *                                    
+ */
+router
+    .route('/update')
+    .put(tokenVerifieAdmin, validate(adminAuth.update), authAdmin.update)
 
 /**
  * @swagger

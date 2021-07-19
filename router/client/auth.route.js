@@ -47,6 +47,8 @@ const router = express.Router();
  *                                  type: string
  *                              profileImage:
  *                                  type: string
+ *                              description:
+ *                                  type: string
  *                          example:
  *                              name: Sipoufo Yvan
  *                              birthday: 2002-01-29
@@ -57,8 +59,9 @@ const router = express.Router();
  *                              longitude: 12
  *                              latitude: 12
  *                              profileImage: /test/test.png
+ *                              description: Bafoussam TPO
  *          responses:
- *              '201':
+ *              '200':
  *                  description: >
  *                      Save your new client and return the information about it
  *                                    
@@ -66,6 +69,62 @@ const router = express.Router();
 router
     .route('/register')
     .post(tokenVerifieAdmin, validate(AuthValidationClient.register), authControllerUser.register)
+
+/**
+ * @swagger
+ *  /client/auth/update:
+ *      put: 
+ *          summary: Client update
+ *          tags: [Client]
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  type: string
+ *                              birthday:
+ *                                  type: string
+ *                              phone:
+ *                                  type: string
+ *                              email:
+ *                                  type: string
+ *                              IdCompteur:
+ *                                  type: string
+ *                              password:
+ *                                  type: string
+ *                                  format: password
+ *                                  minLength: 8
+ *                              longitude:
+ *                                  type: string
+ *                              latitude:
+ *                                  type: string
+ *                              profileImage:
+ *                                  type: string
+ *                              description:
+ *                                  type: string
+ *                          example:
+ *                              name: Sipoufo Yvan
+ *                              birthday: 2002-01-29
+ *                              phone: "695914926"
+ *                              password: Azerty12
+ *                              IdCompteur: 12A
+ *                              email: sipoufoTest@gmail.com
+ *                              longitude: 12
+ *                              latitude: 12
+ *                              profileImage: /test/test.png
+ *                              description: Bafoussam TPO
+ *          responses:
+ *              '200':
+ *                  description: >
+ *                      Save your new client and return the information about it
+ *                                    
+ */
+router
+    .route('/update')
+    .put(tokenVerifieAdmin, validate(AuthValidationClient.update), authControllerUser.update)
 
 /**
  * @swagger

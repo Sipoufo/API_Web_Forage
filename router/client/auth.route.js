@@ -45,6 +45,8 @@ const router = express.Router();
  *                                  type: string
  *                              latitude:
  *                                  type: string
+ *                              profileImage:
+ *                                  type: string
  *                          example:
  *                              name: Sipoufo Yvan
  *                              birthday: 2002-01-29
@@ -54,6 +56,7 @@ const router = express.Router();
  *                              email: sipoufoTest@gmail.com
  *                              longitude: 12
  *                              latitude: 12
+ *                              profileImage: /test/test.png
  *          responses:
  *              '201':
  *                  description: >

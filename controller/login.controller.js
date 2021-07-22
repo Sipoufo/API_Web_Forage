@@ -82,7 +82,7 @@ const localisation = catchAsync(async(req, res) => {
                         return Client.findById(decodedToken.id)
                             .then(client => {
                                 if (client) {
-                                    return Client.findByIdAndUpdate(decodedToken.id, { localisation: { longitude, latitude, description } })
+                                    return Client.findByIdAndUpdate(decodedToken.id, { localisation: { longitude, latitude } })
                                         .then(response => {
                                             res.status(200).json({ status: 200, result: response })
                                         })

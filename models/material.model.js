@@ -1,28 +1,34 @@
 const mongoose = require('mongoose')
 const model = mongoose.Schema
+var mongoosePaginate = require('mongoose-paginate-v2');
 
 const materialSchema = new model({
-        nom: {
+        name: {
             type: String,
             required: true
         },
         disponible: {
             type: Boolean,
-            required: true
+            required: false,
+            default: true
         },
         type: {
             type: String,
             required: true
         },
-        prixUnitaire: {
+        prixUnit: {
             type: Number,
             required: true
         },
-        quantite: {
+        quantity: {
             type: Number,
             required: true
         },
         description: {
+            type: String,
+            required: false
+        },
+        picture: {
             type: String,
             required: false
         }
@@ -31,6 +37,8 @@ const materialSchema = new model({
     }
 
 )
+
+materialSchema.plugin(mongoosePaginate);
 
 const material = mongoose.model('material', materialSchema)
 

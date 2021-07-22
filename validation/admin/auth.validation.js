@@ -29,6 +29,23 @@ const update = {
     })
 }
 
+const updateById = {
+    params: Joi.object().keys({
+        idAdmin: Joi.custom(objectId).required()
+    }),
+    body: Joi.object().keys({
+        name: Joi.string().required(),
+        phone: Joi.number().required(),
+        email: Joi.string().required(),
+        description: Joi.string(),
+        profileImage: Joi.string(),
+        birthday: Joi.string().required(),
+        password: Joi.custom(password).required(),
+        longitude: Joi.number().required(),
+        latitude: Joi.number().required()
+    })
+}
+
 const login = {
     body: Joi.object().keys({
         phone: Joi.number().required(),
@@ -39,5 +56,6 @@ const login = {
 module.exports = {
     register,
     login,
-    update
+    update,
+    updateById
 }

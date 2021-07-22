@@ -13,6 +13,7 @@ const cookieParse = require('cookie-parser');
 const compression = require('compression');;
 const adminroutes = require('./router/admin/index');
 const login = require('./router/login/index');
+const stock = require('./router/stock/index');
 const docs = require('./router/docs/docs.route');
 const userRoutes = require('./router/client/index');
 const { errorConverter, errorHandler } = require('./middlewares/error');
@@ -72,6 +73,9 @@ app.use('/admin', adminroutes)
 
 // log routes
 app.use('/login', login)
+
+// stock
+app.use('/stock', stock)
 
 // admin routes
 app.use('/docs', docs)

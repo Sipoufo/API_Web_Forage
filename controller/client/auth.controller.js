@@ -5,6 +5,10 @@ const Client = require('../../models/client.model')
 const Admin = require('../../models/administrateur.model')
 const jwt = require('jsonwebtoken')
 
+const authorization = (req) => {
+    return req.headers.authorization.split(" ")[1]
+}
+
 const register = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
@@ -51,6 +55,7 @@ const register = catchAsync(async(req, res) => {
 })
 
 const update = catchAsync(async(req, res) => {
+    const token = authorization(req)
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email
@@ -65,35 +70,73 @@ const update = catchAsync(async(req, res) => {
             console.log(err);
         } else {
             return Admin.findOne({ phone })
-                .then(admin => {
+                .then(async admin => {
                     if (!admin) {
-                        return Client.findOne({ phone })
-                            .then(async number => {
-                                if ((number && number._id === idAdmin) || !number) {
-                                    const emailAdmin = await Admin.findOne({ email })
-                                    const emailClient = await Client.findOne({ email })
-                                    if (!emailAdmin && !emailClient) {
-                                        const result = await Client.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday, password, localisation: { longitude, latitude, description } })
-                                        if (result) {
-                                            res.status(200).json({ status: 200, result: result })
-                                        } else {
-                                            res.status(500).json({ status: 500, error: "Error during the save" })
-                                        }
-                                    } else {
-                                        res.status(500).json({ status: 500, error: "This email don't exist" })
-                                    }
-
+                        const number = await Client.findOne({ phone });
+                        if ((number && number._id == decodedToken.id) || !number) {
+                            const emailAdmin = await Admin.findOne({ email });
+                            const emailClient = await Client.findOne({ email });
+                            if (!emailAdmin && !emailClient) {
+                                const result = await Client.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday, password, localisation: { longitude, latitude, description } });
+                                if (result) {
+                                    res.status(200).json({ status: 200, result: result });
                                 } else {
-                                    console.log()
-                                    res.status(500).json({ status: 500, error: "this number exist <-_->" })
+                                    res.status(500).json({ status: 500, error: "Error during the save" });
                                 }
-                            })
+                            } else {
+                                res.status(500).json({ status: 500, error: "This email don't exist" });
+                            }
+
+                        } else {
+                            console.log();
+                            res.status(500).json({ status: 500, error: "this number exist <-_->" });
+                        }
                     } else {
                         res.status(500).json({ status: 500, error: "One Client have this phone" })
                     }
                 })
         }
     })
+})
+
+const updateById = catchAsync(async(req, res) => {
+    const idClient = req.params.idClient
+    const name = req.body.name
+    const phone = req.body.phone
+    const email = req.body.email
+    const birthday = req.body.birthday
+    const password = req.body.password
+    const description = req.body.description
+    const IdCompteur = req.body.IdCompteur
+    const profileImage = req.body.profileImage
+    const longitude = req.body.longitude
+    const latitude = req.body.latitude
+    return Admin.findOne({ phone })
+        .then(async admin => {
+            if (!admin) {
+                const number = await Client.findOne({ phone });
+                if ((number && number._id == idClient) || !number) {
+                    const emailAdmin = await Admin.findOne({ email });
+                    const emailClient = await Client.findOne({ email });
+                    if (!emailAdmin && !emailClient) {
+                        const result = await Client.findByIdAndUpdate(idClient, { name, IdCompteur, phone: phone, profileImage, email, birthday, password, localisation: { longitude, latitude, description } });
+                        if (result) {
+                            res.status(200).json({ status: 200, result: result });
+                        } else {
+                            res.status(500).json({ status: 500, error: "Error during the save" });
+                        }
+                    } else {
+                        res.status(500).json({ status: 500, error: "This email don't exist" });
+                    }
+
+                } else {
+                    console.log();
+                    res.status(500).json({ status: 500, error: "this number exist <-_->" });
+                }
+            } else {
+                res.status(500).json({ status: 500, error: "One Client have this phone" })
+            }
+        })
 })
 
 // const login = catchAsync(async(req, res) => {
@@ -127,5 +170,6 @@ const logout = (req, res) => {
 module.exports = {
     register,
     logout,
-    update
+    update,
+    updateById
 }

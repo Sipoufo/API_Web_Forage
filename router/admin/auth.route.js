@@ -2,7 +2,7 @@ const express = require('express');
 const validate = require('../../middlewares/validate');
 const { adminAuth } = require('../../validation/index');
 const { authAdmin } = require('../../controller/index');
-const { tokenVerifieAdmin } = require('../../middlewares/auth')
+const { tokenVerifieAdmin, tokenVerifie } = require('../../middlewares/auth')
 
 const router = express.Router();
 
@@ -196,6 +196,30 @@ router
 router
     .route('/logout')
     .get(tokenVerifieAdmin, authAdmin.logout)
+
+//get one
+/**
+ * @swagger
+ * /admin/auth/{idAdmin}:
+ *  get:
+ *      summary: get one admin
+ *      tags: [Admin]
+ *      parameters:
+ *          -   in: path
+ *              name: idAdmin
+ *              schema: 
+ *                  type: string
+ *              required: true
+ *              description: The id of Admin
+ *      responses: 
+ *          200:
+ *              description: get successfully
+ *          500:
+ *              description: Error
+ */
+router
+    .route('/:idAdmin')
+    .get(tokenVerifie, validate(adminAuth.getAdmin), authAdmin.getOneAdmin)
 
 /**
  * @swagger

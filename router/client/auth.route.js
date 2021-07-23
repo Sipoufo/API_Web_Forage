@@ -2,7 +2,7 @@ const express = require('express');
 const validate = require('../../middlewares/validate');
 const { AuthValidationClient } = require('../../validation/index');
 const { authControllerUser } = require('../../controller/index');
-const { tokenVerifieAdmin, tokenVerifieClient } = require('../../middlewares/auth')
+const { tokenVerifieAdmin, tokenVerifieClient, tokenVerifie } = require('../../middlewares/auth')
 
 const router = express.Router();
 
@@ -122,6 +122,30 @@ router
 router
     .route('/update')
     .put(tokenVerifieClient, validate(AuthValidationClient.update), authControllerUser.update)
+
+// get one
+/**
+ * @swagger
+ * /client/auth/{idClient}:
+ *  get:
+ *      summary: get one client
+ *      tags: [Admin]
+ *      parameters:
+ *          -   in: path
+ *              name: idClient
+ *              schema: 
+ *                  type: string
+ *              required: true
+ *              description: The id of client
+ *      responses: 
+ *          200:
+ *              description: get successfully
+ *          500:
+ *              description: Error
+ */
+router
+    .route('/:idClient')
+    .get(tokenVerifie, validate(AuthValidationClient.getOne), authControllerUser.getOneClient)
 
 // Update By ID
 /**

@@ -172,6 +172,22 @@ const sendFirstAdmin = catchAsync(async(req, res) => {
         })
 })
 
+const getOneAdmin = catchAsync(async(req, res) => {
+    const id = req.params.idAdmin
+    return admin.findById(id)
+        .then(response => {
+            if (response) {
+                res.status(200).json({ status: 200, result: response });
+            } else {
+                res.status(500).json({ status: 500, error: "This admin don't exist" })
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({ status: 500, error: "Error" })
+        })
+})
+
 // const login = catchAsync(async(req, res) => {
 //     const phone = req.body.phone
 //     const password = req.body.password
@@ -233,5 +249,6 @@ module.exports = {
     getClients,
     getAdmins,
     update,
-    updateById
+    updateById,
+    getOneAdmin
 }

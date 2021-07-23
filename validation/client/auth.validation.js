@@ -55,9 +55,16 @@ const login = {
     })
 }
 
+const getOne = {
+    params: Joi.object().keys({
+        idClient: Joi.number().required(),
+    })
+}
+
 module.exports = {
     register,
     login,
     update,
-    updateById
+    updateById,
+    getOne
 }

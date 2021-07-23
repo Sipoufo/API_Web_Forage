@@ -92,7 +92,7 @@ const update = catchAsync(async(req, res) => {
                             res.status(500).json({ status: 500, error: "this number exist <-_->" });
                         }
                     } else {
-                        res.status(500).json({ status: 500, error: "One Client have this phone" })
+                        res.status(500).json({ status: 500, error: "One Admin have this phone" })
                     }
                 })
         }
@@ -167,9 +167,26 @@ const logout = (req, res) => {
     res.status(200).json({ status: 200, result: "You are log out" })
 }
 
+const getOneClient = catchAsync(async(req, res) => {
+    const id = req.params.idAdmin
+    return Client.findById(id)
+        .then(response => {
+            if (response) {
+                res.status(200).json({ status: 200, result: response });
+            } else {
+                res.status(500).json({ status: 500, error: "This client don't exist" })
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({ status: 500, error: "Error" })
+        })
+})
+
 module.exports = {
     register,
     logout,
     update,
-    updateById
+    updateById,
+    getOneClient
 }

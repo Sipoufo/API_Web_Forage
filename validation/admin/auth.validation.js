@@ -53,9 +53,16 @@ const login = {
     })
 }
 
+const getAdmin = {
+    params: Joi.object().keys({
+        idAdmin: Joi.custom(objectId).required()
+    })
+}
+
 module.exports = {
     register,
     login,
     update,
-    updateById
+    updateById,
+    getAdmin
 }

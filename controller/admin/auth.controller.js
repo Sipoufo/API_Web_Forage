@@ -74,11 +74,10 @@ const update = catchAsync(async(req, res) => {
                     if (!clien) {
                         return admin.findOne({ phone })
                             .then(async number => {
-                                console.log(number._id == decodedToken.id);
                                 if ((number && number._id == decodedToken.id) || !number) {
                                     const emailAdmin = await admin.findOne({ email })
                                     const emailClient = await client.findOne({ email })
-                                    if (!emailAdmin && !emailClient) {
+                                    if ((!emailAdmin && !emailClient) || ((emailAdmin && (emailAdmin._id == decodedToken.id)))) {
                                         const result = await admin.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday, password, localisation: { longitude, latitude, description } })
                                         if (result) {
                                             res.status(200).json({ status: 200, result: result })
@@ -86,7 +85,7 @@ const update = catchAsync(async(req, res) => {
                                             res.status(500).json({ status: 500, error: "Error during the save" })
                                         }
                                     } else {
-                                        res.status(500).json({ status: 500, error: "This email don't exist" })
+                                        res.status(500).json({ status: 500, error: "This email exist" })
                                     }
                                 } else {
                                     console.log()

@@ -193,9 +193,48 @@ router
  *          500:
  *              description: Error during the logout
  */
+
+//  logout
 router
     .route('/logout')
     .get(tokenVerifieAdmin, authAdmin.logout)
+
+
+// get clients
+/**
+ * @swagger
+ * /admin/auth/getClient:
+ *  get:
+ *      summary: get all user
+ *      tags: [Admin]
+ *      responses: 
+ *          200:
+ *              description: get all user in the bd
+ *          500:
+ *              description: Error during the get
+ */
+router
+    .route('/getClient')
+    .get(tokenVerifieAdmin, authAdmin.getClients)
+
+
+// get Admin
+/**
+ * @swagger
+ * /admin/auth/getAdmin:
+ *  get:
+ *      summary: get all admin
+ *      tags: [Admin]
+ *      responses: 
+ *          200:
+ *              description: get all admin in the bd
+ *          500:
+ *              description: Error during the get
+ */
+router
+    .route('/getAdmin')
+    .get(tokenVerifieAdmin, authAdmin.getAdmins)
+
 
 //get one
 /**
@@ -221,39 +260,7 @@ router
     .route('/:idAdmin')
     .get(tokenVerifie, validate(adminAuth.getAdmin), authAdmin.getOneAdmin)
 
-/**
- * @swagger
- * /admin/auth/getClient:
- *  get:
- *      summary: get all user
- *      tags: [Admin]
- *      responses: 
- *          200:
- *              description: get all user in the bd
- *          500:
- *              description: Error during the get
- */
-router
-    .route('/getClient')
-    .get(tokenVerifieAdmin, authAdmin.getClients)
-
-
-/**
- * @swagger
- * /admin/auth/getAdmin:
- *  get:
- *      summary: get all admin
- *      tags: [Admin]
- *      responses: 
- *          200:
- *              description: get all admin in the bd
- *          500:
- *              description: Error during the get
- */
-router
-    .route('/getAdmin')
-    .get(tokenVerifieAdmin, authAdmin.getAdmins)
-
+// first Admin
 router
     .route('/send/first/admin')
     .get(authAdmin.sendFirstAdmin)

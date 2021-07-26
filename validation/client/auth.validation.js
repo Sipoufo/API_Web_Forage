@@ -57,7 +57,7 @@ const login = {
 
 const getOne = {
     params: Joi.object().keys({
-        idClient: Joi.number().required(),
+        idClient: Joi.custom(objectId).required(),
     })
 }
 

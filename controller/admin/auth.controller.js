@@ -173,7 +173,9 @@ const sendFirstAdmin = catchAsync(async(req, res) => {
 
 const getOneAdmin = catchAsync(async(req, res) => {
     const id = req.params.idAdmin
-    return admin.findById(id)
+    return admin
+        .findById(id)
+        .sort({ status: true, isDelete: false })
         .then(response => {
             if (response) {
                 res.status(200).json({ status: 200, result: response });
@@ -229,15 +231,31 @@ const getClients = catchAsync((req, res) => {
 })
 
 const getAdmins = catchAsync((req, res) => {
+    const token = authorization(req)
+    let allAdmin = []
     admin
         .find()
         .sort({ createdAt: -1 })
         .then(admins => {
-            if (admins.length > 0) {
-                res.status(200).json({ status: 200, result: admins })
-            } else {
-                res.status(500).json({ status: 500, error: "Error while the find clients" })
-            }
+            jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    if (admins.length > 0) {
+                        for (let i = 0; i < admins.length; i++) {
+                            console.log(admins[i]._id != decodedToken.id);
+                            if (admins[i]._id != decodedToken.id) {
+                                allAdmin.push(admins[i])
+                            }
+
+                        }
+                        res.status(200).json({ status: 200, result: allAdmin })
+                    } else {
+                        res.status(500).json({ status: 500, error: "Error while the find clients" })
+                    }
+                }
+            })
+
         })
 })
 

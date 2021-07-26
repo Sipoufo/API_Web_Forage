@@ -146,7 +146,7 @@ router
  *                      get factures
  */
 router
-    .route('/client/block/:idAdmin')
+    .route('/admin/block/:idAdmin')
     .put(tokenVerifieAdmin, validate(gestionCompteValidation.blockCompteAdmin), gestionCompteController.BlockCompteAdmin)
 
 // Update admin

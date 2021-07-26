@@ -175,7 +175,6 @@ const getOneAdmin = catchAsync(async(req, res) => {
     const id = req.params.idAdmin
     return admin
         .findById(id)
-        .sort({ status: true, isDelete: false })
         .then(response => {
             if (response) {
                 res.status(200).json({ status: 200, result: response });

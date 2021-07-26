@@ -168,11 +168,11 @@ const logout = (req, res) => {
 }
 
 const getOneClient = catchAsync(async(req, res) => {
-    const id = req.params.idAdmin
+    const id = req.params.idClient
     return Client
         .findById(id)
-        .sort({ status: true, isDelete: false })
         .then(response => {
+            console.log(id);
             if (response) {
                 res.status(200).json({ status: 200, result: response });
             } else {

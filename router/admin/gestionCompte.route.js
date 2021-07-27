@@ -118,6 +118,41 @@ router
 // Block admin
 /**
  * @swagger
+ *  /admin/manageCompte/client/idCompte/{idAdmin}:
+ *      put: 
+ *          summary: update id compteur facture
+ *          tags: [Manage_compte]
+ *          parameters:
+ *              -   in: path
+ *                  name: idAdmin
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The id of admin
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              IdCompteur:
+ *                                  type: string
+ *                          example:
+ *                              IdCompteur: UX2024
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      get one Client
+ */
+router
+    .route('/admin/block/:idAdmin')
+    .put(tokenVerifieAdmin, validate(gestionCompteValidation.blockCompteAdmin), gestionCompteController.BlockCompteAdmin)
+
+
+// compte Client
+/**
+ * @swagger
  *  /admin/manageCompte/admin/block/{idAdmin}:
  *      put: 
  *          summary: delete facture
@@ -178,10 +213,6 @@ router
  *                                  type: string
  *                              email:
  *                                  type: string
- *                              password:
- *                                  type: string
- *                                  format: password
- *                                  minLength: 8
  *                              longitude:
  *                                  type: string
  *                              latitude:
@@ -194,7 +225,6 @@ router
  *                              name: Sipoufo Yvan
  *                              birthday: 2002-01-29
  *                              phone: "695914926"
- *                              password: Azerty12
  *                              email: sipoufoTest@gmail.com
  *                              longitude: 12
  *                              latitude: 12
@@ -239,10 +269,6 @@ router
  *                                  type: string
  *                              email:
  *                                  type: string
- *                              password:
- *                                  type: string
- *                                  format: password
- *                                  minLength: 8
  *                              longitude:
  *                                  type: string
  *                              latitude:
@@ -255,7 +281,6 @@ router
  *                              name: Sipoufo Yvan
  *                              birthday: 2002-01-29
  *                              phone: "695914926"
- *                              password: Azerty12
  *                              email: sipoufoTest@gmail.com
  *                              longitude: 12
  *                              latitude: 12

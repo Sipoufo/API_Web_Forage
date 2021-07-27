@@ -38,12 +38,16 @@ const factureSchema = new model({
             type: Number,
             required: true,
         },
+        observation: {
+            type: String,
+            required: true,
+        },
         fraisEntretien: {
             type: Number,
             required: false,
             default: 1000
         },
-        montantTotal: {
+        penalite: {
             type: Number,
             required: true
         },
@@ -66,7 +70,17 @@ const factureSchema = new model({
             required: false,
             default: false
         },
-        dateReleveOldIndex: {
+        dateFacturation: {
+            type: Date,
+            required: false,
+            default: false
+        },
+        datePaid: {
+            type: Date,
+            required: true,
+            default: false
+        },
+        dateReleveNewIndex: {
             type: Date,
             required: true
         },

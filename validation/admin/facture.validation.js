@@ -7,14 +7,12 @@ const addFacture = {
     }),
     body: Joi.object().keys({
         newIndex: Joi.number().required(),
-        oldIndex: Joi.number().required(),
-        consommation: Joi.number().required(),
-        prixUnitaire: Joi.number(),
-        montantConsommation: Joi.number().required(),
-        fraisEntretien: Joi.number(),
-        montantTotal: Joi.number().required(),
-        dataLimitePaid: Joi.date().required(),
-        dateReleveOldIndex: Joi.date().required(),
+        oldIndex: Joi.number(),
+        observation: Joi.string().required(),
+        penalite: Joi.number(),
+        dataPaid: Joi.date(),
+        montantVerse: Joi.number().required(),
+        dateReleveNewIndex: Joi.date().required(),
     })
 }
 
@@ -24,14 +22,10 @@ const updateFacture = {
     }),
     body: Joi.object().keys({
         newIndex: Joi.number().required(),
-        oldIndex: Joi.number().required(),
-        consommation: Joi.number().required(),
-        prixUnitaire: Joi.number(),
-        montantConsommation: Joi.number().required(),
-        fraisEntretien: Joi.number(),
-        montantTotal: Joi.number().required(),
-        dataLimitePaid: Joi.date().required(),
-        dateReleveOldIndex: Joi.date().required(),
+        observation: Joi.string().required(),
+        penalite: Joi.number(),
+        montantVerse: Joi.number().required(),
+        dateReleveNewIndex: Joi.date().required(),
     })
 }
 
@@ -44,7 +38,7 @@ const statusPaidFacture = {
     })
 }
 
-const getWithStatus = {
+const getByStatus = {
     body: Joi.object().keys({
         status: Joi.boolean().required(),
     })
@@ -61,5 +55,5 @@ module.exports = {
     updateFacture,
     getClientFactures,
     statusPaidFacture,
-    getWithStatus
+    getByStatus
 }

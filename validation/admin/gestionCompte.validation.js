@@ -30,7 +30,6 @@ const updateAdmin = {
         description: Joi.string().required(),
         profileImage: Joi.string().required(),
         birthday: Joi.string().required(),
-        password: Joi.custom(password).required(),
         longitude: Joi.number().required(),
         latitude: Joi.number().required()
     })
@@ -47,7 +46,6 @@ const updateClient = {
         description: Joi.string().required(),
         profileImage: Joi.string().required(),
         birthday: Joi.string().required(),
-        password: Joi.custom(password).required(),
         longitude: Joi.number().required(),
         latitude: Joi.number().required()
     })
@@ -59,6 +57,15 @@ const blockCompteClient = {
     }),
     body: Joi.object().keys({
         isBlock: Joi.boolean().required(),
+    })
+}
+
+const IdCompteClient = {
+    params: Joi.object().keys({
+        idClient: Joi.custom(objectId).required(),
+    }),
+    body: Joi.object().keys({
+        IdCompteur: Joi.string().required(),
     })
 }
 
@@ -77,5 +84,6 @@ module.exports = {
     updateAdmin,
     updateClient,
     blockCompteClient,
-    blockCompteAdmin
+    blockCompteAdmin,
+    IdCompteClient
 }

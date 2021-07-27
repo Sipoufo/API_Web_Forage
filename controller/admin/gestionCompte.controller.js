@@ -56,7 +56,6 @@ const updateAdmin = catchAsync(async(req, res) => {
     const phone = req.body.phone
     const email = req.body.email
     const birthday = req.body.birthday
-    const password = req.body.password
     const description = req.body.description
     const profileImage = req.body.profileImage
     const longitude = req.body.longitude
@@ -80,7 +79,7 @@ const updateAdmin = catchAsync(async(req, res) => {
                                                 const emailAdmin = await Admin.findOne({ email })
                                                 const emailClient = await Client.findOne({ email })
                                                 if (!emailAdmin && !emailClient) {
-                                                    const result = await Admin.findByIdAndUpdate(idAdmin, { name, phone: phone, profileImage, email, birthday, password, localisation: { longitude, latitude, description } })
+                                                    const result = await Admin.findByIdAndUpdate(idAdmin, { name, phone: phone, profileImage, email, birthday, localisation: { longitude, latitude, description } })
                                                     if (result) {
                                                         res.status(200).json({ status: 200, result: result })
                                                     } else {
@@ -112,12 +111,10 @@ const updateClient = catchAsync(async(req, res) => {
     const phone = req.body.phone
     const email = req.body.email
     const birthday = req.body.birthday
-    const password = req.body.password
     const description = req.body.description
     const profileImage = req.body.profileImage
     const longitude = req.body.longitude
     const latitude = req.body.latitude
-    const token = authorization(req)
 
     await Admin.findOne({ phone })
         .then(async admin => {
@@ -129,7 +126,7 @@ const updateClient = catchAsync(async(req, res) => {
                             const emailAdmin = await Admin.findOne({ email })
                             const emailClient = await Client.findOne({ email })
                             if (!emailAdmin && !emailClient) {
-                                const result = await Client.findByIdAndUpdate(idClient, { name, phone: phone, profileImage, email, birthday, password, localisation: { longitude, latitude, description } })
+                                const result = await Client.findByIdAndUpdate(idClient, { name, phone: phone, profileImage, email, birthday, localisation: { longitude, latitude, description } })
                                 if (result) {
                                     res.status(200).json({ status: 200, result: result })
                                 } else {
@@ -167,6 +164,25 @@ const BlockCompteClient = catchAsync(async(req, res) => {
                     }
                 } else {
                     res.status(500).json({ status: 500, error: "This user is already deleted" })
+                }
+            } else {
+                res.status(500).json({ status: 500, error: "I don't see this user" })
+            }
+        })
+})
+
+const IdCompteClient = catchAsync(async(req, res) => {
+    const IdCompteur = req.body.IdCompteur
+    const idClient = req.params.idClient
+
+    await Client.findById(idClient)
+        .then(async client => {
+            if (client) {
+                const block = await Client.findByIdAndUpdate(idClient, { IdCompteur })
+                if (block) {
+                    res.status(200).json({ status: 200, result: block })
+                } else {
+                    res.status(500).json({ status: 500, error: "Error during the update" })
                 }
             } else {
                 res.status(500).json({ status: 500, error: "I don't see this user" })
@@ -218,5 +234,6 @@ module.exports = {
     updateAdmin,
     updateClient,
     BlockCompteClient,
-    BlockCompteAdmin
+    BlockCompteAdmin,
+    IdCompteClient
 }

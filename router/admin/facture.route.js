@@ -50,6 +50,7 @@ router
     .put(tokenVerifieAdmin, validate(FactureValidation.getWithStatus), FactureController.getWithStatus)
 
 
+//  get all facture advance
 /**
  * @swagger
  *  /admin/facture/getFactureAd:
@@ -65,6 +66,24 @@ router
 router
     .route('/getFactureAd')
     .get(tokenVerifieAdmin, FactureController.getFactureAdvance)
+
+
+// all facture by status
+/**
+ * @swagger
+ *  /admin/facture/getByStatus:
+ *      get:
+ *          summary: get all facture advance
+ *          tags: [Facture_Admin]
+ *          responses: 
+ *              200:
+ *                  description: get advance facture save in the bd
+ *              500:
+ *                  description: Error during the get
+ */
+router
+    .route('/getByStatus')
+    .get(tokenVerifieAdmin, validate(FactureValidation.getByStatus), FactureController.getByStatus)
 
 /**
  * @swagger
@@ -88,26 +107,26 @@ router
  *                          properties:
  *                              newIndex:
  *                                  type: integer
+ *                              observation:
+ *                                  type: string
+ *                              penalite:
+ *                                  type: integer
+ *                              dataPaid:
+ *                                  type: string
+ *                              montantVerse:
+ *                                  type: integer
+ *                              dateReleveNewIndex:
+ *                                  type: string
  *                              oldIndex:
  *                                  type: integer
- *                              consommation:
- *                                  type: integer
- *                              montantConsommation:
- *                                  type: integer
- *                              montantTotal:
- *                                  type: integer
- *                              dataLimitePaid:
- *                                  type: string
- *                              dateReleveOldIndex:
- *                                  type: string
  *                          example:
- *                              newIndex: 82
- *                              oldIndex: 50
- *                              consommation: 32
- *                              montantConsommation: 16000
- *                              montantTotal: 28000
- *                              dataLimitePaid: 2021-07-12
- *                              dateReleveOldIndex: 2021-06-02
+ *                              newIndex: 150
+ *                              observation: 'Bon client'
+ *                              penalite: 0
+ *                              dataPaid: 2021-07-30
+ *                              montantVerse: 2000
+ *                              dateReleveNewIndex: 2021-07-12
+ *                              oldIndex: 100
  *          responses:
  *              '201':
  *                  description: >
@@ -189,32 +208,20 @@ router
  *                          properties:
  *                              newIndex:
  *                                  type: integer
- *                              oldIndex:
+ *                              observation:
  *                                  type: integer
- *                              consommation:
+ *                              penalite:
  *                                  type: integer
- *                              prixUnitaire:
+ *                              montantVerse:
  *                                  type: integer
- *                              montantConsommation:
+ *                              dateReleveNewIndex:
  *                                  type: integer
- *                              fraisEntretien:
- *                                  type: integer
- *                              montantTotal:
- *                                  type: integer
- *                              dataLimitePaid:
- *                                  type: string
- *                              dateReleveOldIndex:
- *                                  type: string
  *                          example:
- *                              newIndex: 82
- *                              oldIndex: 50
- *                              consommation: 32
- *                              prixUnitaire: 500
- *                              montantConsommation: 16000
- *                              fraisEntretien: 1000
- *                              montantTotal: 28000
- *                              dataLimitePaid: 2021-07-12
- *                              dateReleveOldIndex: 2021-06-02
+ *                              newIndex: 140
+ *                              observation: 'Il derange parfois'
+ *                              penalite: 500
+ *                              montantVerse: 2500
+ *                              dateReleveNewIndex: 2021-07-13
  *          responses:
  *              '201':
  *                  description: >

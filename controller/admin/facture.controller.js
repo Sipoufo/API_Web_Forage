@@ -13,30 +13,46 @@ const addFacture = catchAsync(async(req, res) => {
         if (err) {
             console.log(err);
         } else {
-            const facture = {
-                idClient: req.params.idClient,
-                idAdmin: decodedToken.id,
-                newIndex: req.body.newIndex,
-                oldIndex: req.body.oldIndex,
-                consommation: req.body.consommation,
-                prixUnitaire: req.body.consommation,
-                montantConsommation: req.body.montantConsommation,
-                fraisEntretien: req.body.fraisEntretien,
-                montantTotal: req.body.montantTotal,
-                dataLimitePaid: req.body.dataLimitePaid,
-                dateReleveOldIndex: req.body.dateReleveOldIndex,
-            };
+            const idClient = req.params.idClient;
+            const idAdmin = decodedToken.id;
+            const newIndex = req.body.newIndex;
+            const observation = req.body.observation;
+            const penalite = (req.body.penalite) ? req.body.penalite : 0;
+            const dataPaid = req.body.dataPaid;
+            const montantVerse = req.body.montantVerse;
+            const dateReleveNewIndex = req.body.dateReleveOldIndex;
+            let oldIndex = req.body.oldIndex
+
+            if (oldIndex == 0 || oldIndex == undefined) {
+                await Facture
+                    .find({ idClient })
+                    .sort({ createdAt: -1 })
+                    .then(async factures => {
+                        if (factures.length > 2) {
+                            oldIndex = factures[2].newIndex
+                        } else {
+                            oldIndex = 0
+                        }
+                    })
+            }
             await Admin.findById(decodedToken.id)
                 .then(async(admin) => {
                     if (admin) {
-                        await Facture.create(facture)
+                        const consommation = newIndex - oldIndex
+                        const montantConsommation = (consommation * 500) + 1000 + penalite
+                        const dateFacturation = new Date()
+                        const montantImpaye = montantConsommation - montantVerse
+                        const dataLimitePaid = new Date(dateFacturation.getFullYear(), dateFacturation.getMonth() + 1, dateFacturation.getDate(), dateFacturation.getHours(), dateFacturation.getMinutes(), dateFacturation.getMilliseconds())
+                        await Facture.create({ idClient, idAdmin, newIndex, oldIndex, consommation, prixUnitaire: 500, fraisEntretien: 1000, montantConsommation, observation, dateReleveNewIndex, dateFacturation, dataLimitePaid, dataPaid, montantVerse, montantImpaye })
                             .then(resp => {
                                 if (resp) {
                                     res.status(200).json({ status: 200, result: resp });
                                 } else {
-                                    res.status(500).json({ status: 200, error: "Error during the update" });
+                                    res.status(500).json({ status: 500, error: "Error during the save" });
                                 }
                             });
+                    } else {
+                        res.status(500).json({ status: 500, error: "Error during the save" });
                     }
                 });
 
@@ -102,20 +118,6 @@ const getFactureAdvance = catchAsync(async(req, res) => {
         })
 })
 
-const getWithStatus = catchAsync((req, res) => {
-    const status = req.body.status
-    Facture
-        .find({ status })
-        .sort({ createdAt: -1 })
-        .then(factures => {
-            if (factures > 0) {
-                res.status(200).json({ status: 200, result: factures })
-            } else {
-                res.status(500).json({ status: 500, error: "I don't see the facture with this status" })
-            }
-        })
-})
-
 const updateFacture = catchAsync(async(req, res) => {
     const idFacture = req.params.idFacture
     console.log(idFacture);
@@ -124,23 +126,18 @@ const updateFacture = catchAsync(async(req, res) => {
         if (err) {
             console.log(err);
         } else {
-            const facture = {
-                idClient: req.params.idClient,
-                idAdmin: decodedToken.id,
-                newIndex: req.body.newIndex,
-                oldIndex: req.body.oldIndex,
-                consommation: req.body.consommation,
-                prixUnitaire: req.body.consommation,
-                montantConsommation: req.body.montantConsommation,
-                fraisEntretien: req.body.fraisEntretien,
-                montantTotal: req.body.montantTotal,
-                dataLimitePaid: req.body.dataLimitePaid,
-                dateReleveOldIndex: req.body.dateReleveOldIndex,
-            };
+            const newIndex = req.body.newIndex;
+            const observation = req.body.observation;
+            const penalite = (req.body.penalite) ? req.body.penalite : 0;
+            const montantVerse = req.body.montantVerse;
+            const dateReleveNewIndex = req.body.dateReleveOldIndex;
             await Admin.findById(decodedToken.id)
                 .then(async(res) => {
                     if (res) {
-                        await Facture.findByIdAndUpdate(idFacture, facture)
+                        const consommation = newIndex - oldIndex
+                        const montantConsommation = (consommation * 500) + 1000 + penalite
+                        const montantImpaye = montantConsommation - montantVerse
+                        await Facture.findByIdAndUpdate(idFacture, { newIndex, observation, penalite, montantVerse, dateReleveNewIndex, consommation, montantConsommation, montantImpaye })
                             .then(res => {
                                 if (res) {
                                     res.status(200).json({ status: 200, result: res });
@@ -169,6 +166,21 @@ const statusPaidFacture = catchAsync(async(req, res) => {
         })
 })
 
+const getByStatus = catchAsync(async(req, res) => {
+    const status = req.body.status
+
+    await Facture
+        .find({ facturePay: status })
+        .sort({ createdAt: -1 })
+        .then(factures => {
+            if (factures.length > 0) {
+                res.status(200).json({ status: 200, result: factures })
+            } else {
+                res.status(500).json({ status: 500, error: "I don't see a facture with this status" })
+            }
+        })
+})
+
 
 module.exports = {
     addFacture,
@@ -178,5 +190,5 @@ module.exports = {
     updateFacture,
     statusPaidFacture,
     getFactureAdvance,
-    getWithStatus
+    getByStatus
 }

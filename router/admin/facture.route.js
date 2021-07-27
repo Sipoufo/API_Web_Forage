@@ -25,29 +25,10 @@ const router = express.Router()
  *                  description: return all the facture
  *              500:
  *                  description: Error while the get all the facture
- *      put: 
- *          summary: Add facture
- *          tags: [Facture_Admin]
- *          requestBody:
- *              required: true
- *              content:
- *                  application/json:  
- *                      schema:
- *                          type: object
- *                          properties:
- *                              status:
- *                                  type: boolean
- *                          example:
- *                              status: true
- *          responses:
- *              '201':
- *                  description: >
- *                      get factures
  */
 router
     .route('/')
     .get(tokenVerifieAdmin, FactureController.getFactures)
-    .put(tokenVerifieAdmin, validate(FactureValidation.getWithStatus), FactureController.getWithStatus)
 
 
 //  get all facture advance

@@ -110,6 +110,7 @@ const updateClient = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email
+    const IdCompteur = req.body.IdCompteur
     const birthday = req.body.birthday
     const description = req.body.description
     const profileImage = req.body.profileImage
@@ -126,7 +127,7 @@ const updateClient = catchAsync(async(req, res) => {
                             const emailAdmin = await Admin.findOne({ email })
                             const emailClient = await Client.findOne({ email })
                             if (!emailAdmin && !emailClient) {
-                                const result = await Client.findByIdAndUpdate(idClient, { name, phone: phone, profileImage, email, birthday, localisation: { longitude, latitude, description } })
+                                const result = await Client.findByIdAndUpdate(idClient, { name, phone: phone, profileImage, IdCompteur, email, birthday, localisation: { longitude, latitude, description } })
                                 if (result) {
                                     res.status(200).json({ status: 200, result: result })
                                 } else {

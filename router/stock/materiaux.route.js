@@ -183,7 +183,7 @@ router
  *                                    
  */
 router
-    .route('/{id}')
+    .route('/:id')
     .put(tokenVerifieAdmin, validate(stockValidation.updateMaterial), StockController.updateMateriaux)
     .get(tokenVerifieAdmin, validate(stockValidation.getOneMateriaux), StockController.getOneMateriaux);
 

@@ -1,4 +1,4 @@
-const Joi = require('joi')
+const Joi = require('joi');
 const { password, objectId } = require('../custom.validation');
 
 const addMateriaux = {
@@ -10,7 +10,13 @@ const addMateriaux = {
         description: Joi.string().required(),
         picture: Joi.string().required(),
     })
-}
+};
+
+const addType = {
+    body: Joi.object().keys({
+        name: Joi.string().required(),
+    })
+};
 
 const updateMaterial = {
     params: Joi.object().keys({
@@ -24,21 +30,27 @@ const updateMaterial = {
         description: Joi.string().required(),
         picture: Joi.string().required(),
     })
-}
+};
+
+const deleteType = {
+    params: Joi.object().keys({
+        id: Joi.custom(objectId),
+    }),
+};
 
 const getAllMateriaux = {
     body: Joi.object().keys({
         page: Joi.number(),
         limit: Joi.number()
     })
-}
+};
 
 const getOneMateriaux = {
     body: Joi.object().keys({
         page: Joi.number(),
         limit: Joi.number()
     })
-}
+};
 
 const getGetByType = {
     body: Joi.object().keys({
@@ -46,14 +58,14 @@ const getGetByType = {
         page: Joi.number(),
         limit: Joi.number()
     })
-}
+};
 
 const getGetByPrise = {
     body: Joi.object().keys({
         page: Joi.number(),
         limit: Joi.number()
     })
-}
+};
 
 module.exports = {
     addMateriaux,
@@ -61,5 +73,7 @@ module.exports = {
     updateMaterial,
     getOneMateriaux,
     getGetByType,
-    getGetByPrise
+    getGetByPrise,
+    addType,
+    deleteType,
 }

@@ -13,7 +13,7 @@ const router = express.Router();
  *  description: Part of API to manage the stock
  */
 
-//Stick Save
+//Stock Save
 /**
  * @swagger
  *  /stock/:
@@ -55,6 +55,37 @@ const router = express.Router();
 router
     .route('/')
     .post(tokenVerifieAdmin, validate(stockValidation.addMateriaux), StockController.addMateriaux);
+
+
+//Add Type
+/**
+ * @swagger
+ *  /stock/:
+ *      post: 
+ *          summary: add type
+ *          tags: [Stock]
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  type: string
+ *                          example:
+ *                              name: tuyau
+ *          responses:
+ *              '200':
+ *                  description: >
+ *                      Add a new type in the collection type
+ *                                    
+ */
+router
+    .route('/type')
+    .get(tokenVerifieAdmin, StockController.getTypes)
+    .post(tokenVerifieAdmin, validate(stockValidation.addType), StockController.addType)
+    .delete(tokenVerifieAdmin, validate(stockValidation.deleteType), StockController.deleteType);
 
 // Update material
 /**

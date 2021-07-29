@@ -128,7 +128,7 @@ const getAllMateriaux = catchAsync(async(req, res) => {
         })
 });
 
-const getType = catchAsync(async(req, res) => {
+const getTypes = catchAsync(async(req, res) => {
     return Type.find()
         .then(response => {
             res.status(200).json({ status: 200, result: response });
@@ -140,7 +140,7 @@ const getType = catchAsync(async(req, res) => {
 });
 
 const deleteType = catchAsync(async(req, res) => {
-    const id = req.body.idType
+    const id = req.params.idType
     await Material.find({ type: id })
         .then(async materials => {
             if (materials > 0) {
@@ -224,6 +224,6 @@ module.exports = {
     getGetByPrise,
     getOneMateriaux,
     addType,
-    getType,
+    getTypes,
     deleteType,
 }

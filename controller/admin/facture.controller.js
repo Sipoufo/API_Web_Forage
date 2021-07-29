@@ -23,18 +23,14 @@ const addFacture = catchAsync(async(req, res) => {
             const dateReleveNewIndex = req.body.dateReleveOldIndex;
             let oldIndex = req.body.oldIndex
 
-            if (oldIndex == 0 || oldIndex == undefined) {
-                await Facture
-                    .find({ idClient })
-                    .sort({ createdAt: -1 })
-                    .then(async factures => {
-                        if (factures.length > 2) {
-                            oldIndex = factures[2].newIndex
-                        } else {
-                            oldIndex = 0
-                        }
-                    })
-            }
+            await Facture
+                .find({ idClient })
+                .sort({ createdAt: -1 })
+                .then(async factures => {
+                    if (factures.length > 2) {
+                        oldIndex = factures[2].newIndex
+                    }
+                })
             await Admin.findById(decodedToken.id)
                 .then(async(admin) => {
                     if (admin) {

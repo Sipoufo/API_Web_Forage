@@ -63,7 +63,6 @@ const update = catchAsync(async(req, res) => {
     const birthday = req.body.birthday
     const password = req.body.password
     const description = req.body.description
-    const password = req.body.password
     const profileImage = req.body.profileImage
     const longitude = req.body.longitude
     const latitude = req.body.latitude

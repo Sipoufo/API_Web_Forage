@@ -20,7 +20,7 @@ const addFacture = catchAsync(async(req, res) => {
             const penalite = (req.body.penalite) ? req.body.penalite : 0;
             const dataPaid = req.body.dataPaid;
             const montantVerse = req.body.montantVerse;
-            const dateReleveNewIndex = req.body.dateReleveOldIndex;
+            const dateReleveNewIndex = req.body.dateReleveNewIndex;
             let oldIndex = req.body.oldIndex
 
             await Facture
@@ -30,27 +30,30 @@ const addFacture = catchAsync(async(req, res) => {
                     if (factures.length > 2) {
                         oldIndex = factures[2].newIndex
                     }
+                    await Admin.findById(decodedToken.id)
+                        .then(async(admin) => {
+                            if (admin) {
+                                const consommation = newIndex - oldIndex
+                                const montantConsommation = (consommation * 500) + 1000 + penalite
+                                const dateFacturation = new Date()
+                                const montantImpaye = montantConsommation - montantVerse
+                                const dataLimitePaid = new Date(dateFacturation.getFullYear(), dateFacturation.getMonth() + 1, dateFacturation.getDate(), dateFacturation.getHours(), dateFacturation.getMinutes(), dateFacturation.getMilliseconds());
+                                const prixUnitaire = 500;
+                                const fraisEntretien = 1000;
+                                await Facture.create({ idClient, idAdmin, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, observation, dateReleveNewIndex, dateFacturation, dataLimitePaid, dataPaid, montantVerse, montantImpaye, penalite })
+                                    .then(resp => {
+                                        if (resp) {
+                                            res.status(200).json({ status: 200, result: resp });
+                                        } else {
+                                            res.status(500).json({ status: 500, error: "Error during the save" });
+                                        }
+                                    });
+                            } else {
+                                res.status(500).json({ status: 500, error: "Error during the save" });
+                            }
+                        });
                 })
-            await Admin.findById(decodedToken.id)
-                .then(async(admin) => {
-                    if (admin) {
-                        const consommation = newIndex - oldIndex
-                        const montantConsommation = (consommation * 500) + 1000 + penalite
-                        const dateFacturation = new Date()
-                        const montantImpaye = montantConsommation - montantVerse
-                        const dataLimitePaid = new Date(dateFacturation.getFullYear(), dateFacturation.getMonth() + 1, dateFacturation.getDate(), dateFacturation.getHours(), dateFacturation.getMinutes(), dateFacturation.getMilliseconds())
-                        await Facture.create({ idClient, idAdmin, newIndex, oldIndex, consommation, prixUnitaire: 500, fraisEntretien: 1000, montantConsommation, observation, dateReleveNewIndex, dateFacturation, dataLimitePaid, dataPaid, montantVerse, montantImpaye })
-                            .then(resp => {
-                                if (resp) {
-                                    res.status(200).json({ status: 200, result: resp });
-                                } else {
-                                    res.status(500).json({ status: 500, error: "Error during the save" });
-                                }
-                            });
-                    } else {
-                        res.status(500).json({ status: 500, error: "Error during the save" });
-                    }
-                });
+
 
         }
     })

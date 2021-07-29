@@ -34,7 +34,7 @@ const updateMaterial = {
 
 const deleteType = {
     params: Joi.object().keys({
-        id: Joi.custom(objectId),
+        idType: Joi.custom(objectId),
     }),
 };
 

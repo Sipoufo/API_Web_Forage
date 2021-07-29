@@ -60,7 +60,16 @@ router
 //Add Type
 /**
  * @swagger
- *  /stock/:
+ *  /stock/type:
+ * 
+ *      get: 
+ *          summary: get all type
+ *          tags: [Stock]
+ *          responses: 
+ *              200:
+ *                  description: get all 
+ *              500:
+ *                  description: Error
  *      post: 
  *          summary: add type
  *          tags: [Stock]
@@ -84,13 +93,37 @@ router
 router
     .route('/type')
     .get(tokenVerifieAdmin, StockController.getTypes)
-    .post(tokenVerifieAdmin, validate(stockValidation.addType), StockController.addType)
+    .post(tokenVerifieAdmin, validate(stockValidation.addType), StockController.addType);
+
+// Delete Type
+/**
+ * @swagger
+ *  /stock/type/{idType}:
+ *      delete: 
+ *          summary: delete one material in stock
+ *          tags: [Stock]
+ *          parameters:
+ *              -   in: path
+ *                  name: id
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The id of material
+ *          responses: 
+ *              200:
+ *                  description: get one 
+ *              500:
+ *                  description: Error
+ *                                    
+ */
+router
+    .route('/type')
     .delete(tokenVerifieAdmin, validate(stockValidation.deleteType), StockController.deleteType);
 
 // Update material
 /**
  * @swagger
- *  /{id}:
+ *  /stock/{id}:
  *      put: 
  *          summary: material update
  *          tags: [Stock]
@@ -133,7 +166,7 @@ router
  *                      Update one material in the stock
  * 
  *      get: 
- *          summary: get all materials in stock
+ *          summary: get one material in stock
  *          tags: [Stock]
  *          parameters:
  *              -   in: path

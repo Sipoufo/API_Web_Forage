@@ -10,9 +10,9 @@ const addFacture = {
         oldIndex: Joi.number(),
         observation: Joi.string().required(),
         penalite: Joi.number(),
-        dataPaid: Joi.date(),
+        dataPaid: Joi.string(),
         montantVerse: Joi.number().required(),
-        dateReleveNewIndex: Joi.date().required(),
+        dateReleveNewIndex: Joi.string().required(),
     })
 }
 

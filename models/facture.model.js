@@ -31,7 +31,6 @@ const factureSchema = new model({
         prixUnitaire: {
             type: Number,
             required: true,
-            default: 500
         },
         // Prix de la consommation
         montantConsommation: {
@@ -44,8 +43,7 @@ const factureSchema = new model({
         },
         fraisEntretien: {
             type: Number,
-            required: false,
-            default: 1000
+            required: true,
         },
         penalite: {
             type: Number,
@@ -71,17 +69,17 @@ const factureSchema = new model({
             default: false
         },
         dateFacturation: {
-            type: Date,
+            type: String,
             required: false,
             default: false
         },
         datePaid: {
-            type: Date,
+            type: String,
             required: true,
             default: false
         },
         dateReleveNewIndex: {
-            type: Date,
+            type: String,
             required: true
         },
     }, {

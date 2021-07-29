@@ -4,6 +4,7 @@ const catchAsync = require('../../utils/catchAsync');
 const admin = require('../../models/administrateur.model')
 const client = require('../../models/client.model')
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs');
 
 const maxAge = 3 * 24 * 60 * 60
 
@@ -106,11 +107,12 @@ const updateById = catchAsync(async(req, res) => {
     const phone = req.body.phone
     const email = req.body.email
     const birthday = req.body.birthday
+    const password = req.body.password
     const description = req.body.description
     const profileImage = req.body.profileImage
     const longitude = req.body.longitude
     const latitude = req.body.latitude
-
+    const hashpassword = await bcrypt.hash(password, 8);
 
     return client.findOne({ phone })
         .then(userClient => {
@@ -122,7 +124,7 @@ const updateById = catchAsync(async(req, res) => {
                             const emailAdmin = await admin.findOne({ email })
                             const emailClient = await client.findOne({ email })
                             if (!emailAdmin && !emailClient) {
-                                const result = await admin.findByIdAndUpdate(idAdmin, { name, phone: phone, profileImage, email, birthday, localisation: { longitude, latitude, description } })
+                                const result = await admin.findByIdAndUpdate(idAdmin, { name, phone: phone, password: hashpassword, profileImage, email, birthday, localisation: { longitude, latitude, description } })
                                 if (result) {
                                     res.status(200).json({ status: 200, result: result })
                                 } else {
@@ -257,6 +259,32 @@ const getAdmins = catchAsync((req, res) => {
         })
 })
 
+const getAdminByToken = catchAsync((req, res) => {
+    const token = authorization(req)
+
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            return admin
+                .findById(decodedToken.id)
+                .then(response => {
+                    if (response) {
+                        res.status(200).json({ status: 200, result: response });
+                    } else {
+                        res.status(500).json({ status: 500, error: "This admin don't exist" })
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    res.status(500).json({ status: 500, error: "Error" })
+                })
+        }
+    })
+
+
+})
+
 module.exports = {
     register,
     sendFirstAdmin,
@@ -265,5 +293,6 @@ module.exports = {
     getAdmins,
     update,
     updateById,
-    getOneAdmin
+    getOneAdmin,
+    getAdminByToken
 }

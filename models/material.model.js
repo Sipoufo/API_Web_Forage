@@ -13,8 +13,10 @@ const materialSchema = new model({
             default: true
         },
         type: {
-            type: String,
-            required: true
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "type",
+            required: true,
+            trim: true,
         },
         prixUnit: {
             type: Number,

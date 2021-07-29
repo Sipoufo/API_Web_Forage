@@ -2,7 +2,7 @@ const express = require('express');
 const validate = require('../../middlewares/validate');
 const { AuthValidationClient } = require('../../validation/index');
 const { authControllerUser } = require('../../controller/index');
-const { tokenVerifieAdmin, tokenVerifieClient, tokenVerifie } = require('../../middlewares/auth')
+const { tokenVerifieAdmin, tokenVerifieClient, tokenVerifie } = require('../../middlewares/auth');
 
 const router = express.Router();
 
@@ -68,7 +68,7 @@ const router = express.Router();
  */
 router
     .route('/register')
-    .post(tokenVerifieAdmin, validate(AuthValidationClient.register), authControllerUser.register)
+    .post(tokenVerifieAdmin, validate(AuthValidationClient.register), authControllerUser.register);
 
 /**
  * @swagger
@@ -121,7 +121,7 @@ router
  */
 router
     .route('/update')
-    .put(tokenVerifieClient, validate(AuthValidationClient.update), authControllerUser.update)
+    .put(tokenVerifieClient, validate(AuthValidationClient.update), authControllerUser.update);
 
 // get one
 /**
@@ -145,7 +145,7 @@ router
  */
 router
     .route('/:idClient')
-    .get(tokenVerifie, validate(AuthValidationClient.getOne), authControllerUser.getOneClient)
+    .get(tokenVerifie, validate(AuthValidationClient.getOne), authControllerUser.getOneClient);
 
 // Update By ID
 /**
@@ -209,7 +209,7 @@ router
  */
 router
     .route('/update/:idClient')
-    .put(tokenVerifieAdmin, validate(AuthValidationClient.updateById), authControllerUser.updateById)
+    .put(tokenVerifieAdmin, validate(AuthValidationClient.updateById), authControllerUser.updateById);
 
 /**
  * @swagger
@@ -225,6 +225,22 @@ router
  */
 router
     .route('/logout')
-    .get(tokenVerifieAdmin, authControllerUser.logout)
+    .get(tokenVerifieAdmin, authControllerUser.logout);
+
+/**
+ * @swagger
+ * /client/auth/getClientByToken:
+ *  get:
+ *      summary: get one client
+ *      tags: [Client]
+ *      responses: 
+ *          200:
+ *              description: get successfully
+ *          400:
+ *              description: Error during the logout
+ */
+router
+    .route('/getClientByToken')
+    .get(tokenVerifieAdmin, authControllerUser.getAdminByToken);
 
 module.exports = router

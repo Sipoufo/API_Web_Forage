@@ -58,9 +58,9 @@ router
  *                          type: object
  *                          properties:
  *                              longitude:
- *                                  type: string
+ *                                  type: number
  *                              latitude:
- *                                  type: String
+ *                                  type: number
  *                          example:
  *                              longitude: 12
  *                              latitude: 12

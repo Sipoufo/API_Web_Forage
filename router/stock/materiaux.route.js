@@ -54,7 +54,7 @@ const router = express.Router();
  */
 router
     .route('/')
-    .post(tokenVerifieAdmin, validate(stockValidation.addMateriaux), StockController.addMateriaux)
+    .post(tokenVerifieAdmin, validate(stockValidation.addMateriaux), StockController.addMateriaux);
 
 // Update material
 /**
@@ -121,7 +121,7 @@ router
 router
     .route('/{id}')
     .put(tokenVerifieAdmin, validate(stockValidation.updateMaterial), StockController.updateMateriaux)
-    .get(tokenVerifieAdmin, validate(stockValidation.getOneMateriaux), StockController.getOneMateriaux)
+    .get(tokenVerifieAdmin, validate(stockValidation.getOneMateriaux), StockController.getOneMateriaux);
 
 //Get all
 /**
@@ -153,7 +153,7 @@ router
  */
 router
     .route('/getAll')
-    .post(tokenVerifieAdmin, validate(stockValidation.getAllMateriaux), StockController.getAllMateriaux)
+    .post(tokenVerifieAdmin, validate(stockValidation.getAllMateriaux), StockController.getAllMateriaux);
 
 //Get by type
 /**
@@ -187,7 +187,7 @@ router
  */
 router
     .route('/getByType')
-    .post(tokenVerifieAdmin, validate(stockValidation.getGetByType), StockController.getGetByType)
+    .post(tokenVerifieAdmin, validate(stockValidation.getGetByType), StockController.getGetByType);
 
 //Get by price
 /**
@@ -220,6 +220,6 @@ router
  */
 router
     .route('/getByPrice')
-    .post(tokenVerifieAdmin, validate(stockValidation.getGetByPrise), StockController.getGetByPrise)
+    .post(tokenVerifieAdmin, validate(stockValidation.getGetByPrise), StockController.getGetByPrise);
 
 module.exports = router

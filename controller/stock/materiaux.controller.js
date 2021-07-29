@@ -1,5 +1,5 @@
 const catchAsync = require('../../utils/catchAsync');
-const Material = require('../../models/material.model')
+const { Material, Type } = require('../../models/index');
 
 const addMateriaux = catchAsync(async(req, res) => {
     const { name, type, prixUnit, quantity, description, picture } = req.body
@@ -15,6 +15,24 @@ const addMateriaux = catchAsync(async(req, res) => {
                 }
             } else {
                 res.status(500).json({ status: 500, error: "This material exist" })
+            }
+        })
+})
+
+const addType = catchAsync(async(req, res) => {
+    const name = req.body.name
+
+    await Type.findOne({ name })
+        .then(async response => {
+            if (!response) {
+                const save = await Type.create({ name })
+                if (save) {
+                    res.status(200).json({ status: 200, result: save });
+                } else {
+                    res.status(500).json({ status: 500, error: "Error during the save" })
+                }
+            } else {
+                res.status(500).json({ status: 500, error: "This type exist" })
             }
         })
 })
@@ -108,7 +126,51 @@ const getAllMateriaux = catchAsync(async(req, res) => {
             console.log(err)
             res.status(500).json({ status: 500, error: "Error" })
         })
-})
+});
+
+const getType = catchAsync(async(req, res) => {
+    return Type.find()
+        .then(response => {
+            res.status(200).json({ status: 200, result: response });
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({ status: 500, error: "Error" })
+        })
+});
+
+const deleteType = catchAsync(async(req, res) => {
+    const id = req.body.idType
+    await Material.find({ type: id })
+        .then(async materials => {
+            if (materials > 0) {
+                for (let i = 0; i < materials.length; i++) {
+                    await Material.findByIdAndUpdate(materials[i]._id, { type: undefined })
+                }
+                await Type.findByIdAndDelete(id)
+                    .then(response => {
+                        res.status(200).json({ status: 200, result: response });
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        res.status(500).json({ status: 500, error: "Error" })
+                    })
+            } else {
+                await Type.findByIdAndDelete(id)
+                    .then(response => {
+                        res.status(200).json({ status: 200, result: response });
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        res.status(500).json({ status: 500, error: "Error" })
+                    })
+            }
+        })
+
+
+
+});
+
 const getOneMateriaux = catchAsync(async(req, res) => {
     const id = req.params.id
     return Material.findById(id)
@@ -160,5 +222,8 @@ module.exports = {
     getAllMateriaux,
     getGetByType,
     getGetByPrise,
-    getOneMateriaux
+    getOneMateriaux,
+    addType,
+    getType,
+    deleteType,
 }

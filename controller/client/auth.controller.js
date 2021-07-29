@@ -3,6 +3,7 @@ const ApiError = require('../../utils/ApiError');
 const catchAsync = require('../../utils/catchAsync');
 const Client = require('../../models/client.model')
 const Admin = require('../../models/administrateur.model')
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 
 const authorization = (req) => {
@@ -62,9 +63,11 @@ const update = catchAsync(async(req, res) => {
     const birthday = req.body.birthday
     const password = req.body.password
     const description = req.body.description
+    const password = req.body.password
     const profileImage = req.body.profileImage
     const longitude = req.body.longitude
     const latitude = req.body.latitude
+    const hashpassword = await bcrypt.hash(password, 8);
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err);
@@ -184,10 +187,37 @@ const getOneClient = catchAsync(async(req, res) => {
         })
 })
 
+const getAdminByToken = catchAsync((req, res) => {
+    const token = authorization(req)
+
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            return Client
+                .findById(decodedToken.id)
+                .then(response => {
+                    if (response) {
+                        res.status(200).json({ status: 200, result: response });
+                    } else {
+                        res.status(500).json({ status: 500, error: "This admin don't exist" })
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    res.status(500).json({ status: 500, error: "Error" })
+                })
+        }
+    })
+
+
+})
+
 module.exports = {
     register,
     logout,
     update,
     updateById,
-    getOneClient
+    getOneClient,
+    getAdminByToken
 }

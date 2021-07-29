@@ -2,7 +2,7 @@ const express = require('express');
 const validate = require('../../middlewares/validate');
 const { adminAuth } = require('../../validation/index');
 const { authAdmin } = require('../../controller/index');
-const { tokenVerifieAdmin, tokenVerifie } = require('../../middlewares/auth')
+const { tokenVerifieAdmin, tokenVerifie } = require('../../middlewares/auth');
 
 const router = express.Router();
 
@@ -65,7 +65,7 @@ const router = express.Router();
  */
 router
     .route('/register')
-    .post(tokenVerifieAdmin, validate(adminAuth.register), authAdmin.register)
+    .post(tokenVerifieAdmin, validate(adminAuth.register), authAdmin.register);
 
 /**
  * @swagger
@@ -118,7 +118,7 @@ router
  */
 router
     .route('/update')
-    .put(tokenVerifieAdmin, validate(adminAuth.update), authAdmin.update)
+    .put(tokenVerifieAdmin, validate(adminAuth.update), authAdmin.update);
 
 // Update with ID
 /**
@@ -179,7 +179,7 @@ router
  */
 router
     .route('/update/:idAdmin')
-    .put(tokenVerifieAdmin, validate(adminAuth.updateById), authAdmin.updateById)
+    .put(tokenVerifieAdmin, validate(adminAuth.updateById), authAdmin.updateById);
 
 /**
  * @swagger
@@ -197,7 +197,7 @@ router
 //  logout
 router
     .route('/logout')
-    .get(tokenVerifieAdmin, authAdmin.logout)
+    .get(tokenVerifieAdmin, authAdmin.logout);
 
 
 // get clients
@@ -215,7 +215,24 @@ router
  */
 router
     .route('/getClient')
-    .get(tokenVerifieAdmin, authAdmin.getClients)
+    .get(tokenVerifieAdmin, authAdmin.getClients);
+
+// get client by authorization
+/**
+ * @swagger
+ * /admin/auth/getAdminByToken:
+ *  get:
+ *      summary: get one admin
+ *      tags: [Admin]
+ *      responses: 
+ *          200:
+ *              description: get all user in the bd
+ *          500:
+ *              description: Error during the get
+ */
+router
+    .route('/getAdminByToken')
+    .get(tokenVerifieAdmin, authAdmin.getAdminByToken);
 
 
 // get Admin
@@ -233,7 +250,7 @@ router
  */
 router
     .route('/getAdmin')
-    .get(tokenVerifieAdmin, authAdmin.getAdmins)
+    .get(tokenVerifieAdmin, authAdmin.getAdmins);
 
 
 //get one
@@ -258,11 +275,11 @@ router
  */
 router
     .route('/:idAdmin')
-    .get(tokenVerifie, validate(adminAuth.getAdmin), authAdmin.getOneAdmin)
+    .get(tokenVerifie, validate(adminAuth.getAdmin), authAdmin.getOneAdmin);
 
 // first Admin
 router
     .route('/send/first/admin')
-    .get(authAdmin.sendFirstAdmin)
+    .get(authAdmin.sendFirstAdmin);
 
 module.exports = router

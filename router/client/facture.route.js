@@ -50,13 +50,10 @@ router
  *                      schema:
  *                          type: object
  *                          properties:
- *                              status:
- *                                  type: boolean
  *                              montant:
  *                                  type: integer
  *                          example:
- *                              status: true
- *                              montant: 28000
+ *                              montant: 24000
  *          responses:
  *              '201':
  *                  description: >

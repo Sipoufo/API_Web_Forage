@@ -4,7 +4,8 @@ const catchAsync = require('../../utils/catchAsync');
 const Client = require('../../models/client.model')
 const Admin = require('../../models/administrateur.model')
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const { Facture } = require('../../models');
 
 const authorization = (req) => {
     return req.headers.authorization.split(" ")[1]
@@ -68,6 +69,7 @@ const update = catchAsync(async(req, res) => {
     const longitude = req.body.longitude
     const latitude = req.body.latitude
     const hashpassword = await bcrypt.hash(password, 8);
+    console.log("je passe");
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err);
@@ -79,6 +81,7 @@ const update = catchAsync(async(req, res) => {
                         if ((number && number._id == decodedToken.id) || !number) {
                             const emailAdmin = await Admin.findOne({ email });
                             const emailClient = await Client.findOne({ email });
+                            console.log(emailAdmin);
                             if ((!emailAdmin && !emailClient) || ((emailAdmin && (emailClient._id == decodedToken.id)))) {
                                 const result = await Client.findByIdAndUpdate(decodedToken.id, { name, phone: phone, IdCompteur, profileImage, email, birthday, password: hashpassword, localisation: { longitude, latitude, description } });
                                 if (result) {
@@ -211,6 +214,33 @@ const getAdminByToken = catchAsync((req, res) => {
     })
 
 
+});
+
+const dashboard = catchAsync(async(req, res) => {
+    // console.log(await bcrypt.hash("Azerty12", 8));
+    const token = authorization(req);
+    let numberFacturePaid = 0;
+    let numberFactureInvoice = 0;
+    let numberFacture = 0;
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            await Facture
+                .find({ idClient: decodedToken.id })
+                .then(async facture => {
+                    if (facture.length > 0) {
+                        facturePaid = await Facture.find({ facturePay: true });
+                        factureInvoice = await Facture.find({ facturePay: false });
+                        numberFacturePaid = await Facture.find({ facturePay: true }).count();
+                        numberFactureInvoice = await Facture.find({ facturePay: false }).count();
+                        numberFacture = await Facture.find().count();
+                        client = await Client.findById(decodedToken.id);
+                    }
+                })
+            res.status(200).json({ status: 200, result: { client, facturePaid, factureInvoice, numberFacturePaid, numberFactureInvoice, numberFacture } })
+        }
+    })
 })
 
 module.exports = {
@@ -219,5 +249,6 @@ module.exports = {
     update,
     updateById,
     getOneClient,
-    getAdminByToken
+    getAdminByToken,
+    dashboard,
 }

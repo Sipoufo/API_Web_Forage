@@ -4,7 +4,7 @@ const { password, objectId } = require('../custom.validation');
 const addMateriaux = {
     body: Joi.object().keys({
         name: Joi.string().required(),
-        type: Joi.string().required(),
+        type: Joi.custom(objectId).required(),
         prixUnit: Joi.number().required(),
         quantity: Joi.number().required(),
         description: Joi.string().required(),
@@ -24,7 +24,7 @@ const updateMaterial = {
     }),
     body: Joi.object().keys({
         name: Joi.string().required(),
-        type: Joi.string().required(),
+        type: Joi.custom(objectId).required(),
         prixUnit: Joi.number().required(),
         quantity: Joi.number().required(),
         description: Joi.string().required(),
@@ -34,7 +34,7 @@ const updateMaterial = {
 
 const deleteType = {
     params: Joi.object().keys({
-        idType: Joi.custom(objectId),
+        idType: Joi.custom(objectId).required(),
     }),
 };
 
@@ -60,6 +60,13 @@ const getGetByType = {
     })
 };
 
+const removeMaterial = {
+    body: Joi.object().keys({
+        name: Joi.string().required(),
+        quantity: Joi.number(),
+    })
+};
+
 const getGetByPrise = {
     body: Joi.object().keys({
         page: Joi.number(),
@@ -76,4 +83,5 @@ module.exports = {
     getGetByPrise,
     addType,
     deleteType,
+    removeMaterial
 }

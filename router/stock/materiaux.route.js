@@ -57,6 +57,32 @@ router
     .post(tokenVerifieAdmin, validate(stockValidation.addMateriaux), StockController.addMateriaux);
 
 
+// Delete Type
+/**
+ * @swagger
+ *  /stock/type/{idType}:
+ *      delete: 
+ *          summary: delete one material in stock
+ *          tags: [Stock]
+ *          parameters:
+ *              -   in: path
+ *                  name: idType
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The id of type
+ *          responses: 
+ *              200:
+ *                  description: get type deleted
+ *              500:
+ *                  description: Error
+ *                                    
+ */
+router
+    .route('/type/:idType')
+    .delete(tokenVerifieAdmin, StockController.deleteType);
+
+
 //Add Type
 /**
  * @swagger
@@ -88,37 +114,36 @@ router
  *              '200':
  *                  description: >
  *                      Add a new type in the collection type
+ * 
+ *      put: 
+ *          summary: remove material
+ *          tags: [Stock]
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  type: string
+ *                              quantity:
+ *                                  type: integer
+ *                          example:
+ *                              name: tuyau
+ *                              quantity: 1
+ *          responses:
+ *              '200':
+ *                  description: >
+ *                      remove material
  *                                    
  */
 router
     .route('/type')
     .get(tokenVerifieAdmin, StockController.getTypes)
-    .post(tokenVerifieAdmin, validate(stockValidation.addType), StockController.addType);
+    .post(tokenVerifieAdmin, validate(stockValidation.addType), StockController.addType)
+    .put(tokenVerifieAdmin, validate(stockValidation.removeMaterial), StockController.removeMaterial);
 
-// Delete Type
-/**
- * @swagger
- *  /stock/type/{idType}:
- *      delete: 
- *          summary: delete one material in stock
- *          tags: [Stock]
- *          parameters:
- *              -   in: path
- *                  name: id
- *                  schema: 
- *                      type: string
- *                  required: true
- *                  description: The id of material
- *          responses: 
- *              200:
- *                  description: get one 
- *              500:
- *                  description: Error
- *                                    
- */
-router
-    .route('/type')
-    .delete(tokenVerifieAdmin, validate(stockValidation.deleteType), StockController.deleteType);
 
 // Update material
 /**

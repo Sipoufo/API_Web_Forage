@@ -28,24 +28,42 @@ const getFactures = catchAsync(async(req, res) => {
 })
 
 const statusPaidFacture = catchAsync(async(req, res) => {
-    const status = req.body.status
     const montant = req.body.montant
     const token = authorization(req)
     const idFacture = req.params.idFacture
+    let status = false
 
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err);
         } else {
-            await Facture
-                .findOneAndUpdate({ idClient: decodedToken.id, _id: idFacture }, { facturePay: status, montantVerse: montant })
-                .then(factures => {
-                    if (factures.length > 0) {
-                        res.status(200).json({ status: 200, result: factures });
+            await Facture.findById(idFacture)
+                .then(async result => {
+                    if (resultfacturePay == false) {
+                        if (result) {
+                            const newVerse = result.montantVerse + montant
+                            const newImpaye = result.montantImpaye - montant
+                            if (newImpaye == 0) {
+                                status = true
+                            }
+                            await Facture
+                                .findOneAndUpdate({ idClient: decodedToken.id, _id: idFacture }, { facturePay: status, montantVerse: newVerse, montantImpaye: newImpaye })
+                                .then(factures => {
+                                    if (factures) {
+                                        res.status(200).json({ status: 200, result: factures });
+                                    } else {
+                                        res.status(500).json({ status: 500, error: "Error while the find factures" });
+                                    }
+                                });
+                        } else {
+                            res.status(500).json({ status: 500, error: "This facture don't exist" });
+                        }
                     } else {
-                        res.status(500).json({ status: 500, error: "Error while the find factures" });
+                        res.status(500).json({ status: 500, error: "This facture is already OK" });
                     }
-                });
+
+                })
+
         }
     })
 })

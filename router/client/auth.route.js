@@ -12,6 +12,20 @@ const router = express.Router();
  *  name: Client
  *  description: Part of API to manage the client
  */
+// Dashboard 
+/**
+ * @swagger
+ * /client/auth/dashboard:
+ *  get:
+ *      summary: Admin logout
+ *      tags: [Client]
+ *      responses: 
+ *          200:
+ *              description: Dashboard
+ */
+router
+    .route('/dashboard')
+    .get(tokenVerifieClient, authControllerUser.dashboard);
 
 //Admin Authentification
 /**
@@ -228,7 +242,8 @@ router
  */
 router
     .route('/logout')
-    .get(tokenVerifieAdmin, authControllerUser.logout);
+    .get(tokenVerifieClient, authControllerUser.logout);
+
 
 /**
  * @swagger
@@ -244,6 +259,6 @@ router
  */
 router
     .route('/getClientByToken')
-    .get(tokenVerifieAdmin, authControllerUser.getAdminByToken);
+    .get(tokenVerifieClient, authControllerUser.getAdminByToken);
 
 module.exports = router

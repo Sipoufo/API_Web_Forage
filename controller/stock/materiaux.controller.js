@@ -39,22 +39,24 @@ const addType = catchAsync(async(req, res) => {
 
 const updateMateriaux = catchAsync(async(req, res) => {
     const { id } = req.params
+    console.log(req.body.type);
     const { name, type, prixUnit, quantity, description, picture } = req.body
 
-    return Material.findBy(id)
+
+    return Material.findById(id)
         .then(resultFind => {
             if (resultFind) {
                 return Material.findOne({ name })
                     .then(async response => {
-                        if (!response) {
-                            const save = await Material.findByIdAndUpdate(id, { name, type, prixUnit, quantity, description, picture })
+                        if (response) {
+                            const save = await Material.findByIdAndUpdate(id, { type, prixUnit, quantity, description, picture })
                             if (save) {
                                 res.status(200).json({ status: 200, result: save });
                             } else {
                                 res.status(500).json({ status: 500, error: "Error during the update" })
                             }
                         } else {
-                            res.status(500).json({ status: 500, error: "This material exist" })
+                            res.status(500).json({ status: 500, error: "This material don\'t exist" })
                         }
                     })
             } else {
@@ -128,6 +130,29 @@ const getAllMateriaux = catchAsync(async(req, res) => {
         })
 });
 
+const removeMaterial = catchAsync(async(req, res) => {
+    const name = req.body.name;
+    const quantity = req.body.quantity;
+
+    await Material.findOne({ name })
+        .then(async(material) => {
+            if (material) {
+                const reste = material.quantity - quantity
+                if (material.quantity > quantity) {
+                    await Material.findOneAndUpdate({ name }, { quantity: reste });
+                    res.status(200).json({ status: 200, error: "the " + name + " is is well registered " });
+                } else if (material.quantity < quantity) {
+                    res.status(500).json({ status: 500, error: "the " + name + " in stock is finished " });
+                } else {
+                    await Material.findOneAndUpdate({ name }, { quantity: reste });
+                    res.status(500).json({ status: 500, error: "the " + name + " in stock has just finished " });
+                }
+            } else {
+                res.status(500).json({ status: 500, error: "This material don't exist" });
+            }
+        })
+})
+
 const getTypes = catchAsync(async(req, res) => {
     return Type.find()
         .then(response => {
@@ -141,6 +166,7 @@ const getTypes = catchAsync(async(req, res) => {
 
 const deleteType = catchAsync(async(req, res) => {
     const id = req.params.idType
+    console.log(id);
     await Material.find({ type: id })
         .then(async materials => {
             if (materials > 0) {
@@ -226,4 +252,5 @@ module.exports = {
     addType,
     getTypes,
     deleteType,
+    removeMaterial
 }

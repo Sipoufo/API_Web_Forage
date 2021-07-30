@@ -6,7 +6,6 @@ const statusPaidFacture = {
         idFacture: Joi.custom(objectId).required()
     }),
     body: Joi.object().keys({
-        status: Joi.boolean().required(),
         montant: Joi.number().required(),
     })
 }

@@ -73,7 +73,20 @@ const getFactures = catchAsync((req, res) => {
                 res.status(500).json({ status: 500, error: "Error while the find factures" })
             }
         })
-})
+});
+
+const getFactureOne = catchAsync((req, res) => {
+    const idFacture = req.params.idFacture
+    console.log(idFacture);
+    Facture.findById(idFacture)
+        .then(facture => {
+            if (facture) {
+                res.status(200).json({ status: 200, result: facture })
+            } else {
+                res.status(500).json({ status: 500, error: "Error while the find facture" })
+            }
+        })
+});
 
 const getClientFactures = catchAsync((req, res) => {
     const idClient = req.params.idClient
@@ -87,19 +100,7 @@ const getClientFactures = catchAsync((req, res) => {
                 res.status(500).json({ status: 500, error: "Error during the find factures" })
             }
         })
-})
-
-const getFacture = catchAsync((req, res) => {
-    const idFacture = req.params.idFacture
-    Facture.findById(idFacture)
-        .then(facture => {
-            if (facture) {
-                res.status(200).json({ status: 200, result: facture })
-            } else {
-                res.status(500).json({ status: 500, error: "Error while the find facture" })
-            }
-        })
-})
+});
 
 const getFactureAdvance = catchAsync(async(req, res) => {
     const EndFactureAdvance = []
@@ -188,9 +189,9 @@ module.exports = {
     addFacture,
     getFactures,
     getClientFactures,
-    getFacture,
     updateFacture,
     statusPaidFacture,
     getFactureAdvance,
-    getByStatus
+    getByStatus,
+    getFactureOne,
 }

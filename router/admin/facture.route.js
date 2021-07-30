@@ -131,7 +131,7 @@ router
 router
     .route('/:idClient')
     .post(tokenVerifieAdmin, validate(FactureValidation.addFacture), FactureController.addFacture)
-    .get(tokenVerifieAdmin, validate(FactureValidation.getClientFactures), FactureController.getClientFactures)
+    .get(tokenVerifieAdmin, validate(FactureValidation.getClientFactures), FactureController.getClientFactures);
 
 /**
  * @swagger
@@ -165,11 +165,27 @@ router
  */
 router
     .route('/statusPaidFacture/:idFacture')
-    .put(tokenVerifie, validate(FactureValidation.statusPaidFacture), FactureController.statusPaidFacture)
+    .put(tokenVerifie, validate(FactureValidation.statusPaidFacture), FactureController.statusPaidFacture);
 
 /**
  * @swagger
- *  /admin/facture/{idFacture}:
+ *  /admin/facture/one/{idFacture}:
+ *      get:
+ *          summary: get one facture
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: idFacture
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The id of facture
+ *          responses: 
+ *              200:
+ *                  description: get on facture save in the bd
+ *              500:
+ *                  description: Error during the get
+ * 
  *      put: 
  *          summary: Add facture
  *          tags: [Facture_Admin]
@@ -207,28 +223,12 @@ router
  *              '201':
  *                  description: >
  *                      update a facture
- * 
- *      get:
- *          summary: get one facture
- *          tags: [Facture_Admin]
- *          parameters:
- *              -   in: path
- *                  name: idFacture
- *                  schema: 
- *                      type: string
- *                  required: true
- *                  description: The id of facture
- *          responses: 
- *              200:
- *                  description: get on facture save in the bd
- *              500:
- *                  description: Error during the get
  *                                    
  */
 router
-    .route('/:idFacture')
-    .get(tokenVerifieAdmin, FactureController.getFacture)
-    .put(tokenVerifieAdmin, validate(FactureValidation.updateFacture), FactureController.updateFacture)
+    .route('/one/:idFacture')
+    .get(tokenVerifieAdmin, FactureController.getFactureOne)
+    .put(tokenVerifieAdmin, validate(FactureValidation.updateFacture), FactureController.updateFacture);
 
 
 module.exports = router

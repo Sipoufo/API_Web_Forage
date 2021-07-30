@@ -91,6 +91,8 @@ router
  *                                  type: string
  *                              email:
  *                                  type: string
+ *                              idCompteur:
+ *                                  type: string
  *                              password:
  *                                  type: string
  *                                  format: password
@@ -108,6 +110,7 @@ router
  *                              birthday: 2002-01-29
  *                              phone: "695914926"
  *                              password: Azerty12
+ *                              idCompteur: UX2024
  *                              email: sipoufoTest@gmail.com
  *                              longitude: 12
  *                              latitude: 12

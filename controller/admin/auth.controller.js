@@ -65,6 +65,7 @@ const update = catchAsync(async(req, res) => {
     const profileImage = req.body.profileImage
     const longitude = req.body.longitude
     const latitude = req.body.latitude
+    const hashpassword = await bcrypt.hash(password, 8);
 
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
@@ -79,7 +80,7 @@ const update = catchAsync(async(req, res) => {
                                     const emailAdmin = await admin.findOne({ email })
                                     const emailClient = await client.findOne({ email })
                                     if ((!emailAdmin && !emailClient) || ((emailAdmin && (emailAdmin._id == decodedToken.id)))) {
-                                        const result = await admin.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday, password, localisation: { longitude, latitude, description } })
+                                        const result = await admin.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday, password: hashpassword, localisation: { longitude, latitude, description } })
                                         if (result) {
                                             res.status(200).json({ status: 200, result: result })
                                         } else {

@@ -62,6 +62,7 @@ const update = catchAsync(async(req, res) => {
     const email = req.body.email
     const birthday = req.body.birthday
     const password = req.body.password
+    const IdCompteur = req.body.IdCompteur
     const description = req.body.description
     const profileImage = req.body.profileImage
     const longitude = req.body.longitude
@@ -79,7 +80,7 @@ const update = catchAsync(async(req, res) => {
                             const emailAdmin = await Admin.findOne({ email });
                             const emailClient = await Client.findOne({ email });
                             if ((!emailAdmin && !emailClient) || ((emailAdmin && (emailClient._id == decodedToken.id)))) {
-                                const result = await Client.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday, password, localisation: { longitude, latitude, description } });
+                                const result = await Client.findByIdAndUpdate(decodedToken.id, { name, phone: phone, IdCompteur, profileImage, email, birthday, password: hashpassword, localisation: { longitude, latitude, description } });
                                 if (result) {
                                     res.status(200).json({ status: 200, result: result });
                                 } else {

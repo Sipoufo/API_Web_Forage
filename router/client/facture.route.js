@@ -14,6 +14,32 @@ const router = express.Router()
  */
 
 
+// Get facture month
+/**
+ * @swagger
+ *  /client/facture/getFactureWithMonth/{status}:
+ *      get:
+ *          summary: All facture whit status and month
+ *          tags: [Facture_Client]
+ *          parameters:
+ *              -   in: path
+ *                  name: status
+ *                  schema: 
+ *                      type: boolean
+ *                  required: true
+ *                  description: The status
+ *          responses:
+ *              200:
+ *                  description: return all the facture for all
+ *              500:
+ *                  description: Error while the get all the facture
+ */
+router
+    .route('/getFactureWithMonth/:status')
+    .get(tokenVerifieClient, validate(ClientFactureValidation.factureWithDate), ClientFactureController.factureWithDate);
+
+
+
 /**
  * @swagger
  *  /client/facture:
@@ -115,6 +141,7 @@ router
  */
 router
     .route('/getFactureAdvance')
-    .get(tokenVerifieClient, ClientFactureController.getFactureAdvance)
+    .get(tokenVerifieClient, ClientFactureController.getFactureAdvance);
+
 
 module.exports = router

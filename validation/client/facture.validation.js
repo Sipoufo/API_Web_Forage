@@ -20,7 +20,14 @@ const advanceFacture = {
     })
 }
 
+const factureWithDate = {
+    params: Joi.object().keys({
+        status: Joi.boolean().required(),
+    })
+}
+
 module.exports = {
     statusPaidFacture,
-    advanceFacture
+    advanceFacture,
+    factureWithDate
 }

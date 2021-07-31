@@ -126,7 +126,7 @@ const updateClient = catchAsync(async(req, res) => {
                         if ((number && number._id == idClient) || !number) {
                             const emailAdmin = await Admin.findOne({ email })
                             const emailClient = await Client.findOne({ email })
-                            if ((!emailAdmin && !emailClient) || ((emailAdmin && (emailClient._id == idClient)))) {
+                            if ((!emailAdmin && !emailClient) || ((emailClient && (emailClient._id == idClient)))) {
                                 const result = await Client.findByIdAndUpdate(idClient, { name, phone: phone, profileImage, IdCompteur, email, birthday, localisation: { longitude, latitude, description } })
                                 if (result) {
                                     res.status(200).json({ status: 200, result: result })
@@ -134,7 +134,7 @@ const updateClient = catchAsync(async(req, res) => {
                                     res.status(500).json({ status: 500, error: "This admin don't exist" })
                                 }
                             } else {
-                                res.status(500).json({ status: 500, error: "This email don't exist" })
+                                res.status(500).json({ status: 500, error: "This email exist" })
                             }
 
                         } else {

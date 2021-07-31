@@ -81,7 +81,7 @@ const update = catchAsync(async(req, res) => {
                             const emailAdmin = await Admin.findOne({ email });
                             const emailClient = await Client.findOne({ email });
                             console.log(emailAdmin);
-                            if ((!emailAdmin && !emailClient) || ((emailAdmin && (emailClient._id == decodedToken.id)))) {
+                            if ((!emailAdmin && !emailClient) || ((emailClient && (emailClient._id == decodedToken.id)))) {
                                 const result = await Client.findByIdAndUpdate(decodedToken.id, { name, phone: phone, IdCompteur, profileImage, email, birthday, password: hashpassword, localisation: { longitude, latitude, description } });
                                 if (result) {
                                     res.status(200).json({ status: 200, result: result });
@@ -222,6 +222,9 @@ const dashboard = catchAsync(async(req, res) => {
     let numberFacturePaid = 0;
     let numberFactureInvoice = 0;
     let numberFacture = 0;
+    let client = null;
+    let facturePaid = [];
+    let factureInvoice = [];
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err);
@@ -235,9 +238,9 @@ const dashboard = catchAsync(async(req, res) => {
                         numberFacturePaid = await Facture.find({ facturePay: true }).count();
                         numberFactureInvoice = await Facture.find({ facturePay: false }).count();
                         numberFacture = await Facture.find().count();
-                        client = await Client.findById(decodedToken.id);
                     }
                 })
+            client = await Client.findById(decodedToken.id);
             res.status(200).json({ status: 200, result: { client, facturePaid, factureInvoice, numberFacturePaid, numberFactureInvoice, numberFacture } })
         }
     })

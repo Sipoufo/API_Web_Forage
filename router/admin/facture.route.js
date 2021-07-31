@@ -52,10 +52,17 @@ router
 // all facture by status
 /**
  * @swagger
- *  /admin/facture/getByStatus:
+ *  /admin/facture/getByStatus/{status}:
  *      get:
  *          summary: get all facture advance
  *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: status
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The status of facture
  *          responses: 
  *              200:
  *                  description: get advance facture save in the bd
@@ -63,7 +70,7 @@ router
  *                  description: Error during the get
  */
 router
-    .route('/getByStatus')
+    .route('/getByStatus/:status')
     .get(tokenVerifieAdmin, validate(FactureValidation.getByStatus), FactureController.getByStatus)
 
 /**

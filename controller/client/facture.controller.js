@@ -109,10 +109,15 @@ const advanceFacture = catchAsync(async(req, res) => {
                 .findOne({ _id: idFacture, idClient: decodedToken.id })
                 .then(async(facture) => {
                     if (facture) {
-                        const montant = facture.montantTotal;
+                        const montant = facture.montantConsommation;
                         const reset = (montant - AdvanceCount);
                         const factureAd = await Facture.findByIdAndUpdate(idFacture, { montantVerse: AdvanceCount, montantImpaye: reset });
-                        await Client.findByIdAndUpdate(decodedToken.id, { idFacture, AdvanceCount, advanceDate, reset });
+                        await Client.findByIdAndUpdate(decodedToken.id, {
+                            $push: {
+                                advanceFacture: { AdvanceCount, advanceDate, reset }
+                            }
+                        });
+                        console.log("Je passe");
                         res.status(200).json({ status: 200, result: factureAd });
                     } else {
                         res.status(500).json({ status: 500, error: "This facture don't exist ou it's not for you" });

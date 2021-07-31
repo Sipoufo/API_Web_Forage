@@ -33,13 +33,10 @@ const statusPaidFacture = {
     params: Joi.object().keys({
         idFacture: Joi.custom(objectId).required()
     }),
-    body: Joi.object().keys({
-        newIndex: Joi.boolean().required(),
-    })
 }
 
 const getByStatus = {
-    body: Joi.object().keys({
+    params: Joi.object().keys({
         status: Joi.boolean().required(),
     })
 }

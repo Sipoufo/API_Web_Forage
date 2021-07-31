@@ -170,8 +170,7 @@ const statusPaidFacture = catchAsync(async(req, res) => {
 })
 
 const getByStatus = catchAsync(async(req, res) => {
-    const status = req.body.status
-
+    const status = req.params.status
     await Facture
         .find({ facturePay: status })
         .sort({ createdAt: -1 })

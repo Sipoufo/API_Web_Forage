@@ -133,12 +133,12 @@ const removeMaterial = catchAsync(async(req, res) => {
                 const reste = material.quantity - quantity
                 if (material.quantity > quantity) {
                     await Material.findOneAndUpdate({ name }, { quantity: reste });
-                    res.status(200).json({ status: 200, error: "the " + name + " is is well registered " });
+                    res.status(200).json({ status: 200, error: "Only " + reste + " " + name + " left " });
                 } else if (material.quantity < quantity) {
                     res.status(500).json({ status: 500, error: "the " + name + " in stock is finished " });
                 } else {
                     await Material.findOneAndUpdate({ name }, { quantity: reste });
-                    res.status(500).json({ status: 500, error: "the " + name + " in stock has just finished " });
+                    res.status(200).json({ status: 200, error: "the " + name + " is exhausted " });
                 }
             } else {
                 res.status(500).json({ status: 500, error: "This material don't exist" });
@@ -210,13 +210,22 @@ const getGetByType = catchAsync(async(req, res) => {
     const type = req.body.type
     const page = (req.body.page) ? req.body.page : 1
     const limit = (req.body.limit) ? req.body.limit : 10
-    return Material.paginate({ type }, { page, limit })
-        .then(response => {
-            res.status(200).json({ status: 200, result: response });
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).json({ status: 500, error: "Error" })
+
+    await Type.findOne({ name: type })
+        .then(async type => {
+            if (type) {
+                await Material.paginate({ type: type._id }, { page, limit })
+                    .then(response => {
+                        res.status(200).json({ status: 200, result: response });
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        res.status(500).json({ status: 500, error: "Error" })
+                    })
+            } else {
+                res.status(500).json({ status: 500, error: "This type don't exist" })
+            }
+
         })
 })
 

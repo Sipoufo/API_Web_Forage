@@ -247,7 +247,7 @@ router
 
 /**
  * @swagger
- * /client/auth/getClientByToken:
+ * /client/auth/get/getClientByToken:
  *  get:
  *      summary: get one client
  *      tags: [Client]
@@ -258,7 +258,7 @@ router
  *              description: Error during the logout
  */
 router
-    .route('/getClientByToken')
-    .get(tokenVerifieClient, authControllerUser.getAdminByToken);
+    .route('/get/getClientByToken')
+    .get(tokenVerifieClient, authControllerUser.getClientByToken);
 
 module.exports = router

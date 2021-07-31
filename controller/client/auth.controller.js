@@ -69,7 +69,6 @@ const update = catchAsync(async(req, res) => {
     const longitude = req.body.longitude
     const latitude = req.body.latitude
     const hashpassword = await bcrypt.hash(password, 8);
-    console.log("je passe");
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err);
@@ -190,13 +189,14 @@ const getOneClient = catchAsync(async(req, res) => {
         })
 })
 
-const getAdminByToken = catchAsync((req, res) => {
+const getClientByToken = catchAsync((req, res) => {
     const token = authorization(req)
 
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err);
         } else {
+            console.log(decodedToken.id);
             return Client
                 .findById(decodedToken.id)
                 .then(response => {
@@ -249,6 +249,6 @@ module.exports = {
     update,
     updateById,
     getOneClient,
-    getAdminByToken,
+    getClientByToken,
     dashboard,
 }

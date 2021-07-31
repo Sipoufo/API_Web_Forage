@@ -159,12 +159,19 @@ const statusPaidFacture = catchAsync(async(req, res) => {
     const idFacture = req.params.idFacture
     const status = req.body.status
 
-    await Facture.findByIdAndUpdate(idFacture, { facturePay: status })
-        .then(facture => {
-            if (facture) {
-                res.status(200).json({ status: 200, result: facture })
+    await Facture.findById(idFacture)
+        .then(async result => {
+            if (result) {
+                await Facture.findByIdAndUpdate(idFacture, { facturePay: status, montantImpaye: 0, montantVerse: result.montantConsommation })
+                    .then(facture => {
+                        if (facture) {
+                            res.status(200).json({ status: 200, result: facture })
+                        } else {
+                            res.status(500).json({ status: 500, error: "Error during the update" })
+                        }
+                    })
             } else {
-                res.status(500).json({ status: 500, error: "Error during the update" })
+                res.status(500).json({ status: 500, error: "This facture don't exist" })
             }
         })
 })

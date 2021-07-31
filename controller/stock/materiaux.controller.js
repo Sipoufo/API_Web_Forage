@@ -44,21 +44,14 @@ const updateMateriaux = catchAsync(async(req, res) => {
 
 
     return Material.findById(id)
-        .then(resultFind => {
+        .then(async resultFind => {
             if (resultFind) {
-                return Material.findOne({ name })
-                    .then(async response => {
-                        if (response) {
-                            const save = await Material.findByIdAndUpdate(id, { type, prixUnit, quantity, description, picture })
-                            if (save) {
-                                res.status(200).json({ status: 200, result: save });
-                            } else {
-                                res.status(500).json({ status: 500, error: "Error during the update" })
-                            }
-                        } else {
-                            res.status(500).json({ status: 500, error: "This material don\'t exist" })
-                        }
-                    })
+                const save = await Material.findByIdAndUpdate(id, { name, type, prixUnit, quantity, description, picture })
+                if (save) {
+                    res.status(200).json({ status: 200, result: save });
+                } else {
+                    res.status(500).json({ status: 500, error: "Error during the update" })
+                }
             } else {
                 res.status(500).json({ status: 500, error: "This material don\'t exist" })
             }

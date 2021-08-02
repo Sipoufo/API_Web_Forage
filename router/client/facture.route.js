@@ -58,6 +58,22 @@ router
 
 /**
  * @swagger
+ *  /client/facture/factureClientWithDate:
+ *      get:
+ *          summary: All facture for One client with date
+ *          tags: [Facture_Client]
+ *          responses:
+ *              200:
+ *                  description: return all the facture for one client with date
+ *              500:
+ *                  description: Error while the get all the facture
+ */
+router
+    .route('/factureClientWithDate')
+    .get(tokenVerifieClient, ClientFactureController.getFacturesWithDate)
+
+/**
+ * @swagger
  *  /client/facture/paid/{idFacture}:
  *      put: 
  *          summary: Add facture

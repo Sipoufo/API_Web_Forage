@@ -232,11 +232,11 @@ const dashboard = catchAsync(async(req, res) => {
                 .find({ idClient: decodedToken.id })
                 .then(async facture => {
                     if (facture.length > 0) {
-                        facturePaid = await Facture.find({ facturePay: true });
-                        factureInvoice = await Facture.find({ facturePay: false });
-                        numberFacturePaid = await Facture.find({ facturePay: true }).count();
-                        numberFactureInvoice = await Facture.find({ facturePay: false }).count();
-                        numberFacture = await Facture.find().count();
+                        facturePaid = await Facture.find({ facturePay: true, idClient: decodedToken.id });
+                        factureInvoice = await Facture.find({ facturePay: false, idClient: decodedToken.id });
+                        numberFacturePaid = await Facture.find({ facturePay: true, idClient: decodedToken.id }).count();
+                        numberFactureInvoice = await Facture.find({ facturePay: false, idClient: decodedToken.id }).count();
+                        numberFacture = await Facture.find({ idClient: decodedToken.id }).count();
                     }
                 })
             client = await Client.findById(decodedToken.id);

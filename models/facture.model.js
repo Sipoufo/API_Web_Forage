@@ -59,6 +59,10 @@ const factureSchema = new model({
             required: false,
             default: 0
         },
+        tranche: [{
+            montant: Number,
+            date: Date
+        }],
         dataLimitePaid: {
             type: Date,
             required: true
@@ -69,9 +73,8 @@ const factureSchema = new model({
             default: false
         },
         dateFacturation: {
-            type: String,
-            required: false,
-            default: false
+            type: Date,
+            required: true,
         },
         datePaid: {
             type: String,
@@ -79,7 +82,7 @@ const factureSchema = new model({
             default: false
         },
         dateReleveNewIndex: {
-            type: String,
+            type: Date,
             required: true
         },
     }, {

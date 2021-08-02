@@ -20,7 +20,7 @@ const addFacture = catchAsync(async(req, res) => {
             const penalite = (req.body.penalite) ? req.body.penalite : 0;
             const dataPaid = req.body.dataPaid;
             const montantVerse = req.body.montantVerse;
-            const dateReleveNewIndex = req.body.dateReleveNewIndex;
+            const dateReleveNewIndex = new Date(req.body.dateReleveNewIndex);
             let oldIndex = req.body.oldIndex;
 
             console.log("Je passe 1");
@@ -31,16 +31,16 @@ const addFacture = catchAsync(async(req, res) => {
                 .then(async factures => {
                     console.log("Je passe ici 2 : ", factures.length);
                     if (factures.length >= 1) {
-                        oldIndex = factures[0].newIndex
+                        oldIndex = factures[0].newIndex;
                     }
                     await Admin.findById(decodedToken.id)
                         .then(async(admin) => {
                             if (admin) {
-                                const consommation = newIndex - oldIndex
-                                const montantConsommation = (consommation * 500) + 1000 + penalite
-                                const dateFacturation = new Date()
-                                const montantImpaye = montantConsommation - montantVerse
-                                const dataLimitePaid = new Date(dateFacturation.getFullYear(), dateFacturation.getMonth() + 1, dateFacturation.getDate(), dateFacturation.getHours(), dateFacturation.getMinutes(), dateFacturation.getMilliseconds());
+                                const consommation = newIndex - oldIndex;
+                                const montantConsommation = (consommation * 500) + 1000 + penalite;
+                                const dateFacturation = new Date();
+                                const montantImpaye = montantConsommation - montantVerse;
+                                const dataLimitePaid = new Date(dateFacturation.getFullYear(), dateFacturation.getMonth(), dateFacturation.getDate() + 10, dateFacturation.getHours(), dateFacturation.getMinutes(), dateFacturation.getMilliseconds());
                                 const prixUnitaire = 500;
                                 const fraisEntretien = 1000;
                                 await Facture.create({ idClient, idAdmin, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, observation, dateReleveNewIndex, dateFacturation, dataLimitePaid, dataPaid, montantVerse, montantImpaye, penalite })

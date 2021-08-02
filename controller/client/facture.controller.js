@@ -27,6 +27,30 @@ const getFactures = catchAsync(async(req, res) => {
 
 })
 
+const getFacturesWithDate = catchAsync(async(req, res) => {
+    const token = authorization(req)
+    let result = []
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            await Facture
+                .find({ idClient: decodedToken.id, facturePay: true })
+                .sort({ createdAt: -1 })
+                .then(factures => {
+                    for (let i = 0; i < factures.length; i++) {
+                        const date = " " + (factures[i].dateFacturation.getFullYear() + 1) + "-" + (factures[i].dateFacturation.getMonth() + 1)
+                        const lengthtTranche = factures[i].tranche.length
+                        result.push({ date, montant: factures[i].montantConsommation, tranche: lengthtTranche })
+                    }
+                    console.log(result)
+                    res.status(200).json({ status: 200, result: result });
+                });
+        }
+    })
+
+})
+
 const statusPaidFacture = catchAsync(async(req, res) => {
     const montant = req.body.montant
     const token = authorization(req)
@@ -39,22 +63,27 @@ const statusPaidFacture = catchAsync(async(req, res) => {
         } else {
             await Facture.findById(idFacture)
                 .then(async result => {
-                    if (resultfacturePay == false) {
+                    if (result.facturePay == false) {
                         if (result) {
                             const newVerse = result.montantVerse + montant
                             const newImpaye = result.montantImpaye - montant
                             if (newImpaye == 0) {
                                 status = true
                             }
-                            await Facture
-                                .findOneAndUpdate({ idClient: decodedToken.id, _id: idFacture }, { facturePay: status, montantVerse: newVerse, montantImpaye: newImpaye })
-                                .then(factures => {
-                                    if (factures) {
-                                        res.status(200).json({ status: 200, result: factures });
-                                    } else {
-                                        res.status(500).json({ status: 500, error: "Error while the find factures" });
-                                    }
-                                });
+                            if (newImpaye >= 0) {
+                                await Facture
+                                    .findByIdAndUpdate(idFacture, { facturePay: status, montantVerse: newVerse, montantImpaye: newImpaye, $push: { tranche: { montant, date: new Date() } } })
+                                    .then(factures => {
+                                        if (factures) {
+                                            res.status(200).json({ status: 200, result: factures });
+                                        } else {
+                                            res.status(500).json({ status: 500, error: "Error while the find factures" });
+                                        }
+                                    });
+                            } else {
+                                res.status(500).json({ status: 500, error: "You must enter a valid amount" });
+                            }
+
                         } else {
                             res.status(500).json({ status: 500, error: "This facture don't exist" });
                         }
@@ -72,17 +101,15 @@ const factureWithDate = catchAsync(async(req, res) => {
     const token = authorization(req)
     const status = req.params.status
     const EndFactureAdvance = []
-    console.log(status)
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err);
         } else {
-            console.log(decodedToken.id)
             Facture
                 .find({ idClient: decodedToken.id, facturePay: status })
                 .sort({ createdAt: -1 })
                 .then(async factures => {
-                    if (factures.length > 0) {
+                    if (factures.length >= 0) {
                         for (let i = 0; i < factures.length; i++) {
                             const month = await Facture.aggregate([{
                                 $project: {
@@ -90,9 +117,7 @@ const factureWithDate = catchAsync(async(req, res) => {
                                 }
                             }])
 
-                            if (factures[i].montantImpaye == 0) {
-                                EndFactureAdvance.push({ facture: factures[i], month })
-                            }
+                            EndFactureAdvance.push({ facture: factures[i], month })
                         }
                         res.status(200).json({ status: 200, result: EndFactureAdvance })
                     } else {
@@ -106,12 +131,10 @@ const factureWithDate = catchAsync(async(req, res) => {
 const getFactureAdvance = catchAsync(async(req, res) => {
     const token = authorization(req);
     const EndFactureAdvance = [];
-    console.log(token)
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err);
         } else {
-            console.log(decodedToken.id)
             Facture
                 .find({ idClient: decodedToken.id })
                 .sort({ createdAt: -1 })
@@ -153,7 +176,6 @@ const advanceFacture = catchAsync(async(req, res) => {
                                 advanceFacture: { AdvanceCount, advanceDate, reset }
                             }
                         });
-                        console.log("Je passe");
                         res.status(200).json({ status: 200, result: factureAd });
                     } else {
                         res.status(500).json({ status: 500, error: "This facture don't exist ou it's not for you" });
@@ -168,5 +190,6 @@ module.exports = {
     statusPaidFacture,
     advanceFacture,
     getFactureAdvance,
-    factureWithDate
+    factureWithDate,
+    getFacturesWithDate
 }

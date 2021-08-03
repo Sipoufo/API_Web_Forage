@@ -24,9 +24,7 @@ const update = {
         description: Joi.string(),
         profileImage: Joi.string(),
         birthday: Joi.string().required(),
-        password: Joi.custom(password).required(),
-        longitude: Joi.number().required(),
-        latitude: Joi.number().required()
+        password: Joi.custom(password),
     })
 }
 

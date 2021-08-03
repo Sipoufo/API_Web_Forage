@@ -19,7 +19,7 @@ const getFactures = catchAsync(async(req, res) => {
                     if (factures.length > 0) {
                         res.status(200).json({ status: 200, result: factures });
                     } else {
-                        res.status(500).json({ status: 500, error: "Error while the find factures" });
+                        res.status(200).json({ status: 200, result: factures });
                     }
                 });
         }

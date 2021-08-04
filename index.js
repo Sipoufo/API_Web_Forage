@@ -1,7 +1,11 @@
 const express = require('express')
 const mongoose = require('mongoose');
 const helmet = require('helmet');
-const app = express()
+const http = require('http');
+const socketio = require('socket.io')
+const app = express();
+const server = http.createServer(app);
+const io = socketio()
 const dotenv = require('dotenv');
 const httpStatus = require('http-status');
 const path = require('path');
@@ -17,6 +21,7 @@ const stock = require('./router/stock/index');
 const docs = require('./router/docs/docs.route');
 const userRoutes = require('./router/client/index');
 const { errorConverter, errorHandler } = require('./middlewares/error');
+
 // const routes = require('./router/client/index')
 
 dotenv.config({ path: './.env' })
@@ -95,6 +100,6 @@ app.use(errorConverter);
 // handle error
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`We listening with the port ${PORT}`)
 })

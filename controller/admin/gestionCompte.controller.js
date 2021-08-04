@@ -62,11 +62,11 @@ const updateAdmin = catchAsync(async(req, res) => {
     const latitude = req.body.latitude
     const token = authorization(req)
 
+    console.log(`lng: ${longitude}, lat: ${latitude}`)
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err);
         } else {
-            console.log(req)
             await Admin.findOne({ _id: decodedToken.id, profile: "superAdmin" })
                 .then(async adminResult => {
                     if (adminResult) {
@@ -75,10 +75,10 @@ const updateAdmin = catchAsync(async(req, res) => {
                                 if (!client) {
                                     await Admin.findOne({ phone })
                                         .then(async number => {
-                                            if ((number && number._id === idAdmin) || !number) {
+                                            if ((number && number._id == idAdmin) || !number) {
                                                 const emailAdmin = await Admin.findOne({ email })
                                                 const emailClient = await Client.findOne({ email })
-                                                if (!emailAdmin && !emailClient) {
+                                                if ((!emailAdmin && !emailClient) || ((emailAdmin && (emailAdmin._id == idAdmin)))) {
                                                     const result = await Admin.findByIdAndUpdate(idAdmin, { name, phone: phone, profileImage, email, birthday, localisation: { longitude, latitude, description } })
                                                     if (result) {
                                                         res.status(200).json({ status: 200, result: result })
@@ -89,7 +89,6 @@ const updateAdmin = catchAsync(async(req, res) => {
                                                     res.status(500).json({ status: 500, error: "This email don't exist" })
                                                 }
                                             } else {
-                                                console.log()
                                                 res.status(500).json({ status: 500, error: "this number exist <-_->" })
                                             }
                                         })

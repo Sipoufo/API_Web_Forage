@@ -102,6 +102,27 @@ const getClientFactures = catchAsync((req, res) => {
         })
 });
 
+const findByYear = catchAsync((req, res) => {
+    const year = req.params.year
+    let result = []
+    console.log(year)
+    Facture
+        .find()
+        .sort({ createdAt: 1 })
+        .then(factures => {
+            if (factures.length > 0) {
+                for (let i = 0; i < factures.length; i++) {
+                    const yearFacture = factures[i].createdAt.getFullYear()
+                    console.log(yearFacture);
+                    if (yearFacture == year) {
+                        result.push(factures[i])
+                    }
+                }
+            }
+            res.status(200).json({ status: 200, result })
+        })
+})
+
 const getFactureAdvance = catchAsync(async(req, res) => {
     const EndFactureAdvance = []
     await Facture
@@ -200,4 +221,5 @@ module.exports = {
     getFactureAdvance,
     getByStatus,
     getFactureOne,
+    findByYear
 }

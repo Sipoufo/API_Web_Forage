@@ -238,4 +238,30 @@ router
     .put(tokenVerifieAdmin, validate(FactureValidation.updateFacture), FactureController.updateFacture);
 
 
+// get Facture By Year
+/**
+ * @swagger
+ *  /admin/facture/factureByYear/{year}:
+ *      get:
+ *          summary: find factures about year
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: year
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: The year of facture
+ *          responses: 
+ *              200:
+ *                  description: get factures about the year
+ *              500:
+ *                  description: Error during the get
+ */
+router
+    .route('/factureByYear/:year')
+    .get(tokenVerifieAdmin, validate(FactureValidation.findByYear), FactureController.findByYear);
+
+
+
 module.exports = router

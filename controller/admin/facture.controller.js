@@ -76,15 +76,24 @@ const addFacture = catchAsync(async(req, res) => {
 })
 
 const getFactures = catchAsync((req, res) => {
+    const month = req.params.month;
+    const year = req.params.year;
+    const page = req.params.page;
+    const limit = req.params.limit;
+    const facture = [];
     Facture
-        .find()
-        .sort({ createdAt: -1 })
+        .paginate({}, { page, limit })
         .then(factures => {
-            if (factures.length > 0) {
-                res.status(200).json({ status: 200, result: factures })
-            } else {
-                res.status(500).json({ status: 500, error: "Error while the find factures" })
+            for (let i = 0; i < factures.docs.length; i++) {
+                const monthInvoice = factures.docs[i].createdAt.getMonth() + 1;
+                const yearInvoice = factures.docs[i].createdAt.getFullYear();
+                console.log(monthInvoice)
+                console.log(yearInvoice)
+                if (monthInvoice == month && yearInvoice == year) {
+                    facture.push(factures.docs[i]);
+                }
             }
+            res.status(200).json({ status: 200, result: facture })
         })
 });
 

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const model = mongoose.Schema
+var mongoosePaginate = require('mongoose-paginate-v2');
 
 const factureSchema = new model({
         idClient: {
@@ -90,6 +91,8 @@ const factureSchema = new model({
     }
 
 )
+
+factureSchema.plugin(mongoosePaginate);
 
 const Facture = mongoose.model('factures', factureSchema)
 

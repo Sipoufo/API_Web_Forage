@@ -16,10 +16,35 @@ const router = express.Router()
 
 /**
  * @swagger
- *  /admin/facture:
+ *  /admin/facture/{year}/{month}/{limit}/{page}:
  *      get:
  *          summary: All facture
  *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: year
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: Year
+ *              -   in: path
+ *                  name: month
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: Month
+ *              -   in: path
+ *                  name: limit
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: limit where you want on one page
+ *              -   in: path
+ *                  name: page
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: Page where you want to be
  *          responses:
  *              200:
  *                  description: return all the facture
@@ -27,8 +52,8 @@ const router = express.Router()
  *                  description: Error while the get all the facture
  */
 router
-    .route('/')
-    .get(tokenVerifieAdmin, FactureController.getFactures);
+    .route('/:year/:month/:limit/:page')
+    .get(tokenVerifieAdmin, validate(FactureValidation.getFactures), FactureController.getFactures);
 
 
 //  get all facture advance

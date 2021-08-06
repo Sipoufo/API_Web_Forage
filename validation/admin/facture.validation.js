@@ -44,6 +44,15 @@ const getByStatus = {
     }),
 }
 
+const getFactures = {
+    params: Joi.object().keys({
+        year: Joi.number().required(),
+        month: Joi.number().required(),
+        limit: Joi.number().required(),
+        page: Joi.number().required(),
+    }),
+}
+
 const findByYear = {
     params: Joi.object().keys({
         year: Joi.number().required(),
@@ -70,5 +79,6 @@ module.exports = {
     statusPaidFacture,
     getByStatus,
     findByYear,
-    getOneInvoiceByYear
+    getOneInvoiceByYear,
+    getFactures
 }

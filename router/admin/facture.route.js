@@ -28,7 +28,7 @@ const router = express.Router()
  */
 router
     .route('/')
-    .get(tokenVerifieAdmin, FactureController.getFactures)
+    .get(tokenVerifieAdmin, FactureController.getFactures);
 
 
 //  get all facture advance
@@ -46,7 +46,7 @@ router
  */
 router
     .route('/getFactureAd')
-    .get(tokenVerifieAdmin, FactureController.getFactureAdvance)
+    .get(tokenVerifieAdmin, FactureController.getFactureAdvance);
 
 
 // all facture by status
@@ -160,10 +160,10 @@ router
  *                      schema:
  *                          type: object
  *                          properties:
- *                              status:
- *                                  type: boolean
+ *                              amount:
+ *                                  type: integer
  *                          example:
- *                              status: true
+ *                              amount: 2000
  *          responses:
  *              '201':
  *                  description: >
@@ -261,6 +261,37 @@ router
 router
     .route('/factureByYear/:year')
     .get(tokenVerifieAdmin, validate(FactureValidation.findByYear), FactureController.findByYear);
+
+
+// get one Facture By Year
+/**
+ * @swagger
+ *  /admin/facture/clientFactureByYear/{year}/{idClient}:
+ *      get:
+ *          summary: get all client invoice in relation to year
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: year
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: The year of facture
+ *              -   in: path
+ *                  name: idClient
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The year of facture
+ *          responses: 
+ *              200:
+ *                  description: get factures about the year
+ *              500:
+ *                  description: Error during the get
+ */
+router
+    .route('/clientFactureByYear/:year/:idClient')
+    .get(tokenVerifieAdmin, validate(FactureValidation.getOneInvoiceByYear), FactureController.getOneInvoiceByYear);
 
 
 

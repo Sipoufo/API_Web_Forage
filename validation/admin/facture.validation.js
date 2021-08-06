@@ -33,17 +33,27 @@ const statusPaidFacture = {
     params: Joi.object().keys({
         idFacture: Joi.custom(objectId).required()
     }),
+    body: Joi.object().keys({
+        amount: Joi.number().required()
+    }),
 }
 
 const getByStatus = {
     params: Joi.object().keys({
         status: Joi.boolean().required(),
-    })
+    }),
 }
 
 const findByYear = {
     params: Joi.object().keys({
         year: Joi.number().required(),
+    })
+}
+
+const getOneInvoiceByYear = {
+    params: Joi.object().keys({
+        year: Joi.number().required(),
+        idClient: Joi.custom(objectId).required(),
     })
 }
 
@@ -59,5 +69,6 @@ module.exports = {
     getClientFactures,
     statusPaidFacture,
     getByStatus,
-    findByYear
+    findByYear,
+    getOneInvoiceByYear
 }

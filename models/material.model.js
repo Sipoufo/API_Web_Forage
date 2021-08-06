@@ -33,7 +33,17 @@ const materialSchema = new model({
         picture: {
             type: String,
             required: false
-        }
+        },
+        input: [{
+            quantity: Number,
+            prixUnit: Number,
+            date: Date,
+        }],
+        output: [{
+            quantity: Number,
+            prixUnit: Number,
+            date: Date,
+        }],
     }, {
         timestamps: true,
     }

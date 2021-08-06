@@ -2,10 +2,11 @@ const express = require('express')
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const http = require('http');
-const socketio = require('socket.io')
+const socketIo = require('socket.io')
 const app = express();
 const server = http.createServer(app);
-const io = socketio()
+const { Server } = require("socket.io");
+const io = new Server(server);
 const dotenv = require('dotenv');
 const httpStatus = require('http-status');
 const path = require('path');
@@ -68,6 +69,11 @@ app.options('*', cors())
 //     );
 //     next();
 // });
+
+// socket
+io.on('connection', () => {
+    console.log('a user connected');
+});
 
 
 // client api routes

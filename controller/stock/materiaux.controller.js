@@ -7,14 +7,19 @@ const addMateriaux = catchAsync(async(req, res) => {
     return Material.findOne({ name })
         .then(async response => {
             if (!response) {
-                const save = await Material.create({ name, type, prixUnit, quantity, description, picture })
+                const save = await Material.create({ name, type, prixUnit, quantity, description, picture, input: { quantity, prixUnit, date: new Date() } })
                 if (save) {
                     res.status(200).json({ status: 200, result: save });
                 } else {
                     res.status(500).json({ status: 500, error: "Error during the save" })
                 }
             } else {
-                res.status(500).json({ status: 500, error: "This material exist" })
+                const save = await Material.findByIdAndUpdate(response._id, { prixUnit, quantity, $push: { input: { quantity, prixUnit, date: new Date() } } })
+                if (save) {
+                    res.status(200).json({ status: 200, result: save });
+                } else {
+                    res.status(500).json({ status: 500, error: "Error during the save" })
+                }
             }
         })
 })
@@ -126,13 +131,14 @@ const getAllMateriaux = catchAsync(async(req, res) => {
 const removeMaterial = catchAsync(async(req, res) => {
     const name = req.body.name;
     const quantity = req.body.quantity;
+    const price = req.body.price;
 
     await Material.findOne({ name })
         .then(async(material) => {
             if (material) {
                 const reste = material.quantity - quantity
                 if (material.quantity > quantity) {
-                    await Material.findOneAndUpdate({ name }, { quantity: reste });
+                    await Material.findOneAndUpdate({ name }, { quantity: reste, $push: { output: { quantity, price, date: new Date() } } });
                     res.status(200).json({ status: 200, error: "Only " + reste + " " + name + " left " });
                 } else if (material.quantity < quantity) {
                     res.status(500).json({ status: 500, error: "the " + name + " in stock is finished " });
@@ -204,6 +210,26 @@ const getOneMateriaux = catchAsync(async(req, res) => {
             console.log(err)
             res.status(500).json({ status: 500, error: "Error" })
         })
+});
+
+
+const getMateriauxInputByYear = catchAsync(async(req, res) => {
+    const year = req.params.year
+    let material = []
+    await Material
+        .find()
+        .sort({ createdAt: 1 })
+        .then(materials => {
+            console.log(materials)
+            for (let i = 0; i < materials.length; i++) {
+                for (let k = 0; k < materials[i].input.length; k++) {
+                    if (materials[i].input[k].date.getFullYear() == year) {
+                        material.push({ name: materials[i].name, type: materials[i].type, quantity: materials[i].input[k].quantity, prixUnit: materials[i].input[k].prixUnit, date: materials[i].input[k].date })
+                    }
+                }
+            }
+            res.status(200).json({ status: 200, result: material });
+        })
 })
 
 const getGetByType = catchAsync(async(req, res) => {
@@ -254,5 +280,6 @@ module.exports = {
     addType,
     getTypes,
     deleteType,
-    removeMaterial
+    removeMaterial,
+    getMateriauxInputByYear
 }

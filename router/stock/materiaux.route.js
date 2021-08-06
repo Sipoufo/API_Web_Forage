@@ -83,6 +83,32 @@ router
     .delete(tokenVerifieAdmin, StockController.deleteType);
 
 
+// Get material input by year
+/**
+ * @swagger
+ *  /stock/getInputMaterialByYear/{year}:
+ *      get: 
+ *          summary: Get material input by year
+ *          tags: [Stock]
+ *          parameters:
+ *              -   in: path
+ *                  name: year
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: The id of type
+ *          responses: 
+ *              200:
+ *                  description: get type deleted
+ *              500:
+ *                  description: Error
+ *                                    
+ */
+router
+    .route('/getInputMaterialByYear/:year')
+    .get(tokenVerifieAdmin, validate(stockValidation.getMateriauxInputByYear), StockController.getMateriauxInputByYear);
+
+
 //Add Type
 /**
  * @swagger

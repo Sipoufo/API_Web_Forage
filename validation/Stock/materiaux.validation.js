@@ -38,6 +38,12 @@ const deleteType = {
     }),
 };
 
+const getMateriauxInputByYear = {
+    params: Joi.object().keys({
+        year: Joi.number().required(),
+    }),
+};
+
 const getAllMateriaux = {
     body: Joi.object().keys({
         page: Joi.number(),
@@ -83,5 +89,6 @@ module.exports = {
     getGetByPrise,
     addType,
     deleteType,
-    removeMaterial
+    removeMaterial,
+    getMateriauxInputByYear
 }

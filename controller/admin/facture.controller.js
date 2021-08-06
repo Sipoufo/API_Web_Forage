@@ -22,39 +22,52 @@ const addFacture = catchAsync(async(req, res) => {
             const montantVerse = req.body.montantVerse;
             const dateReleveNewIndex = new Date(req.body.dateReleveNewIndex);
             let oldIndex = req.body.oldIndex;
-
-            console.log("Je passe 1");
+            const monthDate = new Date().getMonth() + 1
+            let doFacture = true
 
             await Facture
                 .find({ idClient })
                 .sort({ createdAt: -1 })
                 .then(async factures => {
-                    console.log("Je passe ici 2 : ", factures.length);
-                    if (factures.length >= 1) {
-                        oldIndex = factures[0].newIndex;
-                    }
-                    await Admin.findById(decodedToken.id)
-                        .then(async(admin) => {
-                            if (admin) {
-                                const consommation = newIndex - oldIndex;
-                                const montantConsommation = (consommation * 500) + 1000 + penalite;
-                                const dateFacturation = new Date();
-                                const montantImpaye = montantConsommation - montantVerse;
-                                const dataLimitePaid = new Date(dateFacturation.getFullYear(), dateFacturation.getMonth(), dateFacturation.getDate() + 10, dateFacturation.getHours(), dateFacturation.getMinutes(), dateFacturation.getMilliseconds());
-                                const prixUnitaire = 500;
-                                const fraisEntretien = 1000;
-                                await Facture.create({ idClient, idAdmin, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, observation, dateReleveNewIndex, dateFacturation, dataLimitePaid, dataPaid, montantVerse, montantImpaye, penalite })
-                                    .then(resp => {
-                                        if (resp) {
-                                            res.status(200).json({ status: 200, result: resp });
-                                        } else {
-                                            res.status(500).json({ status: 500, error: "Error during the save" });
-                                        }
-                                    });
-                            } else {
-                                res.status(500).json({ status: 500, error: "Error during the save" });
+                    if (factures.length > 0) {
+                        for (let i = 0; i < factures.length; i++) {
+                            console.log(factures[i].dateFacturation.getMonth())
+                            if (factures[i].dateFacturation.getMonth() == monthDate) {
+                                doFacture = false;
+                                break;
                             }
-                        });
+                        }
+                    }
+                    if (doFacture == true) {
+                        if (factures.length >= 1) {
+                            oldIndex = factures[0].newIndex;
+                        }
+                        await Admin.findById(decodedToken.id)
+                            .then(async(admin) => {
+                                if (admin) {
+                                    const consommation = newIndex - oldIndex;
+                                    const montantConsommation = (consommation * 500) + 1000 + penalite;
+                                    const dateFacturation = new Date();
+                                    const montantImpaye = montantConsommation - montantVerse;
+                                    const dataLimitePaid = new Date(dateFacturation.getFullYear(), dateFacturation.getMonth(), dateFacturation.getDate() + 10, dateFacturation.getHours(), dateFacturation.getMinutes(), dateFacturation.getMilliseconds());
+                                    const prixUnitaire = 500;
+                                    const fraisEntretien = 1000;
+                                    await Facture.create({ idClient, idAdmin, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, observation, dateReleveNewIndex, dateFacturation, dataLimitePaid, dataPaid, montantVerse, montantImpaye, penalite })
+                                        .then(resp => {
+                                            if (resp) {
+                                                res.status(200).json({ status: 200, result: resp });
+                                            } else {
+                                                res.status(500).json({ status: 500, error: "Error during the save" });
+                                            }
+                                        });
+                                } else {
+                                    res.status(500).json({ status: 500, error: "Error during the save" });
+                                }
+                            });
+                    } else {
+                        res.status(500).json({ status: 500, error: "This customer already has an invoice for this month" });
+                    }
+
                 })
 
 
@@ -123,12 +136,36 @@ const findByYear = catchAsync((req, res) => {
         })
 })
 
+const getOneInvoiceByYear = catchAsync((req, res) => {
+    const year = req.params.year
+    const idClient = req.params.idClient
+    let result = []
+    console.log(idClient)
+    Facture
+        .find({ idClient })
+        .sort({ createdAt: 1 })
+        .then(factures => {
+            console.log(factures)
+            if (factures.length > 0) {
+                for (let i = 0; i < factures.length; i++) {
+                    const yearFacture = factures[i].createdAt.getFullYear()
+                    console.log(yearFacture);
+                    if (yearFacture == year) {
+                        result.push(factures[i])
+                    }
+                }
+            }
+            res.status(200).json({ status: 200, result })
+        })
+})
+
 const getFactureAdvance = catchAsync(async(req, res) => {
-    const EndFactureAdvance = []
+    let EndFactureAdvance = []
     await Facture
         .find()
         .sort({ createdAt: -1 })
         .then(factures => {
+            console.log(factures)
             if (factures.length > 0) {
                 for (let i = 0; i < factures.length; i++) {
                     if (factures[i].montantImpaye == 0) {
@@ -178,19 +215,36 @@ const updateFacture = catchAsync(async(req, res) => {
 
 const statusPaidFacture = catchAsync(async(req, res) => {
     const idFacture = req.params.idFacture
-    const status = req.body.status
+    let status
+    const amount = req.body.amount
 
     await Facture.findById(idFacture)
         .then(async result => {
             if (result) {
-                await Facture.findByIdAndUpdate(idFacture, { facturePay: status, montantImpaye: 0, montantVerse: result.montantConsommation })
-                    .then(facture => {
-                        if (facture) {
-                            res.status(200).json({ status: 200, result: facture })
+                if (result.facturePay != true) {
+                    const newUnpaid = result.montantImpaye - amount
+                    const newAmountPaid = result.montantVerse + amount
+                    if (newUnpaid >= 0) {
+                        if (newUnpaid > 0) {
+                            status = false
                         } else {
-                            res.status(500).json({ status: 500, error: "Error during the update" })
+                            status = true
                         }
-                    })
+                        await Facture.findByIdAndUpdate(idFacture, { facturePay: status, montantImpaye: newUnpaid, montantVerse: newAmountPaid, $push: { tranche: { montant: amount, date: new Date() } } })
+                            .then(facture => {
+                                if (facture) {
+                                    res.status(200).json({ status: 200, result: facture })
+                                } else {
+                                    res.status(500).json({ status: 500, error: "Error during the update" })
+                                }
+                            })
+                    } else {
+                        res.status(500).json({ status: 500, error: "Your amount is so high" })
+                    }
+                } else {
+                    res.status(500).json({ status: 500, error: "This facture is already paid" })
+                }
+
             } else {
                 res.status(500).json({ status: 500, error: "This facture don't exist" })
             }
@@ -221,5 +275,6 @@ module.exports = {
     getFactureAdvance,
     getByStatus,
     getFactureOne,
-    findByYear
+    findByYear,
+    getOneInvoiceByYear
 }

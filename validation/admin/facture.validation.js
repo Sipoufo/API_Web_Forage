@@ -46,10 +46,10 @@ const getByStatus = {
 
 const getFactures = {
     params: Joi.object().keys({
-        year: Joi.number().required(),
-        month: Joi.number().required(),
-        limit: Joi.number().required(),
-        page: Joi.number().required(),
+        year: Joi.number(),
+        month: Joi.number(),
+        limit: Joi.number(),
+        page: Joi.number(),
     }),
 }
 

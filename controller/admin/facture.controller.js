@@ -75,11 +75,20 @@ const addFacture = catchAsync(async(req, res) => {
     })
 })
 
+const getAllFacture = catchAsync((req, res) => {
+    Facture
+        .find()
+        .sort({ createdAt: 1 })
+        .then(factures => {
+            res.status(200).json({ status: 200, result: factures })
+        })
+})
+
 const getFactures = catchAsync((req, res) => {
-    const month = req.params.month;
-    const year = req.params.year;
-    const page = req.params.page;
-    const limit = req.params.limit;
+    const month = (req.params.month) ? req.params.month : new Date().getMonth() + 1;
+    const year = (req.params.year) ? req.params.year : new Date().getFullYear();
+    const page = (req.params.page) ? req.params.page : 1;
+    const limit = (req.params.limit) ? req.params.limit : 10;
     const facture = [];
     Facture
         .paginate({}, { page, limit })
@@ -277,6 +286,7 @@ const getByStatus = catchAsync(async(req, res) => {
 
 module.exports = {
     addFacture,
+    getAllFacture,
     getFactures,
     getClientFactures,
     updateFacture,

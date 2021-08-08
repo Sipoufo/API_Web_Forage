@@ -59,6 +59,25 @@ router
 //  get all facture advance
 /**
  * @swagger
+ *  /admin/facture/:
+ *      get:
+ *          summary: get all facture without params
+ *          tags: [Facture_Admin]
+ *          responses: 
+ *              200:
+ *                  description: get advance facture save in the bd
+ *              500:
+ *                  description: Error during the get
+ */
+router
+    .route('/')
+    .get(tokenVerifieAdmin, FactureController.getAllFacture);
+
+
+
+//  get all facture advance
+/**
+ * @swagger
  *  /admin/facture/getFactureAd:
  *      get:
  *          summary: get all facture advance

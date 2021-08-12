@@ -245,6 +245,35 @@ router
     .get(tokenVerifieClient, authControllerUser.logout);
 
 
+// Update password
+/**
+ * @swagger
+ * /client/auth/updatePassword:
+ *  put:
+ *      summary: Update password
+ *      tags: [Client]
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:  
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          password:
+ *                              type: string
+ *                      example:
+ *                          password: Azerty12
+ *      responses:
+ *          '200':
+ *              description: >
+ *                  Save your new admin and return the information about it
+ *                                    
+ */
+router
+    .route('/updatePassword')
+    .put(tokenVerifieClient, validate(AuthValidationClient.updatePassword), authControllerUser.updatePassword);
+
+
 /**
  * @swagger
  * /client/auth/get/getClientByToken:

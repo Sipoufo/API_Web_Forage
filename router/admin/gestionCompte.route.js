@@ -240,6 +240,44 @@ router
     .route('/admin/update/:idAdmin')
     .put(tokenVerifieAdmin, validate(gestionCompteValidation.updateAdmin), gestionCompteController.updateAdmin)
 
+
+// Update password
+/**
+ * @swagger
+ *  /admin/manageCompte/updatePassord/{id}:
+ *      put: 
+ *          summary: Admin update with ID
+ *          tags: [Manage_compte]
+ *          parameters:
+ *              -   in: path
+ *                  name: id
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The id of client or administrateur
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              password:
+ *                                  type: string
+ *                          example:
+ *                              password: Azerty12
+ *          responses:
+ *              '200':
+ *                  description: >
+ *                      Save your new admin and return the information about it
+ *                                    
+ */
+router
+    .route('/updatePassword/:id')
+    .put(tokenVerifie, validate(gestionCompteValidation.updatePassword), gestionCompteController.updatePassword);
+
+    
+
 // Update client
 /**
  * @swagger

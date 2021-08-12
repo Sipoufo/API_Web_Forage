@@ -278,7 +278,7 @@ router
  */
 router
     .route('/one/:idFacture')
-    .get(tokenVerifieAdmin, FactureController.getFactureOne)
+    .get(tokenVerifie, FactureController.getFactureOne)
     .put(tokenVerifieAdmin, validate(FactureValidation.updateFacture), FactureController.updateFacture);
 
 

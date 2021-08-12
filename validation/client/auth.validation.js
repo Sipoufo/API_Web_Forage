@@ -24,7 +24,12 @@ const update = {
         description: Joi.string(),
         profileImage: Joi.string(),
         birthday: Joi.string().required(),
-        password: Joi.custom(password),
+    })
+}
+
+const updatePassword = {
+    body: Joi.object().keys({
+        password: Joi.custom(password).required(),
     })
 }
 
@@ -40,7 +45,6 @@ const updateById = {
         IdCompteur: Joi.string(),
         profileImage: Joi.string(),
         birthday: Joi.string().required(),
-        password: Joi.custom(password).required(),
         longitude: Joi.number().required(),
         latitude: Joi.number().required()
     })

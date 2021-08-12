@@ -14,13 +14,30 @@ const getFactures = catchAsync(async(req, res) => {
         } else {
             await Facture
                 .find({ idClient: decodedToken.id })
-                .sort({ createdAt: -1 })
+                .sort({ dateFacturation: -1 })
                 .then(factures => {
                     if (factures.length > 0) {
                         res.status(200).json({ status: 200, result: factures });
                     } else {
                         res.status(200).json({ status: 200, result: factures });
                     }
+                });
+        }
+    })
+
+})
+
+const getOneFacture = catchAsync(async(req, res) => {
+    const token = authorization(req)
+    const idFacture = req.params.idFacture
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            await Facture
+                .findOne({ idClient: decodedToken.id, _id: idFacture })
+                .then(factures => {
+                    res.status(200).json({ status: 200, result: factures });
                 });
         }
     })
@@ -191,5 +208,6 @@ module.exports = {
     advanceFacture,
     getFactureAdvance,
     factureWithDate,
-    getFacturesWithDate
+    getFacturesWithDate,
+    getOneFacture
 }

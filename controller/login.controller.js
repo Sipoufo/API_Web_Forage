@@ -23,7 +23,6 @@ const login = catchAsync(async(req, res) => {
     return Admin.findOne({ phone })
         .then(async admin => {
             if (admin) {
-                console.log("Admin : " + admin.name);
                 const resultAdmin = await admin.isPasswordMatch(password)
                 console.log(admin._id);
                 if (resultAdmin) {

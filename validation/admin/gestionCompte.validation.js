@@ -19,6 +19,15 @@ const deleteCompteAdmin = {
     })
 }
 
+const updatePassword = {
+    params: Joi.object().keys({
+        id: Joi.custom(objectId).required(),
+    }),
+    body: Joi.object().keys({
+        password: Joi.custom(password).required(),
+    })
+}
+
 const updateAdmin = {
     params: Joi.object().keys({
         idAdmin: Joi.custom(objectId).required(),
@@ -86,5 +95,6 @@ module.exports = {
     updateClient,
     blockCompteClient,
     blockCompteAdmin,
-    IdCompteClient
+    IdCompteClient,
+    updatePassword
 }

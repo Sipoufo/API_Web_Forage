@@ -62,10 +62,8 @@ const update = catchAsync(async(req, res) => {
     const phone = req.body.phone
     const email = req.body.email
     const birthday = req.body.birthday
-    const password = req.body.password
     const description = req.body.description
     const profileImage = req.body.profileImage
-    let hashpassword
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err);
@@ -79,14 +77,9 @@ const update = catchAsync(async(req, res) => {
                             const emailClient = await Client.findOne({ email });
                             console.log(emailAdmin);
                             if ((!emailAdmin && !emailClient) || ((emailClient && (emailClient._id == decodedToken.id)))) {
-                                if (password == undefined || password == '') {
-                                    hashpassword = number.password;
-                                } else {
-                                    hashpassword = await bcrypt.hash(password, 8);
-                                }
                                 const longitude = number.localisation.longitude;
                                 const latitude = number.localisation.latitude;
-                                const result = await Client.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday, password: hashpassword, localisation: { longitude, latitude, description } });
+                                const result = await Client.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday, localisation: { longitude, latitude, description } });
                                 if (result) {
                                     res.status(200).json({ status: 200, result: result });
                                 } else {
@@ -102,6 +95,33 @@ const update = catchAsync(async(req, res) => {
                         }
                     } else {
                         res.status(500).json({ status: 500, error: "One Admin have this phone" })
+                    }
+                })
+        }
+    })
+})
+
+const updatePassword = catchAsync( (req, res) => {
+    const token = authorization(req)
+    const password = req.body.password
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            await Client
+                .findById( decodedToken.id )
+                .then(async client => {
+                    if (client) {
+                        const bcryptPassword = await bcrypt.hash(password, 8);
+                        const update = await Client.findByIdAndUpdate(decodedToken.id, {password: bcryptPassword})
+                        if (update) {
+                            const find = await Client.findById(decodedToken.id)
+                            res.status(200).json({ status: 200, result: find });
+                        } else {
+                            res.status(500).json({ status: 500, error: "Error while the update password" });
+                        }
+                    } else {
+                        res.status(500).json({ status: 500, error: "this customer don't exist" });
                     }
                 })
         }
@@ -258,4 +278,5 @@ module.exports = {
     getOneClient,
     getClientByToken,
     dashboard,
+    updatePassword
 }

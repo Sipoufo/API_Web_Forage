@@ -88,10 +88,6 @@ router
  *                                  type: string
  *                              email:
  *                                  type: string
- *                              password:
- *                                  type: string
- *                                  format: password
- *                                  minLength: 8
  *                              longitude:
  *                                  type: string
  *                              latitude:
@@ -104,7 +100,6 @@ router
  *                              name: Sipoufo Yvan
  *                              birthday: 2002-01-29
  *                              phone: "695914926"
- *                              password: Azerty12
  *                              email: sipoufoTest@gmail.com
  *                              longitude: 12
  *                              latitude: 12
@@ -149,10 +144,6 @@ router
  *                                  type: string
  *                              email:
  *                                  type: string
- *                              password:
- *                                  type: string
- *                                  format: password
- *                                  minLength: 8
  *                              longitude:
  *                                  type: string
  *                              latitude:
@@ -165,7 +156,6 @@ router
  *                              name: Sipoufo Yvan
  *                              birthday: 2002-01-29
  *                              phone: "695914926"
- *                              password: Azerty12
  *                              email: sipoufoTest@gmail.com
  *                              longitude: 12
  *                              latitude: 12
@@ -180,6 +170,38 @@ router
 router
     .route('/update/:idAdmin')
     .put(tokenVerifieAdmin, validate(adminAuth.updateById), authAdmin.updateById);
+
+
+
+// Update password
+/**
+ * @swagger
+ *  /admin/auth/updatePassword:
+ *      put: 
+ *          summary: Admin update with ID
+ *          tags: [Admin]
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              password:
+ *                                  type: string
+ *                          example:
+ *                              password: Azerty12
+ *          responses:
+ *              '200':
+ *                  description: >
+ *                      Save your new admin and return the information about it
+ *                                    
+ */
+router
+    .route('/updatePassword')
+    .put(tokenVerifieAdmin, validate(adminAuth.updatePassword), authAdmin.updatePassword);
+
+
 
 /**
  * @swagger

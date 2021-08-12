@@ -60,12 +60,10 @@ const update = catchAsync(async(req, res) => {
     const phone = req.body.phone
     const email = req.body.email
     const birthday = req.body.birthday
-    const password = req.body.password
     const description = req.body.description
     const profileImage = req.body.profileImage
     const longitude = req.body.longitude
     const latitude = req.body.latitude
-    const hashpassword = await bcrypt.hash(password, 8);
 
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
@@ -80,7 +78,7 @@ const update = catchAsync(async(req, res) => {
                                     const emailAdmin = await admin.findOne({ email })
                                     const emailClient = await client.findOne({ email })
                                     if ((!emailAdmin && !emailClient) || ((emailAdmin && (emailAdmin._id == decodedToken.id)))) {
-                                        const result = await admin.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday, password: hashpassword, localisation: { longitude, latitude, description } })
+                                        const result = await admin.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday, localisation: { longitude, latitude, description } })
                                         if (result) {
                                             res.status(200).json({ status: 200, result: result })
                                         } else {
@@ -102,18 +100,43 @@ const update = catchAsync(async(req, res) => {
     })
 })
 
+const updatePassword = catchAsync( (req, res) => {
+    const token = authorization(req)
+    const password = req.body.password
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            await admin
+                .findById( decodedToken.id )
+                .then(async admin => {
+                    if (admin) {
+                        const bcryptPassword = await bcrypt.hash(password, 8)
+                        const update = await admin.findByIdAndUpdate(decodedToken.id, {password: bcryptPassword})
+                        if (update) {
+                            const find = await admin.findById(decodedToken.id)
+                            res.status(200).json({ status: 200, result: find });
+                        } else {
+                            res.status(500).json({ status: 500, error: "Error while the update password" });
+                        }
+                    } else {
+                        res.status(500).json({ status: 500, error: "this customer don't exist" });
+                    }
+                })
+        }
+    })
+})
+
 const updateById = catchAsync(async(req, res) => {
     const idAdmin = req.params.idAdmin
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email
     const birthday = req.body.birthday
-    const password = req.body.password
     const description = req.body.description
     const profileImage = req.body.profileImage
     const longitude = req.body.longitude
     const latitude = req.body.latitude
-    const hashpassword = await bcrypt.hash(password, 8);
 
     return client.findOne({ phone })
         .then(userClient => {
@@ -125,7 +148,7 @@ const updateById = catchAsync(async(req, res) => {
                             const emailAdmin = await admin.findOne({ email })
                             const emailClient = await client.findOne({ email })
                             if (!emailAdmin && !emailClient) {
-                                const result = await admin.findByIdAndUpdate(idAdmin, { name, phone: phone, password: hashpassword, profileImage, email, birthday, localisation: { longitude, latitude, description } })
+                                const result = await admin.findByIdAndUpdate(idAdmin, { name, phone: phone, profileImage, email, birthday, localisation: { longitude, latitude, description } })
                                 if (result) {
                                     res.status(200).json({ status: 200, result: result })
                                 } else {
@@ -295,5 +318,6 @@ module.exports = {
     update,
     updateById,
     getOneAdmin,
-    getAdminByToken
+    getAdminByToken,
+    updatePassword
 }

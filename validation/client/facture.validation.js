@@ -26,8 +26,15 @@ const factureWithDate = {
     })
 }
 
+const getOneFacture = {
+    params: Joi.object().keys({
+        idFacture: Joi.custom(objectId).required(),
+    })
+}
+
 module.exports = {
     statusPaidFacture,
     advanceFacture,
-    factureWithDate
+    factureWithDate,
+    getOneFacture
 }

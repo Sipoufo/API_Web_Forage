@@ -50,32 +50,44 @@ const deleteCompteAdmin = catchAsync(async(req, res) => {
 
 })
 
-const updatePassword = catchAsync( (req, res) => {
+const updatePassword = catchAsync((req, res) => {
     const id = req.params.id
-    const password = req.body.password
+    const oldPassword = req.body.oldPassword
+    const newPassword = req.body.newPassword
     return Admin.findById(id)
         .then(async admin => {
             if (admin) {
-                const bcryptPassword = await bcrypt.hash(user.password, 8)
-                return Admin.findByIdAndUpdate(id, { password: bcryptPassword })
-                    .then(resp => {
-                        res.status(200).json({ status: 200, result: resp })
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    })
+                const bcryptPassword = await bcrypt.hash(newPassword, 8)
+                const comparePassword = Admin.isPasswordMatch(oldPassword);
+                if (comparePassword) {
+                    return Admin.findByIdAndUpdate(id, { password: bcryptPassword })
+                        .then(resp => {
+                            res.status(200).json({ status: 200, result: resp })
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                } else {
+                    res.status(500).json({ status: 500, error: "Your old password is needed" })
+                }
+
             } else {
                 return Client.findById(id)
                     .then(async client => {
                         if (client) {
-                            const bcryptPassword = await bcrypt.hash(password, 8)
-                            return Client.findByIdAndUpdate(id, { password: bcryptPassword })
-                                .then(response => {
-                                    res.status(200).json({ status: 200, result: response })
-                                })
-                                .catch(err => {
-                                    console.log(err);
-                                })
+                            const bcryptPassword = await bcrypt.hash(newPassword, 8)
+                            const comparePassword = Admin.isPasswordMatch(oldPassword);
+                            if (comparePassword) {
+                                return Client.findByIdAndUpdate(id, { password: bcryptPassword })
+                                    .then(response => {
+                                        res.status(200).json({ status: 200, result: response })
+                                    })
+                                    .catch(err => {
+                                        console.log(err);
+                                    })
+                            } else {
+                                res.status(500).json({ status: 500, error: "Your old password is needed" })
+                            }
                         } else {
                             res.status(500).json({ status: 500, error: "Your are not register <0_0>" })
                         }

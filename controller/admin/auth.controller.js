@@ -100,27 +100,33 @@ const update = catchAsync(async(req, res) => {
     })
 })
 
-const updatePassword = catchAsync( (req, res) => {
+const updatePassword = catchAsync((req, res) => {
     const token = authorization(req)
-    const password = req.body.password
+    const oldPassword = req.body.oldPassword
+    const newPassword = req.body.newPassword
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err);
         } else {
             await admin
-                .findById( decodedToken.id )
-                .then(async admin => {
-                    if (admin) {
-                        const bcryptPassword = await bcrypt.hash(password, 8)
-                        const update = await admin.findByIdAndUpdate(decodedToken.id, {password: bcryptPassword})
-                        if (update) {
-                            const find = await admin.findById(decodedToken.id)
-                            res.status(200).json({ status: 200, result: find });
+                .findById(decodedToken.id)
+                .then(async ad => {
+                    if (ad) {
+                        const bcryptPassword = await bcrypt.hash(newPassword, 8);
+                        const comparePassword = admin.isPasswordMatch(oldPassword);
+                        if (comparePassword) {
+                            const update = await admin.findByIdAndUpdate(decodedToken.id, { password: bcryptPassword })
+                            if (update) {
+                                const find = await admin.findById(decodedToken.id)
+                                res.status(200).json({ status: 200, result: find });
+                            } else {
+                                res.status(500).json({ status: 500, error: "Error while the update password" });
+                            }
                         } else {
-                            res.status(500).json({ status: 500, error: "Error while the update password" });
+                            res.status(500).json({ status: 500, error: "Your old password is needed" });
                         }
                     } else {
-                        res.status(500).json({ status: 500, error: "this customer don't exist" });
+                        res.status(500).json({ status: 500, error: "This customer don't exist" });
                     }
                 })
         }

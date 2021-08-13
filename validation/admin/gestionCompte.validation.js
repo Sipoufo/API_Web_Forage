@@ -24,7 +24,8 @@ const updatePassword = {
         id: Joi.custom(objectId).required(),
     }),
     body: Joi.object().keys({
-        password: Joi.custom(password).required(),
+        oldPassword: Joi.custom(password).required(),
+        newPassword: Joi.custom(password).required(),
     })
 }
 

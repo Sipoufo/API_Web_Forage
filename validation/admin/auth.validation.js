@@ -57,10 +57,18 @@ const getAdmin = {
     })
 }
 
+const updatePassword = {
+    body: Joi.object().keys({
+        oldPassword: Joi.custom(password).required(),
+        newPassword: Joi.custom(password).required(),
+    })
+}
+
 module.exports = {
     register,
     login,
     update,
     updateById,
-    getAdmin
+    getAdmin,
+    updatePassword
 }

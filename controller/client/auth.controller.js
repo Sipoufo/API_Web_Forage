@@ -62,7 +62,6 @@ const update = catchAsync(async(req, res) => {
     const phone = req.body.phone
     const email = req.body.email
     const birthday = req.body.birthday
-    const description = req.body.description
     const profileImage = req.body.profileImage
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
@@ -77,9 +76,7 @@ const update = catchAsync(async(req, res) => {
                             const emailClient = await Client.findOne({ email });
                             console.log(emailAdmin);
                             if ((!emailAdmin && !emailClient) || ((emailClient && (emailClient._id == decodedToken.id)))) {
-                                const longitude = number.localisation.longitude;
-                                const latitude = number.localisation.latitude;
-                                const result = await Client.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday, localisation: { longitude, latitude, description } });
+                                const result = await Client.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday });
                                 if (result) {
                                     res.status(200).json({ status: 200, result: result });
                                 } else {
@@ -101,24 +98,30 @@ const update = catchAsync(async(req, res) => {
     })
 })
 
-const updatePassword = catchAsync( (req, res) => {
+const updatePassword = catchAsync((req, res) => {
     const token = authorization(req)
-    const password = req.body.password
+    const oldPassword = req.body.oldPassword
+    const newPassword = req.body.newPassword
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
             console.log(err);
         } else {
             await Client
-                .findById( decodedToken.id )
+                .findById(decodedToken.id)
                 .then(async client => {
                     if (client) {
-                        const bcryptPassword = await bcrypt.hash(password, 8);
-                        const update = await Client.findByIdAndUpdate(decodedToken.id, {password: bcryptPassword})
-                        if (update) {
-                            const find = await Client.findById(decodedToken.id)
-                            res.status(200).json({ status: 200, result: find });
+                        const bcryptPassword = await bcrypt.hash(newPassword, 8);
+                        const comparePassword = Client.isPasswordMatch(oldPassword);
+                        if (comparePassword) {
+                            const update = await Client.findByIdAndUpdate(decodedToken.id, { password: bcryptPassword })
+                            if (update) {
+                                const find = await Client.findById(decodedToken.id)
+                                res.status(200).json({ status: 200, result: find });
+                            } else {
+                                res.status(500).json({ status: 500, error: "Error while the update password" });
+                            }
                         } else {
-                            res.status(500).json({ status: 500, error: "Error while the update password" });
+                            res.status(500).json({ status: 500, error: "Your old password is needed" });
                         }
                     } else {
                         res.status(500).json({ status: 500, error: "this customer don't exist" });
@@ -134,11 +137,8 @@ const updateById = catchAsync(async(req, res) => {
     const phone = req.body.phone
     const email = req.body.email
     const birthday = req.body.birthday
-    const description = req.body.description
     const IdCompteur = req.body.IdCompteur
     const profileImage = req.body.profileImage
-    const longitude = req.body.longitude
-    const latitude = req.body.latitude
     return Admin.findOne({ phone })
         .then(async admin => {
             if (!admin) {
@@ -147,7 +147,7 @@ const updateById = catchAsync(async(req, res) => {
                     const emailAdmin = await Admin.findOne({ email });
                     const emailClient = await Client.findOne({ email });
                     if (!emailAdmin && !emailClient) {
-                        const result = await Client.findByIdAndUpdate(idClient, { name, IdCompteur, phone: phone, profileImage, email, birthday, localisation: { longitude, latitude, description } });
+                        const result = await Client.findByIdAndUpdate(idClient, { name, IdCompteur, phone: phone, profileImage, email, birthday });
                         if (result) {
                             res.status(200).json({ status: 200, result: result });
                         } else {

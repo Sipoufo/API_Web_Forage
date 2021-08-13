@@ -21,7 +21,6 @@ const update = {
         name: Joi.string().required(),
         phone: Joi.number().required(),
         email: Joi.string().required(),
-        description: Joi.string(),
         profileImage: Joi.string(),
         birthday: Joi.string().required(),
     })
@@ -29,7 +28,8 @@ const update = {
 
 const updatePassword = {
     body: Joi.object().keys({
-        password: Joi.custom(password).required(),
+        oldPassword: Joi.custom(password).required(),
+        newPassword: Joi.custom(password).required(),
     })
 }
 
@@ -41,12 +41,9 @@ const updateById = {
         name: Joi.string().required(),
         phone: Joi.number().required(),
         email: Joi.string().required(),
-        description: Joi.string(),
         IdCompteur: Joi.string(),
         profileImage: Joi.string(),
         birthday: Joi.string().required(),
-        longitude: Joi.number().required(),
-        latitude: Joi.number().required()
     })
 }
 
@@ -68,5 +65,6 @@ module.exports = {
     login,
     update,
     updateById,
-    getOne
+    getOne,
+    updatePassword
 }

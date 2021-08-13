@@ -187,10 +187,13 @@ router
  *                      schema:
  *                          type: object
  *                          properties:
- *                              password:
+ *                              newPassword:
+ *                                  type: string
+ *                              oldPassword:
  *                                  type: string
  *                          example:
- *                              password: Azerty12
+ *                              newPassword: Azerty12
+ *                              oldPassword: Azerty12
  *          responses:
  *              '200':
  *                  description: >

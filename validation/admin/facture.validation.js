@@ -14,7 +14,14 @@ const addFacture = {
         montantVerse: Joi.number().required(),
         dateReleveNewIndex: Joi.string().required(),
     })
-}
+};
+
+const addInformation = {
+    body: Joi.object().keys({
+        prixUnitaire: Joi.number().required(),
+        fraisEntretien: Joi.number().required(),
+    })
+};
 
 const updateFacture = {
     params: Joi.object().keys({
@@ -80,5 +87,6 @@ module.exports = {
     getByStatus,
     findByYear,
     getOneInvoiceByYear,
-    getFactures
+    getFactures,
+    addInformation
 }

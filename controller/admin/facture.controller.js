@@ -1,5 +1,5 @@
 const catchAsync = require('../../utils/catchAsync');
-const { Admin, Facture, Client } = require('../../models/index');
+const { Admin, Facture, Client, StaticInf } = require('../../models/index');
 const jwt = require('jsonwebtoken')
 
 const authorization = (req) => {
@@ -45,13 +45,15 @@ const addFacture = catchAsync(async(req, res) => {
                         await Admin.findById(decodedToken.id)
                             .then(async(admin) => {
                                 if (admin) {
+                                    const static = await StaticInf.find().sort({ createdAt: 1 })
+                                    const prixUnitaire = static[0].prixUnitaire;
+                                    const fraisEntretien = static[0].fraisEntretien;
                                     const consommation = newIndex - oldIndex;
-                                    const montantConsommation = (consommation * 500) + 1000 + penalite;
+                                    const montantConsommation = (consommation * prixUnitaire) + fraisEntretien + penalite;
                                     const dateFacturation = new Date();
                                     const montantImpaye = montantConsommation - montantVerse;
                                     const dataLimitePaid = new Date(dateFacturation.getFullYear(), dateFacturation.getMonth(), dateFacturation.getDate() + 10, dateFacturation.getHours(), dateFacturation.getMinutes(), dateFacturation.getMilliseconds());
-                                    const prixUnitaire = 500;
-                                    const fraisEntretien = 1000;
+
                                     await Facture.create({ idClient, idAdmin, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, observation, dateReleveNewIndex, dateFacturation, dataLimitePaid, dataPaid, montantVerse, montantImpaye, penalite })
                                         .then(resp => {
                                             if (resp) {
@@ -75,12 +77,53 @@ const addFacture = catchAsync(async(req, res) => {
     })
 })
 
+const addInformation = catchAsync(async(req, res) => {
+    const prixUnitaire = req.body.prixUnitaire
+    const fraisEntretien = req.body.fraisEntretien
+    const token = authorization(req)
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            await Admin.findOne({ _id: decodedToken.id, profile: "superAdmin" })
+                .then(async result => {
+                    if (result) {
+                        const staticResult = await StaticInf.create({ idAdmin: decodedToken.id, prixUnitaire, fraisEntretien })
+                        if (staticResult) {
+                            res.status(200).json({ status: 200, result: staticResult });
+                        } else {
+                            res.status(500).json({ status: 500, error: "Error while the creation" });
+                        }
+                    } else {
+                        res.status(500).json({ status: 500, error: "Your are not super administrator" });
+                    }
+                })
+        }
+    })
+
+});
+
 const getAllFacture = catchAsync((req, res) => {
     Facture
         .find()
         .sort({ createdAt: 1 })
         .then(factures => {
             res.status(200).json({ status: 200, result: factures })
+        })
+})
+
+const getStaticInformation = catchAsync((req, res) => {
+    const staticInf = []
+    StaticInf
+        .find()
+        .sort({ createdAt: 1 })
+        .then(static => {
+            if (static) {
+                for (let i = 0; i < static.length; i++) {
+                    staticInf.push(static[i])
+                }
+            }
+            res.status(200).json({ status: 200, result: staticInf })
         })
 })
 
@@ -214,7 +257,10 @@ const updateFacture = catchAsync(async(req, res) => {
                 .then(async(res) => {
                     if (res) {
                         const consommation = newIndex - oldIndex
-                        const montantConsommation = (consommation * 500) + 1000 + penalite
+                        const static = await StaticInf.find().sort({ createdAt: 1 })
+                        const prixUnitaire = static[0].prixUnitaire;
+                        const fraisEntretien = static[0].fraisEntretien;
+                        const montantConsommation = (consommation * prixUnitaire) + fraisEntretien + penalite
                         const montantImpaye = montantConsommation - montantVerse
                         await Facture.findByIdAndUpdate(idFacture, { newIndex, observation, penalite, montantVerse, dateReleveNewIndex, consommation, montantConsommation, montantImpaye })
                             .then(res => {
@@ -295,5 +341,7 @@ module.exports = {
     getByStatus,
     getFactureOne,
     findByYear,
-    getOneInvoiceByYear
+    getOneInvoiceByYear,
+    addInformation,
+    getStaticInformation
 }

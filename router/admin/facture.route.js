@@ -74,6 +74,22 @@ router
     .get(tokenVerifieAdmin, FactureController.getAllFacture);
 
 
+//  get all facture advance
+/**
+ * @swagger
+ *  /admin/facture/getStaticInformation:
+ *      get:
+ *          summary: get all statics information
+ *          tags: [Facture_Admin]
+ *          responses: 
+ *              200:
+ *                  description: get all statics information
+ */
+router
+    .route('/getStaticInformation')
+    .get(tokenVerifieAdmin, FactureController.getStaticInformation);
+
+
 
 //  get all facture advance
 /**
@@ -91,6 +107,40 @@ router
 router
     .route('/getFactureAd')
     .get(tokenVerifieAdmin, FactureController.getFactureAdvance);
+
+
+
+// Static information
+/**
+ * @swagger
+ *  /admin/facture/staticInformation:
+ *      post: 
+ *          summary: Add static information about facture
+ *          tags: [Facture_Admin]
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              prixUnitaire:
+ *                                  type: integer
+ *                              fraisEntretien:
+ *                                  type: integer
+ *                          example:
+ *                              prixUnitaire: 500
+ *                              fraisEntretien: 1000
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      Save your new admin and return the information about it
+ *                                    
+ */
+router
+    .route('/staticInformation')
+    .post(tokenVerifie, validate(FactureValidation.addInformation), FactureController.addInformation);
+
 
 
 // all facture by status
@@ -183,6 +233,7 @@ router
     .route('/:idClient')
     .post(tokenVerifieAdmin, validate(FactureValidation.addFacture), FactureController.addFacture)
     .get(tokenVerifieAdmin, validate(FactureValidation.getClientFactures), FactureController.getClientFactures);
+
 
 /**
  * @swagger

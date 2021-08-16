@@ -40,8 +40,6 @@ const updateAdmin = {
         description: Joi.string().required(),
         profileImage: Joi.string().required(),
         birthday: Joi.string().required(),
-        longitude: Joi.number().required(),
-        latitude: Joi.number().required()
     })
 }
 
@@ -57,8 +55,6 @@ const updateClient = {
         description: Joi.string().required(),
         profileImage: Joi.string().required(),
         birthday: Joi.string().required(),
-        longitude: Joi.number().required(),
-        latitude: Joi.number().required()
     })
 }
 

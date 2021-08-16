@@ -23,8 +23,6 @@ const update = {
         description: Joi.string(),
         profileImage: Joi.string(),
         birthday: Joi.string().required(),
-        longitude: Joi.number().required(),
-        latitude: Joi.number().required()
     })
 }
 
@@ -39,8 +37,6 @@ const updateById = {
         description: Joi.string(),
         profileImage: Joi.string(),
         birthday: Joi.string().required(),
-        longitude: Joi.number().required(),
-        latitude: Joi.number().required()
     })
 }
 

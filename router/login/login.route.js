@@ -46,10 +46,17 @@ router
 
 /**
  * @swagger
- *  /login/localisation:
+ *  /login/localisation/id:
  *      post: 
  *          summary: Admin connection
  *          tags: [login]
+ *          parameters:
+ *              -   in: path
+ *                  name: id
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The id of client
  *          requestBody:
  *              required: true
  *              content:

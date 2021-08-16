@@ -9,6 +9,9 @@ const localisation = {
 }
 
 const login = {
+    params: Joi.object().keys({
+        id: Joi.custom(objectId).required()
+    }),
     body: Joi.object().keys({
         phone: Joi.number().required(),
         password: Joi.custom(password).required()

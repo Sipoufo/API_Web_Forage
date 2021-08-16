@@ -42,7 +42,7 @@ const router = express.Router();
  */
 router
     .route('/')
-    .post(validate(LoginValidation.login), loginController.login)
+    .post(validate(LoginValidation.login), loginController.login);
 
 /**
  * @swagger
@@ -78,6 +78,6 @@ router
  *                      Successfully authenticated.
  */
 router
-    .route('/localisation')
-    .post(tokenVerifie, validate(LoginValidation.localisation), loginController.localisation)
+    .route('/localisation/:id')
+    .post(tokenVerifie, validate(LoginValidation.localisation), loginController.localisation);
 module.exports = router

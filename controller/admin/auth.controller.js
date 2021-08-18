@@ -113,7 +113,7 @@ const updatePassword = catchAsync((req, res) => {
                 .then(async ad => {
                     if (ad) {
                         const bcryptPassword = await bcrypt.hash(newPassword, 8);
-                        const comparePassword = admin.isPasswordMatch(oldPassword);
+                        const comparePassword = await ad.isPasswordMatch(oldPassword);
                         if (comparePassword) {
                             const update = await admin.findByIdAndUpdate(decodedToken.id, { password: bcryptPassword })
                             if (update) {

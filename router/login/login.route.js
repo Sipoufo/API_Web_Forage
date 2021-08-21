@@ -68,9 +68,12 @@ router
  *                                  type: number
  *                              latitude:
  *                                  type: number
+ *                              description:
+ *                                  type: number
  *                          example:
  *                              longitude: 12
  *                              latitude: 12
+ *                              description: test
  *          responses:
  *              '201':
  *                  description: >

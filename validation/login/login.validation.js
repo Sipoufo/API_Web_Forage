@@ -8,13 +8,14 @@ const localisation = {
     body: Joi.object().keys({
         longitude: Joi.number().required(),
         latitude: Joi.number().required(),
+        description: Joi.string().required(),
     })
 }
 
 const login = {
     body: Joi.object().keys({
         phone: Joi.number().required(),
-        password: Joi.custom(password).required()
+        password: Joi.custom(password).required(),
     })
 }
 

@@ -63,6 +63,7 @@ const localisation = catchAsync(async(req, res) => {
     const id = req.params.id
     const longitude = req.body.longitude
     const latitude = req.body.latitude
+    const description = req.body.description
     return Admin.findById(id)
         .then(admin => {
             if (admin) {
@@ -77,7 +78,7 @@ const localisation = catchAsync(async(req, res) => {
                 return Client.findById(id)
                     .then(client => {
                         if (client) {
-                            return Client.findByIdAndUpdate(id, { localisation: { longitude, latitude, description: client.localisation.description } })
+                            return Client.findByIdAndUpdate(id, { localisation: { longitude, latitude, description: description } })
                                 .then(response => {
                                     res.status(200).json({ status: 200, result: response })
                                 })

@@ -8,7 +8,7 @@ const addFacture = {
     body: Joi.object().keys({
         newIndex: Joi.number().required(),
         oldIndex: Joi.number(),
-        observation: Joi.string().required(),
+        observation: Joi.string(),
         penalite: Joi.number(),
         dataPaid: Joi.string(),
         montantVerse: Joi.number().required(),

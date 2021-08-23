@@ -16,7 +16,7 @@ const register = catchAsync(async(req, res) => {
     const phone = req.body.phone
     const email = req.body.email
     const birthday = req.body.birthday
-    const description = req.body.description
+    const description = (req.body.description) ? req.body.description : null
     const IdCompteur = req.body.IdCompteur
     const password = req.body.password
     const profileImage = req.body.profileImage

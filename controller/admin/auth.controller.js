@@ -182,6 +182,7 @@ const sendFirstAdmin = catchAsync(async(req, res) => {
     const password = "1298ffa93fed18886ef5ddb2837c9c00"
     const longitude = 12
     const latitude = 12
+    const profileImage = "noPath"
 
     console.log(req)
     return admin.findOne({ phone })

@@ -113,7 +113,7 @@ const userSchema = new model({
             }
         }],
     }, {
-        timestamps: true,
+        timestamps: { currentTime: () => new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours() + 1, new Date().getMinutes(), new Date().getMilliseconds()) },
     }
 
 

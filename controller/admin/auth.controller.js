@@ -123,7 +123,7 @@ const updatePassword = catchAsync((req, res) => {
                                 res.status(500).json({ status: 500, error: "Error while the update password" });
                             }
                         } else {
-                            res.status(500).json({ status: 500, error: "Your old password is needed" });
+                            res.status(500).json({ status: 500, error: "Your old password is incorrect" });
                         }
                     } else {
                         res.status(500).json({ status: 500, error: "This customer don't exist" });

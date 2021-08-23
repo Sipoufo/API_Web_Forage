@@ -52,7 +52,7 @@ const addFacture = catchAsync(async(req, res) => {
                                     const montantConsommation = (consommation * prixUnitaire) + fraisEntretien + penalite;
                                     const dateFacturation = new Date();
                                     const montantImpaye = montantConsommation - montantVerse;
-                                    const dataLimitePaid = new Date(dateFacturation.getFullYear(), dateFacturation.getMonth(), dateFacturation.getDate() + 10, dateFacturation.getHours(), dateFacturation.getMinutes(), dateFacturation.getMilliseconds());
+                                    const dataLimitePaid = new Date(dateFacturation.getFullYear(), dateFacturation.getMonth(), dateFacturation.getDate() + 10, dateFacturation.getHours() + 1, dateFacturation.getMinutes(), dateFacturation.getMilliseconds());
 
                                     await Facture.create({ idClient, idAdmin, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, observation, dateReleveNewIndex, dateFacturation, dataLimitePaid, dataPaid, montantVerse, montantImpaye, penalite })
                                         .then(resp => {

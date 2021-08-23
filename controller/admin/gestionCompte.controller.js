@@ -68,7 +68,7 @@ const updatePassword = catchAsync((req, res) => {
                             console.log(err);
                         })
                 } else {
-                    res.status(500).json({ status: 500, error: "Your old password is needed" })
+                    res.status(500).json({ status: 500, error: "Your old password is incorrect" })
                 }
 
             } else {
@@ -86,7 +86,7 @@ const updatePassword = catchAsync((req, res) => {
                                         console.log(err);
                                     })
                             } else {
-                                res.status(500).json({ status: 500, error: "Your old password is needed" })
+                                res.status(500).json({ status: 500, error: "Your old password is incorrect" })
                             }
                         } else {
                             res.status(500).json({ status: 500, error: "Your are not register <0_0>" })

@@ -80,6 +80,7 @@ const addFacture = catchAsync(async(req, res) => {
 const addInformation = catchAsync(async(req, res) => {
     const prixUnitaire = req.body.prixUnitaire
     const fraisEntretien = req.body.fraisEntretien
+    const limiteDay = req.body.limitedate
     const token = authorization(req)
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
@@ -88,7 +89,7 @@ const addInformation = catchAsync(async(req, res) => {
             await Admin.findOne({ _id: decodedToken.id, profile: "superAdmin" })
                 .then(async result => {
                     if (result) {
-                        const staticResult = await StaticInf.create({ idAdmin: decodedToken.id, prixUnitaire, fraisEntretien })
+                        const staticResult = await StaticInf.create({ idAdmin: decodedToken.id, prixUnitaire, fraisEntretien, limiteDay })
                         if (staticResult) {
                             res.status(200).json({ status: 200, result: staticResult });
                         } else {

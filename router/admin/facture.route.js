@@ -128,9 +128,12 @@ router
  *                                  type: integer
  *                              fraisEntretien:
  *                                  type: integer
+ *                              limiteDay:
+ *                                  type: integer
  *                          example:
  *                              prixUnitaire: 500
  *                              fraisEntretien: 1000
+ *                              limiteDay: 02
  *          responses:
  *              '201':
  *                  description: >

@@ -16,6 +16,10 @@ const staticSchema = new model({
             required: true,
             trim: true,
         },
+        limiteDay: {
+            type: Number,
+            required: true,
+        },
     }, {
         timestamps: { currentTime: () => new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours() + 1, new Date().getMinutes(), new Date().getMilliseconds()) },
     }

@@ -20,6 +20,7 @@ const addInformation = {
     body: Joi.object().keys({
         prixUnitaire: Joi.number().required(),
         fraisEntretien: Joi.number().required(),
+        limiteDay: Joi.number().required(),
     })
 };
 
@@ -73,6 +74,12 @@ const getOneInvoiceByYear = {
     })
 }
 
+const seeUnpaidInvoicewithDate = {
+    params: Joi.object().keys({
+        dateUnpaid: Joi.date().required(),
+    })
+}
+
 const getClientFactures = {
     params: Joi.object().keys({
         idClient: Joi.custom(objectId).required()
@@ -88,5 +95,6 @@ module.exports = {
     findByYear,
     getOneInvoiceByYear,
     getFactures,
-    addInformation
+    addInformation,
+    seeUnpaidInvoicewithDate
 }

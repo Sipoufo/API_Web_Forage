@@ -389,7 +389,60 @@ router
  */
 router
     .route('/clientFactureByYear/:year/:idClient')
+    .get(tokenVerifieAdmin, validate(FactureValidation.seeUnpaidInvoicewithDate), FactureController.seeUnpaidInvoicewithDate);
+
+    // get one Facture By Year
+/**
+ * @swagger
+ *  /admin/facture/clientFactureByYear/{year}/{idClient}:
+ *      get:
+ *          summary: get all client invoice in relation to year
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: year
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: The year of facture
+ *              -   in: path
+ *                  name: idClient
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The year of facture
+ *          responses: 
+ *              200:
+ *                  description: get factures about the year
+ *              500:
+ *                  description: Error during the get
+ */
+router
+    .route('/clientFactureByYear/:year/:idClient')
     .get(tokenVerifieAdmin, validate(FactureValidation.getOneInvoiceByYear), FactureController.getOneInvoiceByYear);
+// get one Facture By Year
+/**
+ * @swagger
+ *  /admin/facture/clientFactureByYear/{year}/{idClient}:
+ *      get:
+ *          summary: See unpaid invoice with date
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: date
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: Date
+ *          responses: 
+ *              200:
+ *                  description: get factures about the year
+ *              500:
+ *                  description: Error during the get
+ */
+router
+    .route('/clientFactureByYear/:year/:idClient')
+    .get(tokenVerifieAdmin, validate(FactureValidation.seeUnpaidInvoicewithDate), FactureController.seeUnpaidInvoicewithDate);
 
 
 

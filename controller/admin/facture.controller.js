@@ -80,7 +80,7 @@ const addFacture = catchAsync(async(req, res) => {
 const addInformation = catchAsync(async(req, res) => {
     const prixUnitaire = req.body.prixUnitaire
     const fraisEntretien = req.body.fraisEntretien
-    const limiteDay = req.body.limitedate
+    const limiteDay = req.body.limiteDay
     const token = authorization(req)
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
@@ -111,6 +111,20 @@ const getAllFacture = catchAsync((req, res) => {
         .then(factures => {
             res.status(200).json({ status: 200, result: factures })
         })
+})
+
+const seeUnpaidInvoicewithDate = catchAsync((req, res) => {
+    const dateUnpaid = new Date(req.body.dateUnpaid)
+    let invoiceUnpaid = []
+    Client.find()
+        .then(customers => {
+            for (let i = 0; i < customers.length; i++) {
+                if (Facture.findOne({idClient: customers[i], createdAt: dateUnpaid}) == null) {
+                    invoiceUnpaid.push(customers[i])
+                }
+            }
+        })
+    res.status(200).json({ status: 200, result: invoiceUnpaid })
 })
 
 const getStaticInformation = catchAsync((req, res) => {
@@ -344,5 +358,6 @@ module.exports = {
     findByYear,
     getOneInvoiceByYear,
     addInformation,
-    getStaticInformation
+    getStaticInformation,
+    seeUnpaidInvoicewithDate
 }

@@ -251,7 +251,7 @@ const logout = (req, res) => {
 const getClients = catchAsync((req, res) => {
     client
         .find()
-        .sort({ createdAt: -1 })
+        .sort({ name: 0 })
         .then(clients => {
             if (clients.length > 0) {
                 res.status(200).json({ status: 200, result: clients })
@@ -266,7 +266,7 @@ const getAdmins = catchAsync((req, res) => {
     let allAdmin = []
     admin
         .find()
-        .sort({ createdAt: -1 })
+        .sort({ name: 0 })
         .then(admins => {
             jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
                 if (err) {

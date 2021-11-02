@@ -218,7 +218,7 @@ const getMateriauxInputByYear = catchAsync(async(req, res) => {
     let material = []
     await Material
         .find()
-        .sort({ createdAt: 1 })
+        .sort({ name: 0 })
         .then(materials => {
             console.log(materials)
             for (let i = 0; i < materials.length; i++) {

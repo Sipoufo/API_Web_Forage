@@ -60,6 +60,11 @@ const factureSchema = new model({
             required: false,
             default: 0
         },
+        surplus: {
+            type: Number,
+            required: false,
+            default: 0
+        },
         tranche: [{
             montant: Number,
             date: Date

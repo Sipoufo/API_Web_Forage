@@ -24,6 +24,7 @@ const addFacture = catchAsync(async(req, res) => {
             let oldIndex = req.body.oldIndex;
             const monthDate = new Date().getMonth() + 1
             let doFacture = true
+            let surplus = 0
 
             await Facture
                 .find({ idClient })
@@ -41,6 +42,7 @@ const addFacture = catchAsync(async(req, res) => {
                     if (doFacture == true) {
                         if (factures.length >= 1) {
                             oldIndex = factures[0].newIndex;
+                            surplus = factures[0].surplus
                         }
                         await Admin.findById(decodedToken.id)
                             .then(async(admin) => {
@@ -49,11 +51,11 @@ const addFacture = catchAsync(async(req, res) => {
                                     const prixUnitaire = static[0].prixUnitaire;
                                     const fraisEntretien = static[0].fraisEntretien;
                                     const consommation = newIndex - oldIndex;
-                                    const montantConsommation = (consommation * prixUnitaire) + fraisEntretien + penalite;
+                                    const montantConsommation = (consommation * prixUnitaire) + fraisEntretien + penalite - surplus;
                                     const dateFacturation = new Date();
                                     const montantImpaye = montantConsommation - montantVerse;
                                     const dataLimitePaid = new Date(dateFacturation.getFullYear(), dateFacturation.getMonth(), dateFacturation.getDate() + 10, dateFacturation.getHours() + 1, dateFacturation.getMinutes(), dateFacturation.getMilliseconds());
-
+                                    
                                     await Facture.create({ idClient, idAdmin, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, observation, dateReleveNewIndex, dateFacturation, dataLimitePaid, dataPaid, montantVerse, montantImpaye, penalite })
                                         .then(resp => {
                                             if (resp) {
@@ -296,6 +298,7 @@ const statusPaidFacture = catchAsync(async(req, res) => {
     const idFacture = req.params.idFacture
     let status
     const amount = req.body.amount
+    let surplus = 0
 
     await Facture.findById(idFacture)
         .then(async result => {
@@ -304,22 +307,22 @@ const statusPaidFacture = catchAsync(async(req, res) => {
                     const newUnpaid = result.montantImpaye - amount
                     const newAmountPaid = result.montantVerse + amount
                     if (newUnpaid >= 0) {
-                        if (newUnpaid > 0) {
+                        if (newUnpaid != 0) {
                             status = false
                         } else {
                             status = true
                         }
-                        await Facture.findByIdAndUpdate(idFacture, { facturePay: status, montantImpaye: newUnpaid, montantVerse: newAmountPaid, $push: { tranche: { montant: amount, date: new Date() } } })
-                            .then(facture => {
-                                if (facture) {
-                                    res.status(200).json({ status: 200, result: facture })
-                                } else {
-                                    res.status(500).json({ status: 500, error: "Error during the update" })
-                                }
-                            })
                     } else {
-                        res.status(500).json({ status: 500, error: "Your amount is so high" })
+                        surplus = newUnpaid * (-1)
                     }
+                    await Facture.findByIdAndUpdate(idFacture, { facturePay: status, montantImpaye: newUnpaid, montantVerse: newAmountPaid, surplus, $push: { tranche: { montant: amount, date: new Date() } } })
+                        .then(facture => {
+                            if (facture) {
+                                res.status(200).json({ status: 200, result: facture })
+                            } else {
+                                res.status(500).json({ status: 500, error: "Error during the update" })
+                            }
+                        })
                 } else {
                     res.status(500).json({ status: 500, error: "This facture is already paid" })
                 }

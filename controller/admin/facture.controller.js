@@ -115,14 +115,24 @@ const getAllFacture = catchAsync((req, res) => {
         })
 })
 
-const seeUnpaidInvoicewithDate = catchAsync((req, res) => {
+const seeUnpaidInvoicewithDate = catchAsync(async (req, res) => {
     const dateUnpaid = new Date(req.body.dateUnpaid)
+    const dateUnpaidMonth = dateUnpaid.getMonth() + 1
+    const dateUnpaidYear= dateUnpaid.getFullYear()
+    const factures = await Facture.find()
     let invoiceUnpaid = []
     Client.find()
         .then(customers => {
             for (let i = 0; i < customers.length; i++) {
-                if (Facture.findOne({idClient: customers[i], createdAt: dateUnpaid}) == null) {
-                    invoiceUnpaid.push(customers[i])
+                // if (Facture.findOne({idClient: customers[i], createdAt: dateUnpaid}) == null) {
+                //     invoiceUnpaid.push(customers[i])
+                // }
+                for (let l = 0; l < factures.length; l++) {
+                    const factureMonth = factures[l].getMonth() + 1
+                    const factureYear = factures[l].getFullYear()
+                    if (dateUnpaidMonth != factureMonth && dateUnpaidYear != factureYear) {
+                        invoiceUnpaid.push(customers[i])
+                    }
                 }
             }
         })

@@ -423,7 +423,7 @@ router
 // get one Facture By Year
 /**
  * @swagger
- *  /doInvoiceWithDate/{dateUnpaid}:
+ *  /admin/facture/doInvoiceWithDate/{dateUnpaid}:
  *      get:
  *          summary: See unpaid invoice with date
  *          tags: [Facture_Admin]

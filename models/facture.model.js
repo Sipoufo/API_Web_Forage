@@ -62,8 +62,13 @@ const factureSchema = new model({
         },
         surplus: {
             type: Number,
-            required: false,
+            required: true,
             default: 0
+        },
+        preCreate: {
+            type: Boolean,
+            required: true,
+            default: false
         },
         tranche: [{
             montant: Number,

@@ -314,6 +314,7 @@ const statusPaidFacture = catchAsync(async(req, res) => {
                         }
                     } else {
                         surplus = newUnpaid * (-1)
+                        newUnpaid = 0
                     }
                     await Facture.findByIdAndUpdate(idFacture, { facturePay: status, montantImpaye: newUnpaid, montantVerse: newAmountPaid, surplus, $push: { tranche: { montant: amount, date: new Date() } } })
                         .then(facture => {

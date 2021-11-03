@@ -202,6 +202,8 @@ router
  *                                  type: integer
  *                              dateReleveNewIndex:
  *                                  type: string
+ *                              dateCreationInvoice:
+ *                                  type: string
  *                              oldIndex:
  *                                  type: integer
  *                          example:
@@ -209,6 +211,7 @@ router
  *                              observation: 'Bon client'
  *                              penalite: 0
  *                              dataPaid: 2021-07-30
+ *                              dateCreationInvoice: 2021-07-30
  *                              montantVerse: 2000
  *                              dateReleveNewIndex: 2021-07-12
  *                              oldIndex: 100

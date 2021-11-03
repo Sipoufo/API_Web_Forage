@@ -23,6 +23,7 @@ const addFacture = catchAsync(async(req, res) => {
             const dateReleveNewIndex = new Date(req.body.dateReleveNewIndex);
             let oldIndex = req.body.oldIndex;
             const monthDate = new Date().getMonth() + 1
+            const dateCreationInvoice = req.body.dateCreationInvoice;
             let doFacture = true
             let surplus = 0
 

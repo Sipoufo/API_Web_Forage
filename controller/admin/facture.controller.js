@@ -116,27 +116,30 @@ const getAllFacture = catchAsync((req, res) => {
 })
 
 const seeUnpaidInvoicewithDate = catchAsync(async (req, res) => {
-    const dateUnpaid = new Date(req.body.dateUnpaid)
-    const dateUnpaidMonth = dateUnpaid.getMonth() + 1
-    const dateUnpaidYear= dateUnpaid.getFullYear()
-    const factures = await Facture.find()
+    const dateUnpaid = new Date(req.params.dateUnpaid)
+    const dateUnpaidMonth = new Date(req.params.dateUnpaid).getMonth() + 1
+    const dateUnpaidYear= new Date(req.params.dateUnpaid).getFullYear()
+    console.log(dateUnpaidYear)
     let invoiceUnpaid = []
     Client.find()
-        .then(customers => {
+        .sort({name : 0})
+        .then(async customers => {
             for (let i = 0; i < customers.length; i++) {
-                // if (Facture.findOne({idClient: customers[i], createdAt: dateUnpaid}) == null) {
-                //     invoiceUnpaid.push(customers[i])
-                // }
-                for (let l = 0; l < factures.length; l++) {
-                    const factureMonth = factures[l].getMonth() + 1
-                    const factureYear = factures[l].getFullYear()
-                    if (dateUnpaidMonth != factureMonth && dateUnpaidYear != factureYear) {
-                        invoiceUnpaid.push(customers[i])
+                let invoiceCustomer = await Facture.aggregate([
+                    {
+                        $project: {_id: 1, client: '$idClient' , month: {$month: '$createdAt'}, year: {$year: '$createdAt'}}
+                    },
+                    {
+                        $match: {month: dateUnpaidMonth, year: dateUnpaidYear, client: customers[i]}
                     }
+                ]);
+                if (invoiceCustomer.length == 0) {
+                    invoiceUnpaid.push(customers[i])
                 }
+                console.log(invoiceUnpaid)
             }
+            res.status(200).json({ status: 200, result: invoiceUnpaid })
         })
-    res.status(200).json({ status: 200, result: invoiceUnpaid })
 })
 
 const getStaticInformation = catchAsync((req, res) => {

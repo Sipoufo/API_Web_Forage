@@ -423,25 +423,23 @@ router
 // get one Facture By Year
 /**
  * @swagger
- *  /admin/facture/clientFactureByYear/{year}/{idClient}:
+ *  /doInvoiceWithDate/{dateUnpaid}:
  *      get:
  *          summary: See unpaid invoice with date
  *          tags: [Facture_Admin]
  *          parameters:
  *              -   in: path
- *                  name: date
+ *                  name: dateUnpaid
  *                  schema: 
  *                      type: string
  *                  required: true
  *                  description: Date
  *          responses: 
  *              200:
- *                  description: get factures about the year
- *              500:
- *                  description: Error during the get
+ *                  description: get factures
  */
 router
-    .route('/clientFactureByYear/:year/:idClient')
+    .route('/doInvoiceWithDate/:dateUnpaid')
     .get(tokenVerifieAdmin, validate(FactureValidation.seeUnpaidInvoicewithDate), FactureController.seeUnpaidInvoicewithDate);
 
 

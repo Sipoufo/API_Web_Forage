@@ -383,37 +383,6 @@ router
     .route('/factureByYear/:year')
     .get(tokenVerifieAdmin, validate(FactureValidation.findByYear), FactureController.findByYear);
 
-
-// get one Facture By Year
-/**
- * @swagger
- *  /admin/facture/clientFactureByYear/{year}/{idClient}:
- *      get:
- *          summary: get all client invoice in relation to year
- *          tags: [Facture_Admin]
- *          parameters:
- *              -   in: path
- *                  name: year
- *                  schema: 
- *                      type: integer
- *                  required: true
- *                  description: The year of facture
- *              -   in: path
- *                  name: idClient
- *                  schema: 
- *                      type: string
- *                  required: true
- *                  description: The year of facture
- *          responses: 
- *              200:
- *                  description: get factures about the year
- *              500:
- *                  description: Error during the get
- */
-router
-    .route('/clientFactureByYear/:year/:idClient')
-    .get(tokenVerifieAdmin, validate(FactureValidation.seeUnpaidInvoicewithDate), FactureController.seeUnpaidInvoicewithDate);
-
     // get one Facture By Year
 /**
  * @swagger

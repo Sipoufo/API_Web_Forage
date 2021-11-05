@@ -243,7 +243,7 @@ const getClientFactures = catchAsync((req, res) => {
 const findByYear = catchAsync((req, res) => {
     const year = req.params.year
     let result = []
-    console.log(year)
+    // console.log(year)
     Facture
         .find()
         .sort({ createdAt: 1 })

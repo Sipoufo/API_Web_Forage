@@ -318,8 +318,6 @@ router
  *                                  type: string
  *                              profileImage:
  *                                  type: string
- *                              description:
- *                                  type: string
  *                          example:
  *                              name: Sipoufo Yvan
  *                              birthday: 2002-01-29

@@ -52,7 +52,7 @@ const updateClient = {
         phone: Joi.number().required(),
         email: Joi.string().required(),
         IdCompteur: Joi.string(),
-        description: Joi.string().required(),
+        description: Joi.string(),
         profileImage: Joi.string().required(),
         birthday: Joi.string().required(),
     })

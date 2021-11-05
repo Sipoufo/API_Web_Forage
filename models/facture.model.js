@@ -46,10 +46,6 @@ const factureSchema = new model({
             type: Number,
             required: true,
         },
-        penalite: {
-            type: Number,
-            required: false
-        },
         montantImpaye: {
             type: Number,
             required: false,

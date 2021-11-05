@@ -20,6 +20,14 @@ const addInformation = {
     })
 };
 
+const addPenalty = {
+    body: Joi.object().keys({
+        dayActivation: Joi.number().required(),
+        pas: Joi.number().required(),
+        percentageAmountAdd: Joi.number().required(),
+    })
+};
+
 const haveInvoice = {
     params: Joi.object().keys({
         idClient: Joi.custom(objectId).required(),
@@ -99,5 +107,6 @@ module.exports = {
     getFactures,
     addInformation,
     seeUnpaidInvoicewithDate,
-    haveInvoice
+    haveInvoice,
+    addPenalty
 }

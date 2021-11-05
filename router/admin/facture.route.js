@@ -1,7 +1,7 @@
 const express = require('express');
 const validate = require('../../middlewares/validate');
 const { FactureValidation } = require('../../validation/index');
-const { FactureController } = require('../../controller/index');
+const { FactureController, PenaltyController } = require('../../controller/index');
 const { tokenVerifieAdmin, tokenVerifie } = require('../../middlewares/auth')
 
 const router = express.Router()
@@ -143,6 +143,41 @@ router
 router
     .route('/staticInformation')
     .post(tokenVerifie, validate(FactureValidation.addInformation), FactureController.addInformation);
+
+
+// Pe information
+/**
+ * @swagger
+ *  /admin/facture/penalty:
+ *      post: 
+ *          summary: Add information about a penalty
+ *          tags: [Facture_Admin]
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              dayActivation:
+ *                                  type: integer
+ *                              pas:
+ *                                  type: integer
+ *                              percentageAmountAdd:
+ *                                  type: integer
+ *                          example:
+ *                              dayActivation: 10
+ *                              pas: 5
+ *                              percentageAmountAdd: 1
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      add information about a penalty
+ *                                    
+ */
+router
+    .route('/staticInformation')
+    .post(tokenVerifie, validate(FactureValidation.addPenalty), PenaltyController.addPenalty);
 
 
 

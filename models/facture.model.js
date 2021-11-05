@@ -48,7 +48,7 @@ const factureSchema = new model({
         },
         penalite: {
             type: Number,
-            required: true
+            required: false
         },
         montantImpaye: {
             type: Number,
@@ -83,22 +83,13 @@ const factureSchema = new model({
             required: false,
             default: false
         },
-        dateFacturation: {
-            type: Date,
-            required: true,
-        },
-        datePaid: {
-            type: String,
-            required: true,
-            default: false
-        },
         dateReleveNewIndex: {
             type: Date,
             required: true
         },
         dateCreationInvoice: {
             type: Date,
-            required: true
+            required: false
         },
     }, {
         timestamps: { currentTime: () => new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours() + 1, new Date().getMinutes(), new Date().getMilliseconds()) },

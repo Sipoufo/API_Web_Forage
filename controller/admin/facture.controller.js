@@ -16,16 +16,18 @@ const addFacture = catchAsync(async(req, res) => {
             const idClient = req.params.idClient;
             const idAdmin = decodedToken.id;
             const newIndex = req.body.newIndex;
-            const observation = req.body.observation;
-            const penalite = (req.body.penalite) ? req.body.penalite : 0;
-            const dataPaid = req.body.dataPaid;
-            const montantVerse = req.body.montantVerse;
+            // const montantVerse = req.body.montantVerse;
             const dateReleveNewIndex = new Date(req.body.dateReleveNewIndex);
-            let oldIndex = req.body.oldIndex;
-            const monthDate = new Date().getMonth() + 1
-            const dateCreationInvoice = req.body.dateCreationInvoice;
-            let doFacture = true
-            let surplus = 0
+            let oldIndex = (req.body.oldIndex) ? req.body.oldIndex : null;
+            const monthDate = new Date().getMonth() + 1;
+            const yearDate = new Date().getFullYear();
+            let doFacture = true;
+            let surplus = 0;
+
+            // for pre-create invoice
+            let indexFacture = null
+            let isprecreate = false
+            let idFacturePre = null
 
             await Facture
                 .find({ idClient })
@@ -34,13 +36,17 @@ const addFacture = catchAsync(async(req, res) => {
                     if (factures.length > 0) {
                         for (let i = 0; i < factures.length; i++) {
                             console.log(factures[i].dateFacturation.getMonth())
-                            if (factures[i].dateFacturation.getMonth() == monthDate) {
+                            if (factures[i].dateFacturation.getMonth() == monthDate && factures[i].dateFacturation.getFullYear() == yearDate && factures[i].preCreate == true) {
                                 doFacture = false;
                                 break;
+                            }else if (factures[i].preCreate == false){
+                                indexFacture = i
+                                isprecreate = true
+                                idFacturePre = factures[i]._id
                             }
                         }
                     }
-                    if (doFacture == true) {
+                    if (doFacture == true && isprecreate == false) {
                         if (factures.length >= 1) {
                             oldIndex = factures[0].newIndex;
                             surplus = factures[0].surplus
@@ -52,12 +58,13 @@ const addFacture = catchAsync(async(req, res) => {
                                     const prixUnitaire = static[0].prixUnitaire;
                                     const fraisEntretien = static[0].fraisEntretien;
                                     const consommation = newIndex - oldIndex;
-                                    const montantConsommation = (consommation * prixUnitaire) + fraisEntretien + penalite - surplus;
-                                    const dateFacturation = new Date();
-                                    const montantImpaye = montantConsommation - montantVerse;
-                                    const dataLimitePaid = new Date(dateFacturation.getFullYear(), dateFacturation.getMonth(), dateFacturation.getDate() + 10, dateFacturation.getHours() + 1, dateFacturation.getMinutes(), dateFacturation.getMilliseconds());
+                                    const montantConsommation = (consommation * prixUnitaire) + fraisEntretien - surplus;
+                                    // const dateFacturation = new Date();
+                                    const montantImpaye = montantConsommation;
+                                    const dayLimit = await StaticInf.find().sort({createdAt : -1})
+                                    const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth(), dayLimit[0].createdAt.getDate(), dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
                                     
-                                    await Facture.create({ idClient, idAdmin, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, observation, dateReleveNewIndex, dateFacturation, dataLimitePaid, dataPaid, montantVerse, montantImpaye, penalite })
+                                    await Facture.create({ idClient, idAdmin, dateReleveNewIndex, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, dataLimitePaid, montantImpaye })
                                         .then(resp => {
                                             if (resp) {
                                                 res.status(200).json({ status: 200, result: resp });
@@ -69,7 +76,18 @@ const addFacture = catchAsync(async(req, res) => {
                                     res.status(500).json({ status: 500, error: "Error during the save" });
                                 }
                             });
-                    } else {
+                    } else if(doFacture == true && isprecreate == true) {
+                        const static = await StaticInf.find().sort({ createdAt: 1 })
+                        const prixUnitaire = static[0].prixUnitaire;
+                        const fraisEntretien = static[0].fraisEntretien;
+                        const new_Consommation = newIndex - oldIndex;
+                        const old_Consommation = factures[indexFacture].newIndex - factures[indexFacture].oldIndex;
+                        const final_Consommation = new_Consommation + old_Consommation
+                        const montantConsommation = (final_Consommation * prixUnitaire) + fraisEntretien - surplus;
+                        const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth(), dayLimit[0].createdAt.getDate(), dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
+
+                        await Facture.findByIdAndUpdate(idFacturePre, {idClient, idAdmin, dateReleveNewIndex, newIndex : factures[indexFacture].newIndex, oldIndex : factures[indexFacture].oldIndex, consommation: final_Consommation, montantConsommation, dataLimitePaid})
+                    }else {
                         res.status(500).json({ status: 500, error: "This customer already has an invoice for this month" });
                     }
 
@@ -116,8 +134,23 @@ const getAllFacture = catchAsync((req, res) => {
         })
 })
 
+const haveInvoice = catchAsync((req, res) => {
+    const idClient = req.params.idClient;
+    let have
+    Facture
+        .find({ idClient })
+        .then(factures => {
+            if(factures.length > 0) {
+                have = true
+            }else {
+                have = false
+            }
+            res.status(200).json({ status: 200, result: have })
+        })
+})
+
 const seeUnpaidInvoicewithDate = catchAsync(async (req, res) => {
-    const dateUnpaid = new Date(req.params.dateUnpaid)
+    // const dateUnpaid = new Date(req.params.dateUnpaid)
     const dateUnpaidMonth = new Date(req.params.dateUnpaid).getMonth() + 1
     const dateUnpaidYear= new Date(req.params.dateUnpaid).getFullYear()
     console.log(dateUnpaidYear)
@@ -377,5 +410,6 @@ module.exports = {
     getOneInvoiceByYear,
     addInformation,
     getStaticInformation,
-    seeUnpaidInvoicewithDate
+    seeUnpaidInvoicewithDate,
+    haveInvoice
 }

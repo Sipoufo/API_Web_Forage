@@ -192,27 +192,12 @@ router
  *                          properties:
  *                              newIndex:
  *                                  type: integer
- *                              observation:
- *                                  type: string
- *                              penalite:
- *                                  type: integer
- *                              dataPaid:
- *                                  type: string
- *                              montantVerse:
- *                                  type: integer
  *                              dateReleveNewIndex:
- *                                  type: string
- *                              dateCreationInvoice:
  *                                  type: string
  *                              oldIndex:
  *                                  type: integer
  *                          example:
  *                              newIndex: 150
- *                              observation: 'Bon client'
- *                              penalite: 0
- *                              dataPaid: 2021-07-30
- *                              dateCreationInvoice: 2021-07-30
- *                              montantVerse: 2000
  *                              dateReleveNewIndex: 2021-07-12
  *                              oldIndex: 100
  *          responses:
@@ -444,6 +429,30 @@ router
 router
     .route('/doInvoiceWithDate/:dateUnpaid')
     .get(tokenVerifieAdmin, validate(FactureValidation.seeUnpaidInvoicewithDate), FactureController.seeUnpaidInvoicewithDate);
+
+// have a invoice
+/**
+ * @swagger
+ *  /admin/facture/haveInvoice/{idClient}:
+ *      get: 
+ *          summary: See if a customer have a invoice
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: idClient
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: id of customer
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      return a boolean for check if a customer have invoice
+ *                                    
+ */
+router
+    .route('/haveInvoice/:idClient')
+    .get(tokenVerifie, validate(FactureValidation.haveInvoice), FactureController.haveInvoice);
 
 
 

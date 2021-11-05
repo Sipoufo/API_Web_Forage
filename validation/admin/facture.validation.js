@@ -8,10 +8,6 @@ const addFacture = {
     body: Joi.object().keys({
         newIndex: Joi.number().required(),
         oldIndex: Joi.number(),
-        observation: Joi.string().optional(),
-        penalite: Joi.number(),
-        dataPaid: Joi.string(),
-        montantVerse: Joi.number().required(),
         dateReleveNewIndex: Joi.string().required(),
     })
 };
@@ -21,6 +17,12 @@ const addInformation = {
         prixUnitaire: Joi.number().required(),
         fraisEntretien: Joi.number().required(),
         limiteDay: Joi.number().required(),
+    })
+};
+
+const haveInvoice = {
+    params: Joi.object().keys({
+        idClient: Joi.custom(objectId).required(),
     })
 };
 
@@ -96,5 +98,6 @@ module.exports = {
     getOneInvoiceByYear,
     getFactures,
     addInformation,
-    seeUnpaidInvoicewithDate
+    seeUnpaidInvoicewithDate,
+    haveInvoice
 }

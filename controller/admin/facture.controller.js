@@ -31,7 +31,7 @@ const addFacture = catchAsync(async(req, res) => {
 
             await Facture
                 .find({ idClient })
-                .sort({ createdAt: -1 })
+                .sort({ dateReleveNewIndex: -1 })
                 .then(async factures => {
                     if (factures.length > 0) {
                         for (let i = 0; i < factures.length; i++) {
@@ -46,11 +46,11 @@ const addFacture = catchAsync(async(req, res) => {
                             }
                         }
                     }
+                    if (factures.length >= 1) {
+                        oldIndex = factures[0].newIndex;
+                        surplus = factures[0].surplus
+                    }
                     if (doFacture == true && isprecreate == false) {
-                        if (factures.length >= 1) {
-                            oldIndex = factures[0].newIndex;
-                            surplus = factures[0].surplus
-                        }
                         await Admin.findById(decodedToken.id)
                             .then(async(admin) => {
                                 if (admin) {
@@ -61,8 +61,7 @@ const addFacture = catchAsync(async(req, res) => {
                                     const montantConsommation = (consommation * prixUnitaire) + fraisEntretien - surplus;
                                     // const dateFacturation = new Date();
                                     const montantImpaye = montantConsommation;
-                                    const dayLimit = await StaticInf.find().sort({createdAt : -1})
-                                    const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth(), dayLimit[0].createdAt.getDate(), dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
+                                    const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 2, static[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
                                     
                                     await Facture.create({ idClient, idAdmin, dateReleveNewIndex, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, dataLimitePaid, montantImpaye })
                                         .then(resp => {
@@ -84,7 +83,7 @@ const addFacture = catchAsync(async(req, res) => {
                         const old_Consommation = factures[indexFacture].newIndex - factures[indexFacture].oldIndex;
                         const final_Consommation = new_Consommation + old_Consommation
                         const montantConsommation = (final_Consommation * prixUnitaire) + fraisEntretien - surplus;
-                        const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth(), dayLimit[0].createdAt.getDate(), dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
+                        const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 2, dayLimit[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
 
                         await Facture.findByIdAndUpdate(idFacturePre, {idClient, idAdmin, dateReleveNewIndex, newIndex : factures[indexFacture].newIndex, oldIndex : factures[indexFacture].oldIndex, consommation: final_Consommation, montantConsommation, dataLimitePaid})
                     }else {
@@ -97,6 +96,52 @@ const addFacture = catchAsync(async(req, res) => {
         }
     })
 })
+
+const preCreate = catchAsync(async(req, res) => {
+    const static = await StaticInf.find().sort({ createdAt: 1 })
+    const IdCompteur = req.body.IdCompteur;
+    let oldIndex = (req.body.oldIndex) ? req.body.oldIndex : null;
+    const newIndex = req.body.newIndex;
+    const idClient = req.body.idClient;
+    const dateReleveNewIndex = new Date();
+    let consommation = 0;
+    const preCreate = true;
+    const prixUnitaire = static[0].prixUnitaire;
+    const fraisEntretien = static[0].fraisEntretien;
+    const surplus = 0
+
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            Client.findById(idClient)
+                .then( async customer => {
+                    if(customer) {surplussurplus
+                        const factures = await Facture.find({ idClient }).sort({ dateReleveNewIndex: -1 });
+                        if(factures.length > 0) {
+                            oldIndex = factures[O].oldIndex;
+                            surplus = factures[0].surplus;
+                        }
+                        const montantConsommation = (consommation * prixUnitaire) + fraisEntretien - surplus;
+                        consommation = newIndex - oldIndex;
+                        const montantImpaye = montantConsommation;
+                        const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 2, static[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
+                        await Client.findByIdAndUpdate(idClient, { IdCompteur });
+                        Facture.create({ idClient, idAdmin: decodedToken.id, newIndex, oldIndex, consommation, prixUnitaire, montantConsommation, fraisEntretien, montantImpaye, surplus, preCreate, dataLimitePaid, dateReleveNewIndex })
+                            .then( facture => {
+                                if(facture) {
+                                    res.status(200).json({ status: 200, result: staticResult });
+                                } else {
+                                    res.status(500).json({ status: 500, error: "Error during the creation" });
+                                }
+                            })
+                    } else {
+                        res.status(500).json({ status: 500, error: "This customer don't exist" });
+                    }
+                })
+        }
+    })
+});
 
 const addInformation = catchAsync(async(req, res) => {
     const prixUnitaire = req.body.prixUnitaire
@@ -114,7 +159,7 @@ const addInformation = catchAsync(async(req, res) => {
                         if (staticResult) {
                             res.status(200).json({ status: 200, result: staticResult });
                         } else {
-                            res.status(500).json({ status: 500, error: "Error while the creation" });
+                            res.status(500).json({ status: 500, error: "Error during the creation" });
                         }
                     } else {
                         res.status(500).json({ status: 500, error: "Your are not super administrator" });
@@ -411,5 +456,6 @@ module.exports = {
     addInformation,
     getStaticInformation,
     seeUnpaidInvoicewithDate,
-    haveInvoice
+    haveInvoice,
+    preCreate
 }

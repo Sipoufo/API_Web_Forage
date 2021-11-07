@@ -145,7 +145,7 @@ router
     .post(tokenVerifie, validate(FactureValidation.addInformation), FactureController.addInformation);
 
 
-// Pe information
+//  information
 /**
  * @swagger
  *  /admin/facture/penalty:
@@ -176,8 +176,50 @@ router
  *                                    
  */
 router
-    .route('/staticInformation')
+    .route('/penalty')
     .post(tokenVerifie, validate(FactureValidation.addPenalty), PenaltyController.addPenalty);
+
+
+//  information
+/**
+ * @swagger
+ *  /admin/facture/invoicePreCreate:
+ *      post: 
+ *          summary: Add information about a penalty
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: idClient
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The id of user
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              IdCompteur:
+ *                                  type: string
+ *                              newIndex:
+ *                                  type: integer
+ *                              oldIndex:
+ *                                  type: integer
+ *                          example:
+ *                              IdCompteur: UIX2000
+ *                              newIndex: 160
+ *                              oldIndex: 100
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      create a pre-create invoicem
+ *                                    
+ */
+router
+    .route('/invoicePreCreate')
+    .post(tokenVerifie, validate(FactureValidation.preCreate), FactureController.preCreate);
 
 
 

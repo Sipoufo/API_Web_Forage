@@ -38,10 +38,6 @@ const factureSchema = new model({
             type: Number,
             required: true,
         },
-        observation: {
-            type: String,
-            required: false,
-        },
         fraisEntretien: {
             type: Number,
             required: true,

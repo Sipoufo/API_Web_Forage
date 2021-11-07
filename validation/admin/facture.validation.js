@@ -12,6 +12,17 @@ const addFacture = {
     })
 };
 
+const preCreate = {
+    params: Joi.object().keys({
+        idClient: Joi.custom(objectId).required()
+    }),
+    body: Joi.object().keys({
+        IdCompteur: Joi.string().required(),
+        newIndex: Joi.number().required(),
+        oldIndex: Joi.number(),
+    })
+};
+
 const addInformation = {
     body: Joi.object().keys({
         prixUnitaire: Joi.number().required(),
@@ -108,5 +119,6 @@ module.exports = {
     addInformation,
     seeUnpaidInvoicewithDate,
     haveInvoice,
-    addPenalty
+    addPenalty,
+    preCreate
 }

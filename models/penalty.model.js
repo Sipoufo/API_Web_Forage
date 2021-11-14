@@ -11,7 +11,7 @@ const penaltySchema = new model({
             type: Number,
             required: true
         },
-        percentageAmountAdd: {
+        amountAdd: {
             type: Number,
             default: true
         },

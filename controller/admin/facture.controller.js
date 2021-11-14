@@ -63,7 +63,7 @@ const addFacture = catchAsync(async(req, res) => {
                                     const montantImpaye = montantConsommation;
                                     const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 2, static[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
                                     
-                                    await Facture.create({ idClient, idAdmin, dateReleveNewIndex, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, dataLimitePaid, montantImpaye })
+                                    await Facture.create({ idClient, idAdmin, dateReleveNewIndex, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, dataLimitePaid, montantImpaye, penalty: { montant: 0, date: dateReleveNewIndex } })
                                         .then(resp => {
                                             if (resp) {
                                                 res.status(200).json({ status: 200, result: resp });
@@ -127,7 +127,7 @@ const preCreate = catchAsync(async(req, res) => {
                         const montantImpaye = montantConsommation;
                         const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 2, static[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
                         await Client.findByIdAndUpdate(idClient, { IdCompteur });
-                        Facture.create({ idClient, idAdmin: decodedToken.id, newIndex, oldIndex, consommation, prixUnitaire, montantConsommation, fraisEntretien, montantImpaye, surplus, preCreate, dataLimitePaid, dateReleveNewIndex })
+                        Facture.create({ idClient, idAdmin: decodedToken.id, newIndex, oldIndex, consommation, prixUnitaire, montantConsommation, fraisEntretien, montantImpaye, surplus, preCreate, dataLimitePaid, dateReleveNewIndex, penalty: { montant: 0, date: dateReleveNewIndex } })
                             .then( facture => {
                                 if(facture) {
                                     res.status(200).json({ status: 200, result: staticResult });
@@ -457,5 +457,5 @@ module.exports = {
     getStaticInformation,
     seeUnpaidInvoicewithDate,
     haveInvoice,
-    preCreate
+    preCreate,
 }

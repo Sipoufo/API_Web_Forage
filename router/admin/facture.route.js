@@ -163,12 +163,12 @@ router
  *                                  type: integer
  *                              pas:
  *                                  type: integer
- *                              percentageAmountAdd:
+ *                              amountAdd:
  *                                  type: integer
  *                          example:
  *                              dayActivation: 10
  *                              pas: 5
- *                              percentageAmountAdd: 1
+ *                              amountAdd: 1000
  *          responses:
  *              '201':
  *                  description: >
@@ -178,6 +178,31 @@ router
 router
     .route('/penalty')
     .post(tokenVerifie, validate(FactureValidation.addPenalty), PenaltyController.addPenalty);
+
+
+//  remove penalty
+/**
+ * @swagger
+ *  /admin/facture/penalty/{idFacture}:
+ *      post: 
+ *          summary: remove a penalty of one invoice
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: idFacture
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The id of invoice
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      return a update of invoice
+ *                                    
+ */
+router
+    .route('/penalty/:idFacture')
+    .put(tokenVerifie, validate(FactureValidation.removePenalty), PenaltyController.removePenalty);
 
 
 //  information

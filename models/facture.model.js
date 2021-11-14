@@ -66,6 +66,17 @@ const factureSchema = new model({
             montant: Number,
             date: Date
         }],
+        penalty: [{
+            montant: {
+                type: Number,
+                required: true,
+                default: 0
+            },
+            date: {
+                type: Date,
+                required: true,
+            },
+        }],
         dataLimitePaid: {
             type: Date,
             required: true

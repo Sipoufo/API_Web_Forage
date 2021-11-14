@@ -23,6 +23,12 @@ const preCreate = {
     })
 };
 
+const removePenalty = {
+    params: Joi.object().keys({
+        idFacture: Joi.custom(objectId).required()
+    }),
+};
+
 const addInformation = {
     body: Joi.object().keys({
         prixUnitaire: Joi.number().required(),
@@ -35,7 +41,7 @@ const addPenalty = {
     body: Joi.object().keys({
         dayActivation: Joi.number().required(),
         pas: Joi.number().required(),
-        percentageAmountAdd: Joi.number().required(),
+        amountAdd: Joi.number().required(),
     })
 };
 
@@ -120,5 +126,6 @@ module.exports = {
     seeUnpaidInvoicewithDate,
     haveInvoice,
     addPenalty,
-    preCreate
+    preCreate,
+    removePenalty
 }

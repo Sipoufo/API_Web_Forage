@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const addPenalty = catchAsync(async(req, res) => {
     const dayActivation = req.body.dayActivation
     const pas = req.body.pas
-    const percentageAmountAdd = req.body.percentageAmountAdd
+    const amountAdd = req.body.amountAdd
     const token = authorization(req)
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
@@ -14,7 +14,7 @@ const addPenalty = catchAsync(async(req, res) => {
             await Admin.findOne({ _id: decodedToken.id, profile: "superAdmin" })
                 .then(async result => {
                     if (result) {
-                        const penality = await Penalty.create({ dayActivation, pas, percentageAmountAdd })
+                        const penality = await Penalty.create({ dayActivation, pas, amountAdd })
                         if (penality) {
                             res.status(200).json({ status: 200, result: penality });
                         } else {
@@ -29,6 +29,28 @@ const addPenalty = catchAsync(async(req, res) => {
 
 })
 
+const removePenalty = catchAsync((req, res) => {
+    const idFacture = req.params.idFacture;
+    Facture
+        .findById( idFacture )
+        .then(factures => {
+            if(factures) {
+                Facture.findByIdAndUpdate(idFacture, { $push: { penalty: { montant: 0, date: new Date() } } })
+                    .then(async updatePenalty => {
+                        if(updatePenalty) {
+                            const result = await Facture.findById(idFacture);
+                            res.status(200).json({ status: 200, result });
+                        } else {
+                            res.status(500).json({ status: 500, error: "Error please retry" })
+                        }
+                    })
+            }else {
+                res.status(500).json({ status: 500, error: "This invoice don't exist" })
+            }
+        })
+})
+
 module.exports = {
     addPenalty,
+    removePenalty
 }

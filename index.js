@@ -78,7 +78,7 @@ io.on('connection', () => {
 });
 
 // cron process
-cron.schedule('* 5 * * * *', async () => {
+cron.schedule('* * * 1 * *', async () => {
     console.log('Verify if customer have penalty');
     let amount = 0;
     let doPenalty = false;

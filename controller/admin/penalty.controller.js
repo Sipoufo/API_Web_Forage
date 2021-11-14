@@ -2,8 +2,12 @@ const catchAsync = require('../../utils/catchAsync');
 const { Admin, Penalty } = require('../../models/index');
 const jwt = require('jsonwebtoken');
 
+const authorization = (req) => {
+    return req.headers.authorization.split(" ")[1]
+}
+
+
 const addPenalty = catchAsync(async(req, res) => {
-    const dayActivation = req.body.dayActivation
     const pas = req.body.pas
     const amountAdd = req.body.amountAdd
     const token = authorization(req)
@@ -14,7 +18,7 @@ const addPenalty = catchAsync(async(req, res) => {
             await Admin.findOne({ _id: decodedToken.id, profile: "superAdmin" })
                 .then(async result => {
                     if (result) {
-                        const penality = await Penalty.create({ dayActivation, pas, amountAdd })
+                        const penality = await Penalty.create({ pas, amountAdd })
                         if (penality) {
                             res.status(200).json({ status: 200, result: penality });
                         } else {

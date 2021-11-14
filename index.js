@@ -78,32 +78,47 @@ io.on('connection', () => {
 });
 
 // cron process
-cron.schedule('* * 23 * *', async () => {
+cron.schedule('* 5 * * * *', async () => {
     console.log('Verify if customer have penalty');
     let amount = 0;
+    let doPenalty = false;
     const staticInformation = await StaticInf.find().sort( { createdAt: -1 } );
     const penaltyInformation = await Penalty.find().sort( { createdAt: -1 } );
-    if(penaltyInformation.length > 0 && staticInformation > 0) {
+    if(penaltyInformation.length > 0 && staticInformation.length > 0) {
         Facture.find( { facturePay: false } )
             .sort( { dateReleveNewIndex: -1 } )
             .then(async (invoice) => {
                 if(invoice.length > 0) {
                     const dateLimite = new Date(invoice[0].dateReleveNewIndex.getFullYear(), invoice[0].dateReleveNewIndex.getMonth() + 2, staticInformation[0].limiteDay);
                     const actualDate = new Date()
+                    console.log(dateLimite.getTime())
+                    console.log(actualDate.getTime())
                     if (dateLimite.getTime() < actualDate.getTime()) {
                         for (let i = 0; i < invoice.length; i++) {
                             if ( invoice[i].penalty.length > 0 ) {
-                                amount = invoice[i].penalty[ invoice[i].penalty.length - 1] + ( penaltyInformation[0].amountAdd )
+                                const oldDate = invoice[i].penalty[invoice[i].penalty.length - 1].date;
+                                const nextDay = new Date(oldDate.getFullYear(), oldDate.getMonth() + 1, oldDate.getDate() + staticInformation[0].limiteDay);
+                                if(actualDate.getTime() >= nextDay.getTime()) {
+                                    doPenalty = true
+                                    amount = invoice[i].penalty[ invoice[i].penalty.length - 1] + ( penaltyInformation[0].amountAdd )
+                                }
                             } else {
                                 amount = penaltyInformation[0].amountAdd
+                                doPenalty = true
                             }
-                            const montantConsommation = invoice[i].montantConsommation + penaltyInformation[0].amountAdd;
-                            const montantImpaye = invoice[i].montantImpaye + penaltyInformation[0].amountAdd;
-                            await Facture.findByIdAndUpdate( invoice[i]._id, { montantConsommation, montantImpaye, $push: { penalty: { montant: amount, date: new Date() } } } )
+                            if (doPenalty) {
+                                const montantConsommation = invoice[i].montantConsommation + penaltyInformation[0].amountAdd;
+                                const montantImpaye = invoice[i].montantImpaye + penaltyInformation[0].amountAdd;
+                                await Facture.findByIdAndUpdate( invoice[i]._id, { montantConsommation, montantImpaye, $push: { penalty: { montant: amount, date: new Date() } } } )
+                            }
                         }
+                    } else {
+                        console.log("It's not a billing day")
                     }
                 }
             })
+    } else {
+        console.log("Please enter static and penalty information")
     }
 });
 

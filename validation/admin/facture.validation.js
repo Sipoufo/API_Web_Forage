@@ -39,7 +39,6 @@ const addInformation = {
 
 const addPenalty = {
     body: Joi.object().keys({
-        dayActivation: Joi.number().required(),
         pas: Joi.number().required(),
         amountAdd: Joi.number().required(),
     })

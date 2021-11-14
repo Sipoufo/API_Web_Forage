@@ -3,10 +3,6 @@ const model = mongoose.Schema
 var mongoosePaginate = require('mongoose-paginate-v2');
 
 const penaltySchema = new model({
-        dayActivation: {
-            type: Number,
-            required: true
-        },
         pas: {
             type: Number,
             required: true

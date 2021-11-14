@@ -159,14 +159,11 @@ router
  *                      schema:
  *                          type: object
  *                          properties:
- *                              dayActivation:
- *                                  type: integer
  *                              pas:
  *                                  type: integer
  *                              amountAdd:
  *                                  type: integer
  *                          example:
- *                              dayActivation: 10
  *                              pas: 5
  *                              amountAdd: 1000
  *          responses:

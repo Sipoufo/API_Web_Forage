@@ -99,6 +99,7 @@ const addFacture = catchAsync(async(req, res) => {
 
 const preCreate = catchAsync(async(req, res) => {
     const static = await StaticInf.find().sort({ createdAt: 1 })
+    const token = authorization(req)
     const IdCompteur = req.body.IdCompteur;
     let oldIndex = (req.body.oldIndex) ? req.body.oldIndex : null;
     const newIndex = req.body.newIndex;
@@ -280,7 +281,7 @@ const getClientFactures = catchAsync((req, res) => {
             if (factures.length > 0) {
                 res.status(200).json({ status: 200, result: factures })
             } else {
-                res.status(500).json({ status: 500, error: "Error during the find factures" })
+                res.status(500).json({ status: 500, error: "This customer don't have invoice" })
             }
         })
 });

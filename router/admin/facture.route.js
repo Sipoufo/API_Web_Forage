@@ -205,7 +205,7 @@ router
 //  information
 /**
  * @swagger
- *  /admin/facture/invoicePreCreate:
+ *  /admin/facture/invoicePreCreate/{idClient}:
  *      post: 
  *          summary: Add information about a penalty
  *          tags: [Facture_Admin]
@@ -240,7 +240,7 @@ router
  *                                    
  */
 router
-    .route('/invoicePreCreate')
+    .route('/invoicePreCreate/:idClient')
     .post(tokenVerifie, validate(FactureValidation.preCreate), FactureController.preCreate);
 
 

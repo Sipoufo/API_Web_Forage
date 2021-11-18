@@ -103,13 +103,13 @@ const preCreate = catchAsync(async(req, res) => {
     const IdCompteur = req.body.IdCompteur;
     let oldIndex = (req.body.oldIndex) ? req.body.oldIndex : null;
     const newIndex = req.body.newIndex;
-    const idClient = req.body.idClient;
+    const idClient = req.params.idClient;
     const dateReleveNewIndex = new Date();
     let consommation = 0;
     const preCreate = true;
     const prixUnitaire = static[0].prixUnitaire;
     const fraisEntretien = static[0].fraisEntretien;
-    const surplus = 0
+    let surplus = 0;
 
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
@@ -117,10 +117,10 @@ const preCreate = catchAsync(async(req, res) => {
         } else {
             Client.findById(idClient)
                 .then( async customer => {
-                    if(customer) {surplussurplus
+                    if(customer) {
                         const factures = await Facture.find({ idClient }).sort({ dateReleveNewIndex: -1 });
-                        if(factures.length > 0) {
-                            oldIndex = factures[O].oldIndex;
+                        if(factures.length > 0){
+                            oldIndex = factures[0].oldIndex;
                             surplus = factures[0].surplus;
                         }
                         const montantConsommation = (consommation * prixUnitaire) + fraisEntretien - surplus;
@@ -131,7 +131,7 @@ const preCreate = catchAsync(async(req, res) => {
                         Facture.create({ idClient, idAdmin: decodedToken.id, newIndex, oldIndex, consommation, prixUnitaire, montantConsommation, fraisEntretien, montantImpaye, surplus, preCreate, dataLimitePaid, dateReleveNewIndex, penalty: { montant: 0, date: dateReleveNewIndex } })
                             .then( facture => {
                                 if(facture) {
-                                    res.status(200).json({ status: 200, result: staticResult });
+                                    res.status(200).json({ status: 200, result: facture });
                                 } else {
                                     res.status(500).json({ status: 500, error: "Error during the creation" });
                                 }

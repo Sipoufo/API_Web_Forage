@@ -20,8 +20,8 @@ const register = catchAsync(async(req, res) => {
     const IdCompteur = req.body.IdCompteur
     const password = req.body.password
     const profileImage = req.body.profileImage
-    const longitude = (req.body.longitude) ? req.body.longitude : undefined
-    const latitude = (req.body.latitude) ? req.body.longitude : undefined
+    const longitude = (req.body.longitude) ? req.body.longitude : null
+    const latitude = (req.body.latitude) ? req.body.longitude : null
 
 
     return Admin.findOne({ phone })

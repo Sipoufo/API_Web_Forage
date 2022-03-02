@@ -23,21 +23,20 @@ const register = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email
-    const birthday = req.body.birthday
     const password = req.body.password
     const description = req.body.description
     const profileImage = req.body.profileImage
     const longitude = (req.body.longitude) ? req.body.longitude : undefined
     const latitude = (req.body.latitude) ? req.body.longitude : undefined
 
-    console.log(req)
+    console.log(password)
     return client.findOne({ phone })
         .then(client => {
             if (!client) {
                 return admin.findOne({ phone })
                     .then(async number => {
                         if (!number) {
-                            const result = await admin.create({ name, phone: phone, profileImage, email, birthday, password, localisation: { longitude, latitude, description } })
+                            const result = await admin.create({ name, phone: phone, profileImage, email, password, localisation: { longitude, latitude, description } })
                             if (result) {
                                 res.status(200).json({ status: 200, result: result })
                             } else {
@@ -59,7 +58,6 @@ const update = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email
-    const birthday = req.body.birthday
     const description = req.body.description
     const profileImage = req.body.profileImage
     const longitude = req.body.longitude
@@ -78,7 +76,7 @@ const update = catchAsync(async(req, res) => {
                                     const emailAdmin = await admin.findOne({ email })
                                     const emailClient = await client.findOne({ email })
                                     if ((!emailAdmin && !emailClient) || ((emailAdmin && (emailAdmin._id == decodedToken.id)))) {
-                                        const result = await admin.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday, localisation: { longitude, latitude, description } })
+                                        const result = await admin.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, localisation: { longitude, latitude, description } })
                                         if (result) {
                                             res.status(200).json({ status: 200, result: result })
                                         } else {
@@ -138,7 +136,6 @@ const updateById = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email
-    const birthday = req.body.birthday
     const description = req.body.description
     const profileImage = req.body.profileImage
     const longitude = req.body.longitude
@@ -154,7 +151,7 @@ const updateById = catchAsync(async(req, res) => {
                             const emailAdmin = await admin.findOne({ email })
                             const emailClient = await client.findOne({ email })
                             if (!emailAdmin && !emailClient) {
-                                const result = await admin.findByIdAndUpdate(idAdmin, { name, phone: phone, profileImage, email, birthday, localisation: { longitude, latitude, description } })
+                                const result = await admin.findByIdAndUpdate(idAdmin, { name, phone: phone, profileImage, email, localisation: { longitude, latitude, description } })
                                 if (result) {
                                     res.status(200).json({ status: 200, result: result })
                                 } else {
@@ -178,7 +175,6 @@ const sendFirstAdmin = catchAsync(async(req, res) => {
     const name = "Sipoufo Yvan"
     const phone = 695914926
     const email = "sipoufoknj@gmail.com"
-    const birthday = "1999-12-12"
     const password = "1298ffa93fed18886ef5ddb2837c9c00"
     const longitude = 12
     const latitude = 12
@@ -188,7 +184,7 @@ const sendFirstAdmin = catchAsync(async(req, res) => {
     return admin.findOne({ phone })
         .then(async number => {
             if (!number) {
-                const result = await admin.create({ name, phone: phone, email, birthday, profile: "superAdmin", password, localisation: { longitude, latitude } })
+                const result = await admin.create({ name, phone: phone, email, profile: "superAdmin", password, localisation: { longitude, latitude } })
                 if (result) {
                     const token = createToken(result._id)
                     res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })

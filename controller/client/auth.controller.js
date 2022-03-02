@@ -15,7 +15,6 @@ const register = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email
-    const birthday = req.body.birthday
     const description = (req.body.description) ? req.body.description : null
     const IdCompteur = req.body.IdCompteur
     const password = req.body.password
@@ -33,7 +32,7 @@ const register = catchAsync(async(req, res) => {
                             return Client.findOne({ email })
                                 .then(async(mail) => {
                                     if (!mail) {
-                                        const result = await Client.create({ name, phone, IdCompteur, profileImage, email, birthday, password, localisation: { longitude, latitude, description } })
+                                        const result = await Client.create({ name, phone, IdCompteur, profileImage, email, password, localisation: { longitude, latitude, description } })
                                         if (result) {
                                             res.status(200).json({ status: 200, result: result })
                                         } else {
@@ -61,7 +60,6 @@ const update = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email
-    const birthday = req.body.birthday
     const profileImage = req.body.profileImage
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
@@ -76,7 +74,7 @@ const update = catchAsync(async(req, res) => {
                             const emailClient = await Client.findOne({ email });
                             console.log(emailAdmin);
                             if ((!emailAdmin && !emailClient) || ((emailClient && (emailClient._id == decodedToken.id)))) {
-                                const result = await Client.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email, birthday });
+                                const result = await Client.findByIdAndUpdate(decodedToken.id, { name, phone: phone, profileImage, email });
                                 if (result) {
                                     res.status(200).json({ status: 200, result: result });
                                 } else {
@@ -136,7 +134,6 @@ const updateById = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email
-    const birthday = req.body.birthday
     const IdCompteur = req.body.IdCompteur
     const profileImage = req.body.profileImage
     return Admin.findOne({ phone })
@@ -147,7 +144,7 @@ const updateById = catchAsync(async(req, res) => {
                     const emailAdmin = await Admin.findOne({ email });
                     const emailClient = await Client.findOne({ email });
                     if (!emailAdmin && !emailClient) {
-                        const result = await Client.findByIdAndUpdate(idClient, { name, IdCompteur, phone: phone, profileImage, email, birthday });
+                        const result = await Client.findByIdAndUpdate(idClient, { name, IdCompteur, phone: phone, profileImage, email });
                         if (result) {
                             res.status(200).json({ status: 200, result: result });
                         } else {

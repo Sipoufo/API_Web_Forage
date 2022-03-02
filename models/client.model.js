@@ -16,11 +16,6 @@ const userSchema = new model({
             type: Number,
             require: true
         },
-        birthday: {
-            type: String,
-            required: true,
-            trim: true,
-        },
         localisation: {
             longitude: {
                 type: Number,

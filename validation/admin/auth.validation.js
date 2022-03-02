@@ -8,7 +8,6 @@ const register = {
         email: Joi.string().required(),
         description: Joi.string(),
         profileImage: Joi.string(),
-        birthday: Joi.string().required(),
         password: Joi.custom(password).required(),
         longitude: Joi.number(),
         latitude: Joi.number()
@@ -22,7 +21,6 @@ const update = {
         email: Joi.string().required(),
         description: Joi.string(),
         profileImage: Joi.string(),
-        birthday: Joi.string().required(),
     })
 }
 
@@ -36,7 +34,6 @@ const updateById = {
         email: Joi.string().required(),
         description: Joi.string(),
         profileImage: Joi.string(),
-        birthday: Joi.string().required(),
     })
 }
 

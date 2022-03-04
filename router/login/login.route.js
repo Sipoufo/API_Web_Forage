@@ -32,7 +32,7 @@ const router = express.Router();
  *                                  type: String
  *                          example:
  *                              phone: "695914926"
- *                              password: Azerty12
+ *                              password: ef773dcfc029bb1c25e48dbbe188372b
  *          responses:
  *              '201':
  *                  description: >

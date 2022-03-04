@@ -175,7 +175,7 @@ const sendFirstAdmin = catchAsync(async(req, res) => {
     const name = "Sipoufo Yvan"
     const phone = 695914926
     const email = "sipoufoknj@gmail.com"
-    const password = "1298ffa93fed18886ef5ddb2837c9c00"
+    const password = "ef773dcfc029bb1c25e48dbbe188372b"
     const longitude = 12
     const latitude = 12
     const profileImage = "noPath"

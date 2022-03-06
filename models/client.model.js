@@ -27,7 +27,6 @@ const userSchema = new model({
             },
             description: {
                 type: String,
-                required: false
             },
         },
         email: {

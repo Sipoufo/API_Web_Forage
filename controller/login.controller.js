@@ -16,6 +16,12 @@ const createToken = (id) => {
     })
 }
 
+const createTokenForgetPassword = (id) => {
+    return jwt.sign({ id }, 'Forget forage password', {
+        expiresIn: (30 * 60)
+    })
+}
+
 const login = catchAsync(async(req, res) => {
     const phone = req.body.phone
     const password = req.body.password
@@ -91,9 +97,35 @@ const localisation = catchAsync(async(req, res) => {
                     })
             }
         })
-
-
 })
+
+// const forgetByEmail = () => {
+
+// }
+
+// const forgetPassword = catchAsync(async(res, req) => {
+//     var result = undefined;
+//     if (req.body.email || req.body.phone){
+//         result = req.body.email ? req.body.email: req.body.phone;
+//         await Admin.findOne({ result })
+//         .then(async(resultFind) => {
+//             if (resultFind) {
+
+//             } else {
+//                 await Client.findOne({ result })
+//                     .then(async(resultFind) => {
+//                         if (resultFind) {
+
+//                         } else {
+//                             res.status(500).json({ status: 500, error: "Your are not register" })
+//                         }
+//                     })
+//             }
+//         })
+//     } else {
+//         res.status(500).json({ status: 500, error: "Your are not register" })
+//     }
+// })
 
 module.exports = {
     login,

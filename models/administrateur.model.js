@@ -25,7 +25,6 @@ const adminSchema = new model({
             },
             description: {
                 type: String,
-                required: false
             },
         },
         password: {

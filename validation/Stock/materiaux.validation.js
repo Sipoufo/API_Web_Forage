@@ -7,7 +7,7 @@ const addMateriaux = {
         type: Joi.custom(objectId).required(),
         prixUnit: Joi.number().required(),
         quantity: Joi.number().required(),
-        description: Joi.string().required(),
+        description: Joi.string(),
         picture: Joi.string().required(),
     })
 };
@@ -27,7 +27,7 @@ const updateMaterial = {
         type: Joi.custom(objectId).required(),
         prixUnit: Joi.number().required(),
         quantity: Joi.number().required(),
-        description: Joi.string().required(),
+        description: Joi.string(),
         picture: Joi.string().required(),
     })
 };

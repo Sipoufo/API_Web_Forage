@@ -28,18 +28,21 @@ const addFacture = catchAsync(async(req, res) => {
             let indexFacture = null
             let isprecreate = false
             let idFacturePre = null
-
             await Facture
                 .find({ idClient })
                 .sort({ dateReleveNewIndex: -1 })
                 .then(async factures => {
                     if (factures.length > 0) {
                         for (let i = 0; i < factures.length; i++) {
-                            console.log(factures[i].dateFacturation.getMonth())
-                            if (factures[i].dateFacturation.getMonth() == monthDate && factures[i].dateFacturation.getFullYear() == yearDate && factures[i].preCreate == true) {
+                            const dateBilling = new Date(factures[i].dateReleveNewIndex)
+                            if ((dateBilling.getMonth() + 1) == monthDate && dateBilling.getFullYear() == yearDate && factures[i].preCreate == false) {
                                 doFacture = false;
                                 break;
                             }else if (factures[i].preCreate == false){
+                                indexFacture = i
+                                isprecreate = false
+                                idFacturePre = factures[i]._id
+                            } else if (dateBilling.getMonth() == monthDate && dateBilling.getFullYear() == yearDate && factures[i].preCreate == true) {
                                 indexFacture = i
                                 isprecreate = true
                                 idFacturePre = factures[i]._id
@@ -83,9 +86,9 @@ const addFacture = catchAsync(async(req, res) => {
                         const old_Consommation = factures[indexFacture].newIndex - factures[indexFacture].oldIndex;
                         const final_Consommation = new_Consommation + old_Consommation
                         const montantConsommation = (final_Consommation * prixUnitaire) + fraisEntretien - surplus;
-                        const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 2, dayLimit[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
+                        const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 2, static[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
 
-                        await Facture.findByIdAndUpdate(idFacturePre, {idClient, idAdmin, dateReleveNewIndex, newIndex : factures[indexFacture].newIndex, oldIndex : factures[indexFacture].oldIndex, consommation: final_Consommation, montantConsommation, dataLimitePaid})
+                        await Facture.findByIdAndUpdate(idFacturePre, {idClient, idAdmin, dateReleveNewIndex, newIndex : factures[indexFacture].newIndex, oldIndex : factures[indexFacture].oldIndex, consommation: final_Consommation, montantConsommation, dataLimitePaid, preCreate: false})
                     }else {
                         res.status(500).json({ status: 500, error: "This customer already has an invoice for this month" });
                     }

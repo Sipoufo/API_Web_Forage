@@ -3,6 +3,7 @@
 const catchAsync = require('../utils/catchAsync');
 const { Admin, Client } = require('../models/index')
 const jwt = require('jsonwebtoken')
+const nodemailer = require('nodemailer')
 
 const maxAge = 3 * 24 * 60 * 60
 
@@ -127,7 +128,38 @@ const localisation = catchAsync(async(req, res) => {
 //     }
 // })
 
+const forgotPassword = catchAsync(async(req, res) => {
+    phone = req.body.phone
+    const admin = await Admin.findOne({profile: "superAdmin"})
+    Client.findOne({phone})
+        .then(async customer => {
+            if (customer) {
+                let testAccount = await nodemailer.createTestAccount();
+                let transporter = nodemailer.createTransport({
+                    host: "smtp.ethereal.email",
+                    port: 587,
+                    secure: false, // true for 465, false for other ports
+                    auth: {
+                      user: testAccount.user, // generated ethereal user
+                      pass: testAccount.pass, // generated ethereal password
+                    },
+                });
+                let info = await transporter.sendMail({
+                    from: '"WEB FORAGE" <'+admin.email+'>', // sender address
+                    to: "sipoufoknj@gmail.com", // list of receivers
+                    subject: "Forgot Password : "+customer.name, // Subject line
+                    text: "This user have forgot it password", // plain text body
+                    html: "", // html body
+                });
+            } else {
+                res.status(500).json({ status: 500, error: "You are not register"})
+            }
+        })
+})
+
+
 module.exports = {
     login,
-    localisation
+    localisation,
+    forgotPassword,
 }

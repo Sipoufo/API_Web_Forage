@@ -83,4 +83,32 @@ router
 router
     .route('/localisation/:id')
     .post(tokenVerifie, validate(LoginValidation.localisation), loginController.localisation);
+
+
+/**
+ * @swagger
+ *  /login/forgotPassword:
+ *      post: 
+ *          summary: Forgot password
+ *          tags: [login]
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              phone:
+ *                                  type: string
+ *                          example:
+ *                              phone: "695914926"
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      Get a mail for admin
+ */
+router
+    .route('/forgotPassword')
+    .post(loginController.forgotPassword)
+
 module.exports = router

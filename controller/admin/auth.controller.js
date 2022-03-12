@@ -5,6 +5,7 @@ const admin = require('../../models/administrateur.model')
 const client = require('../../models/client.model')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer')
 
 const maxAge = 3 * 24 * 60 * 60
 
@@ -308,9 +309,8 @@ const getAdminByToken = catchAsync((req, res) => {
                 })
         }
     })
-
-
 })
+
 
 module.exports = {
     register,
@@ -322,5 +322,5 @@ module.exports = {
     updateById,
     getOneAdmin,
     getAdminByToken,
-    updatePassword
+    updatePassword,
 }

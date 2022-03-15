@@ -145,7 +145,7 @@ router
 /**
  * @swagger
  *  /login/userInfo/{phone}:
- *      post: 
+ *      get: 
  *          summary: Forgot password
  *          tags: [login]
  *          parameters:

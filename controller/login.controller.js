@@ -172,16 +172,16 @@ const changePassword = async(user, data, newPassword, res) => {
 
 const passwordUserReset = catchAsync(async(req, res) => {
     let newPassword = req.body.newPassword;
-    const phone = req.body.phone;
+    const id = req.params.id;
     console.log(newPassword)
     newPassword = await bcrypt.hash(newPassword, 8);
 
-    return Admin.findOne({phone})
+    return Admin.findById(id)
         .then(async(admin) => {
             if (admin) {
                 await changePassword(Admin, admin, newPassword, res)
             } else {
-                return Client.findOne({phone})
+                return Client.findById(id)
                     .then(async (customer) => {
                         if(customer) {
                             await changePassword(Client, customer, newPassword, res)

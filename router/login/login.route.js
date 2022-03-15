@@ -114,10 +114,17 @@ router
 
 /**
  * @swagger
- *  /login/passwordUserReset:
+ *  /login/passwordUserReset/{id}:
  *      post: 
  *          summary: Forgot password
  *          tags: [login]
+ *          parameters:
+ *              -   in: path
+ *                  name: id
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: Phone number
  *          requestBody:
  *              required: true
  *              content:
@@ -125,8 +132,6 @@ router
  *                      schema:
  *                          type: object
  *                          properties:
- *                              phone:
- *                                  type: integer
  *                              newPassword:
  *                                  type: string
  *                          example:
@@ -138,7 +143,7 @@ router
  *                      Get a mail for admin
  */
 router
-    .route('/passwordUserReset')
+    .route('/passwordUserReset/:id')
     .post(loginController.passwordUserReset)
 
 

@@ -115,7 +115,7 @@ router
 /**
  * @swagger
  *  /login/passwordUserReset/{id}:
- *      post: 
+ *      put: 
  *          summary: Forgot password
  *          tags: [login]
  *          parameters:
@@ -143,7 +143,7 @@ router
  */
 router
     .route('/passwordUserReset/:id')
-    .post(loginController.passwordUserReset)
+    .put(loginController.passwordUserReset)
 
 
 /**

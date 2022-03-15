@@ -3,7 +3,8 @@
 const catchAsync = require('../utils/catchAsync');
 const { Admin, Client } = require('../models/index')
 const jwt = require('jsonwebtoken')
-const nodemailer = require('nodemailer')
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcryptjs');
 
 const maxAge = 3 * 24 * 60 * 60
 
@@ -157,9 +158,66 @@ const forgotPassword = catchAsync(async(req, res) => {
         })
 })
 
+const changePassword = async(user, data, newPassword, res) => {
+    await user.findByIdAndUpdate(data.id, { password: newPassword})
+        .then(result => {
+            console.log(result)
+            if (result) {
+                res.status(200).json({ status: 200, result });
+            } else {
+                res.status(500).json({ status: 500, error:"Error please retry" });
+            }
+        })
+}
+
+const passwordUserReset = catchAsync(async(req, res) => {
+    let newPassword = req.body.newPassword;
+    const phone = req.body.phone;
+    console.log(newPassword)
+    newPassword = await bcrypt.hash(newPassword, 8);
+
+    return Admin.findOne({phone})
+        .then(async(admin) => {
+            if (admin) {
+                await changePassword(Admin, admin, newPassword, res)
+            } else {
+                return Client.findOne({phone})
+                    .then(async (customer) => {
+                        if(customer) {
+                            await changePassword(Client, customer, newPassword, res)
+                        } else {
+                            res.status(500).json({ status: 500, error:"You are not register!" });
+                        }
+                    })
+            }
+        })
+})
+
+const userName = catchAsync(async (req, res) => {
+    const phone = req.params.phone;
+    
+    await Admin.findOne({phone})
+        .then( async admin => {
+            if (admin) {
+                res.status(200).json({ status: 200, result: admin.name })
+            } else {
+                await Client.findOne({phone})
+                    .then(customer => {
+                        if (customer) {
+                            res.status(200).json({ status: 200, result: customer.name  })
+                        } else {
+                            res.status(500).json({ status: 500, error:"You are not register!" });
+                        }
+                    })
+            }
+        })
+})
+
 
 module.exports = {
     login,
     localisation,
     forgotPassword,
+    passwordUserReset,
+    userName,
 }

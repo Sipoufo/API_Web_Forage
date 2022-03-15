@@ -111,4 +111,57 @@ router
     .route('/forgotPassword')
     .post(loginController.forgotPassword)
 
+
+/**
+ * @swagger
+ *  /login/passwordUserReset:
+ *      post: 
+ *          summary: Forgot password
+ *          tags: [login]
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              phone:
+ *                                  type: integer
+ *                              newPassword:
+ *                                  type: string
+ *                          example:
+ *                              phone: 695914926
+ *                              newPassword: "ef773dcfc029bb1c25e48dbbe188372b"
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      Get a mail for admin
+ */
+router
+    .route('/passwordUserReset')
+    .post(loginController.passwordUserReset)
+
+
+/**
+ * @swagger
+ *  /login/userInfo/{phone}:
+ *      post: 
+ *          summary: Forgot password
+ *          tags: [login]
+ *          parameters:
+ *              -   in: path
+ *                  name: phone
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: Phone number
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      Get a name for admin
+ */
+router
+    .route('/userInfo/:phone')
+    .get(loginController.userName)
+
 module.exports = router

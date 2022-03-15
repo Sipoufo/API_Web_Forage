@@ -135,7 +135,6 @@ router
  *                              newPassword:
  *                                  type: string
  *                          example:
- *                              phone: 695914926
  *                              newPassword: "ef773dcfc029bb1c25e48dbbe188372b"
  *          responses:
  *              '201':

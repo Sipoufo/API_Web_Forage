@@ -21,7 +21,6 @@ const update = {
         phone: Joi.number().required(),
         email: Joi.string().required(),
         profileImage: Joi.string(),
-        birthday: Joi.string().required(),
     })
 }
 
@@ -42,7 +41,6 @@ const updateById = {
         email: Joi.string().required(),
         IdCompteur: Joi.string(),
         profileImage: Joi.string(),
-        birthday: Joi.string().required(),
     })
 }
 

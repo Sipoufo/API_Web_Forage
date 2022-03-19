@@ -304,30 +304,17 @@ router
  *                          properties:
  *                              name:
  *                                  type: string
- *                              birthday:
- *                                  type: string
  *                              phone:
  *                                  type: string
- *                              IdCompteur:
- *                                  type: string
  *                              email:
- *                                  type: string
- *                              longitude:
- *                                  type: string
- *                              latitude:
  *                                  type: string
  *                              profileImage:
  *                                  type: string
  *                          example:
  *                              name: Sipoufo Yvan
- *                              birthday: 2002-01-29
  *                              phone: "695914926"
- *                              IdCompteur: UX2024
  *                              email: sipoufoTest@gmail.com
- *                              longitude: 12
- *                              latitude: 12
  *                              profileImage: /test/test.png
- *                              description: Bafoussam TPO
  *          responses:
  *              '201':
  *                  description: >

@@ -101,7 +101,6 @@ const updateAdmin = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email
-    const birthday = req.body.birthday
     const description = req.body.description
     const profileImage = req.body.profileImage
     const longitude = req.body.longitude
@@ -125,7 +124,7 @@ const updateAdmin = catchAsync(async(req, res) => {
                                                 const emailAdmin = await Admin.findOne({ email })
                                                 const emailClient = await Client.findOne({ email })
                                                 if ((!emailAdmin && !emailClient) || ((emailAdmin && (emailAdmin._id == idAdmin)))) {
-                                                    const result = await Admin.findByIdAndUpdate(idAdmin, { name, phone: phone, profileImage, email, birthday, localisation: { longitude, latitude, description } })
+                                                    const result = await Admin.findByIdAndUpdate(idAdmin, { name, phone: phone, profileImage, email, localisation: { longitude, latitude, description } })
                                                     if (result) {
                                                         res.status(200).json({ status: 200, result: result })
                                                     } else {
@@ -155,24 +154,17 @@ const updateClient = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email
-    const IdCompteur = req.body.IdCompteur
-    const birthday = req.body.birthday
-    const description = req.body.description
     const profileImage = req.body.profileImage
-    const longitude = req.body.longitude
-    const latitude = req.body.latitude
-    console.log(IdCompteur);
     await Admin.findOne({ phone })
         .then(async admin => {
             if (!admin) {
                 await Client.findOne({ phone })
                     .then(async number => {
-                        console.log(number._id == idClient);
                         if ((number && number._id == idClient) || !number) {
                             const emailAdmin = await Admin.findOne({ email })
                             const emailClient = await Client.findOne({ email })
                             if ((!emailAdmin && !emailClient) || ((emailClient && (emailClient._id == idClient)))) {
-                                const result = await Client.findByIdAndUpdate(idClient, { name, phone: phone, profileImage, IdCompteur, email, birthday, localisation: { longitude, latitude, description } })
+                                const result = await Client.findByIdAndUpdate(idClient, { name, phone: phone, profileImage, email })
                                 if (result) {
                                     res.status(200).json({ status: 200, result: result })
                                 } else {

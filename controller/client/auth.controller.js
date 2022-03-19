@@ -12,6 +12,7 @@ const authorization = (req) => {
 }
 
 const register = catchAsync(async(req, res) => {
+    console.log(req.body);
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email

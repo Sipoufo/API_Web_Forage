@@ -28,7 +28,7 @@ const addFacture = catchAsync(async(req, res) => {
             let indexFacture = null
             let isprecreate = false
             let idFacturePre = null
-            console.log("Step 1");
+            console.log(idClient);
             await Facture
                 .find({ idClient })
                 .sort({ dateReleveNewIndex: -1 })
@@ -204,24 +204,23 @@ const seeUnpaidInvoicewithDate = catchAsync(async (req, res) => {
     // const dateUnpaid = new Date(req.params.dateUnpaid)
     const dateUnpaidMonth = new Date(req.params.dateUnpaid).getMonth() + 1
     const dateUnpaidYear= new Date(req.params.dateUnpaid).getFullYear()
-    console.log(dateUnpaidYear)
     let invoiceUnpaid = []
     Client.find({isDelete: false})
         .sort({name : 0})
         .then(async customers => {
             for (let i = 0; i < customers.length; i++) {
+                // console.log(customers[i])
                 let invoiceCustomer = await Facture.aggregate([
                     {
-                        $project: {_id: 1, client: '$idClient' , month: {$month: '$createdAt'}, year: {$year: '$createdAt'}}
+                        $project: {_id: 1, client: '$idClient' , month: {$month: '$dateReleveNewIndex'}, year: {$year: '$dateReleveNewIndex'}}
                     },
                     {
-                        $match: {month: dateUnpaidMonth, year: dateUnpaidYear, client: customers[i]}
+                        $match: {month: dateUnpaidMonth, year: dateUnpaidYear, client: customers[i]["_id"]}
                     }
                 ]);
                 if (invoiceCustomer.length == 0) {
                     invoiceUnpaid.push(customers[i])
                 }
-                console.log(invoiceUnpaid)
             }
             res.status(200).json({ status: 200, result: invoiceUnpaid })
         })

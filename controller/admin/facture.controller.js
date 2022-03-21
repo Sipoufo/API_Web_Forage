@@ -66,9 +66,10 @@ const addFacture = catchAsync(async(req, res) => {
                                     const montantConsommation = (consommation * prixUnitaire) + fraisEntretien - surplus;
                                     // const dateFacturation = new Date();
                                     const montantImpaye = montantConsommation;
-                                    const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 2, static[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
+                                    const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 1, static[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
+                                    let facturePay = false
                                     console.log("Step 3");
-                                    await Facture.create({ idClient, idAdmin, dateReleveNewIndex, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, dataLimitePaid, montantImpaye, penalty: { montant: 0, date: dateReleveNewIndex } })
+                                    await Facture.create({ idClient, idAdmin, dateReleveNewIndex, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, dataLimitePaid, montantImpaye, facturePay, penalty: { montant: 0, date: dateReleveNewIndex } })
                                         .then(resp => {
                                             if (resp) {
                                                 res.status(200).json({ status: 200, result: resp });
@@ -393,7 +394,7 @@ const updateFacture = catchAsync(async(req, res) => {
 
 const statusPaidFacture = catchAsync(async(req, res) => {
     const idFacture = req.params.idFacture
-    let status
+    let status = false
     const amount = req.body.amount
     let surplus = 0
 
@@ -401,7 +402,7 @@ const statusPaidFacture = catchAsync(async(req, res) => {
         .then(async result => {
             if (result) {
                 if (result.facturePay != true) {
-                    const newUnpaid = result.montantImpaye - amount
+                    let newUnpaid = result.montantImpaye - amount
                     const newAmountPaid = result.montantVerse + amount
                     if (newUnpaid >= 0) {
                         if (newUnpaid != 0) {
@@ -412,6 +413,7 @@ const statusPaidFacture = catchAsync(async(req, res) => {
                     } else {
                         surplus = newUnpaid * (-1)
                         newUnpaid = 0
+                        status = true
                     }
                     await Facture.findByIdAndUpdate(idFacture, { facturePay: status, montantImpaye: newUnpaid, montantVerse: newAmountPaid, surplus, $push: { tranche: { montant: amount, date: new Date() } } })
                         .then(facture => {

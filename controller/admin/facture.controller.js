@@ -19,8 +19,8 @@ const addFacture = catchAsync(async(req, res) => {
             // const montantVerse = req.body.montantVerse;
             const dateReleveNewIndex = new Date(req.body.dateReleveNewIndex);
             let oldIndex = (req.body.oldIndex) ? req.body.oldIndex : 0;
-            const monthDate = new Date().getMonth() + 1;
-            const yearDate = new Date().getFullYear();
+            const monthDate = dateReleveNewIndex.getMonth() + 1;
+            const yearDate = dateReleveNewIndex.getFullYear();
             let doFacture = true;
             let surplus = 0;
 
@@ -63,13 +63,19 @@ const addFacture = catchAsync(async(req, res) => {
                                     const prixUnitaire = static[0].prixUnitaire;
                                     const fraisEntretien = static[0].fraisEntretien;
                                     const consommation = newIndex - oldIndex;
-                                    const montantConsommation = (consommation * prixUnitaire) + fraisEntretien - surplus;
+                                    const montantConsommation = (consommation * prixUnitaire) + fraisEntretien;
                                     // const dateFacturation = new Date();
-                                    const montantImpaye = montantConsommation;
-                                    const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 1, static[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
+                                    let montantImpaye = 0
                                     let facturePay = false
+                                    if (montantConsommation - surplus >= 0) {
+                                        montantImpaye = montantConsommation - surplus;
+                                    } else {
+                                        surplus = (montantConsommation- surplus) * (-1);
+                                        facturePay = true
+                                    }
+                                    const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 1, static[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
                                     console.log("Step 3");
-                                    await Facture.create({ idClient, idAdmin, dateReleveNewIndex, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, dataLimitePaid, montantImpaye, facturePay, penalty: { montant: 0, date: dateReleveNewIndex } })
+                                    await Facture.create({ idClient, idAdmin, surplus, facturePay, dateReleveNewIndex, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, dataLimitePaid, montantImpaye, facturePay, penalty: { montant: 0, date: dateReleveNewIndex } })
                                         .then(resp => {
                                             if (resp) {
                                                 res.status(200).json({ status: 200, result: resp });

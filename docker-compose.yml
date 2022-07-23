@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  # MongoDB services
+  mongo_db:
+    container_name: db_container
+    image: mongo:latest
+    restart: always
+    volumes:
+      - mongo_db:/data/db
+
+  # Node Api service
+  api:
+    build: .
+    ports:
+      - 4000:3000
+    environment:
+      PORT: 3000
+      DATABASE_URL: mongodb://mongo_db:27017/Web_Forage_DB
+      DB_NAME: Web_Forage_DB
+    depends_on:
+      - mongo_db
+
+volumes:
+  mongo_db: {}

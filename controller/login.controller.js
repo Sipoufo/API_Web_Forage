@@ -27,7 +27,8 @@ const createTokenForgetPassword = (id) => {
 const login = catchAsync(async(req, res) => {
     const phone = req.body.phone
     const password = req.body.password
-
+    console.log('log: ', req.body);
+    
     return Admin.findOne({ phone })
         .then(async admin => {
             if (admin) {

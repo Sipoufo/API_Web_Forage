@@ -19,7 +19,7 @@ const getFactures = catchAsync(async(req, res) => {
                     if (factures.length > 0) {
                         res.status(200).json({ status: 200, result: factures });
                     } else {
-                        res.status(200).json({ status: 200, result: factures });
+                        res.status(200).json({ status: 200, result: [] });
                     }
                 });
         }
@@ -37,7 +37,11 @@ const getOneFacture = catchAsync(async(req, res) => {
             await Facture
                 .findOne({ idClient: decodedToken.id, _id: idFacture })
                 .then(factures => {
-                    res.status(200).json({ status: 200, result: factures });
+                    if (factures.length > 0) {
+                        res.status(200).json({ status: 200, result: factures });
+                    } else {
+                        res.status(200).json({ status: 200, result: [] });
+                    }
                 });
         }
     })
@@ -60,7 +64,6 @@ const getFacturesWithDate = catchAsync(async(req, res) => {
                         const lengthtTranche = factures[i].tranche.length
                         result.push({ date, montant: factures[i].montantConsommation, tranche: lengthtTranche })
                     }
-                    console.log(result)
                     res.status(200).json({ status: 200, result: result });
                 });
         }

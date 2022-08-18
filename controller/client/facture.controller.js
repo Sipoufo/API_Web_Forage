@@ -60,7 +60,7 @@ const getFacturesWithDate = catchAsync(async(req, res) => {
                 .sort({ createdAt: -1 })
                 .then(factures => {
                     for (let i = 0; i < factures.length; i++) {
-                        const date = " " + (factures[i].dateFacturation.getFullYear() + 1) + "-" + (factures[i].dateFacturation.getMonth() + 1)
+                        const date = " " + (factures[i].dateReleveNewIndex.getFullYear() + 1) + "-" + (factures[i].dateFacturation.getMonth() + 1)
                         const lengthtTranche = factures[i].tranche.length
                         result.push({ date, montant: factures[i].montantConsommation, tranche: lengthtTranche })
                     }

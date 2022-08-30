@@ -118,7 +118,6 @@ io.on('connection', () => {
 //                 }
 //             })
 //     } else {
-//         console.log("Please enter static and penalty information")
 //     }
 // });
 

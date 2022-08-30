@@ -27,6 +27,23 @@ router
     .route('/dashboard')
     .get(tokenVerifieClient, authControllerUser.dashboard);
 
+/**
+ * @swagger
+ * /client/auth/count:
+ *  get:
+ *      summary: get length of client
+ *      tags: [Client]
+ *      responses: 
+ *          200:
+ *              description: get successfully
+ *          500:
+ *              description: Error
+ */
+ router
+ .route('/count')
+ .get(tokenVerifieAdmin,authControllerUser.countClient);
+
+
 //Admin Authentification
 /**
  * @swagger
@@ -292,5 +309,6 @@ router
 router
     .route('/get/getClientByToken')
     .get(tokenVerifieClient, authControllerUser.getClientByToken);
+
 
 module.exports = router

@@ -268,11 +268,38 @@ const dashboard = catchAsync(async(req, res) => {
     })
 })
 
+const countClient = catchAsync((req, res) => {
+    const token = authorization(req)
+    console.log('count count');
+
+    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+        if (err) {
+            console.log(err);
+        } else {
+            return Client
+                .find({})
+                .then(response => {
+                    if (response) {
+                        res.status(200).json({ status: 200, result: response.length });
+                    } else {
+                        res.status(500).json({ status: 500, error: "This admin don't exist" })
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    res.status(500).json({ status: 500, error: "Error" })
+                })
+        }
+    })
+
+});
+
 module.exports = {
     register,
     logout,
     update,
     updateById,
+    countClient,
     getOneClient,
     getClientByToken,
     dashboard,

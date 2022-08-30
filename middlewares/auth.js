@@ -49,6 +49,7 @@ const tokenVerifieAdmin = (req, res, next) => {
             if (err) {
                 res.status(500).json({ status: 500, error: "Please login" })
             } else {
+                console.log(decodedToken.id)
                 Admin.findById(decodedToken.id)
                     .then(admin => {
                         if (admin) {

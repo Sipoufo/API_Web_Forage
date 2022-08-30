@@ -50,6 +50,13 @@ const getAdmin = {
     })
 }
 
+const getClients = {
+    params: Joi.object().keys({
+        page: Joi.number(),
+        limit: Joi.number(),
+    }),
+}
+
 const updatePassword = {
     body: Joi.object().keys({
         oldPassword: Joi.custom(password).required(),
@@ -61,6 +68,7 @@ module.exports = {
     register,
     login,
     update,
+    getClients,
     updateById,
     getAdmin,
     updatePassword

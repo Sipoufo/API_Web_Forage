@@ -242,6 +242,36 @@ router
     .route('/getClient')
     .get(tokenVerifieAdmin, authAdmin.getClients);
 
+// get clients
+/**
+ * @swagger
+ * /admin/auth/client/{page}/{limit}:
+ *  get:
+ *      summary: get all user with pagination
+ *      tags: [Admin]
+ *      parameters:
+ *              -   in: path
+ *                  name: limit
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: limit where you want on one page
+ *              -   in: path
+ *                  name: page
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: Page where you want to be
+ *      responses: 
+ *          200:
+ *              description: get all user in the bd
+ *          500:
+ *              description: Error during the get
+ */
+ router
+    .route('/client/:page/:limit')
+    .get(tokenVerifieAdmin, validate(adminAuth.getClients), authAdmin.getClientsWithPagination);
+
 // get client by authorization
 /**
  * @swagger

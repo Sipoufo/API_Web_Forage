@@ -249,6 +249,24 @@ const getClients = catchAsync((req, res) => {
     client
         .find()
         .sort({ name: 0 })
+        .skip(2).limit(3)
+        .then(clients => {
+            if (clients.length > 0) {
+                res.status(200).json({ status: 200, result: clients })
+            } else {
+                res.status(200).json({ status: 200, result: [] })
+            }
+        })
+})
+
+const getClientsWithPagination = catchAsync((req, res) => {
+    const page = (req.params.page) ? req.params.page : 1;
+    const limit = (req.params.limit) ? req.params.limit : 10;
+    
+    client
+        .find()
+        .sort({ name: 0 })
+        .skip(page !== 1 ? limit * page : 0).limit(limit)
         .then(clients => {
             if (clients.length > 0) {
                 res.status(200).json({ status: 200, result: clients })
@@ -317,6 +335,7 @@ module.exports = {
     sendFirstAdmin,
     logout,
     getClients,
+    getClientsWithPagination,
     getAdmins,
     update,
     updateById,

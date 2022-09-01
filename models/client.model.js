@@ -13,6 +13,14 @@ const userSchema = new model({
             required: false
         },
         phone: {
+            type: String,
+            require: true
+        },
+        subscription: {
+            type: Number,
+            require: true
+        },
+        customerReference: {
             type: Number,
             require: true
         },

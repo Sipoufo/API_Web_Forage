@@ -24,13 +24,12 @@ const register = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email
-    const password = req.body.password
+    const password = req.body.password || 'forage';
     const description = req.body.description
     const profileImage = req.body.profileImage
     const longitude = (req.body.longitude) ? req.body.longitude : undefined
     const latitude = (req.body.latitude) ? req.body.longitude : undefined
 
-    console.log(password)
     return client.findOne({ phone })
         .then(client => {
             if (!client) {
@@ -264,9 +263,8 @@ const getClientsWithPagination = catchAsync((req, res) => {
     const limit = (req.params.limit) ? req.params.limit : 10;
     
     client
-        .find()
+        .paginate({}, { page, limit })
         .sort({ name: 0 })
-        .skip(page !== 1 ? limit * page : 0).limit(limit)
         .then(clients => {
             if (clients.length > 0) {
                 res.status(200).json({ status: 200, result: clients })
@@ -275,6 +273,19 @@ const getClientsWithPagination = catchAsync((req, res) => {
             }
         })
 })
+
+const getAllMateriaux = catchAsync(async(req, res) => {
+    const page = (req.body.page) ? req.body.page : 1
+    const limit = (req.body.limit) ? req.body.limit : 10
+    return Material.paginate({}, { page, limit })
+        .then(response => {
+            res.status(200).json({ status: 200, result: response });
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({ status: 500, error: "Error" })
+        })
+});
 
 const getAdmins = catchAsync((req, res) => {
     const token = authorization(req)

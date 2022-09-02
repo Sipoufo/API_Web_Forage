@@ -2,6 +2,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose')
 const model = mongoose.Schema
+var mongoosePaginate = require('mongoose-paginate-v2');
 
 const userSchema = new model({
         name: {
@@ -134,7 +135,11 @@ userSchema.pre('save', async function(next) {
     next();
 });
 
+userSchema.plugin(mongoosePaginate);
+
 
 const Client = mongoose.model('user', userSchema)
 
 module.exports = Client
+
+

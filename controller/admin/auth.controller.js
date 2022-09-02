@@ -6,6 +6,7 @@ const client = require('../../models/client.model')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer')
+const { Client } = require('../../models/index');
 
 const maxAge = 3 * 24 * 60 * 60
 
@@ -216,29 +217,6 @@ const getOneAdmin = catchAsync(async(req, res) => {
         })
 })
 
-// const login = catchAsync(async(req, res) => {
-//     const phone = req.body.phone
-//     const password = req.body.password
-//     console.log(req)
-//     return admin.findOne({ phone })
-//         .then(async admin => {
-//             if (admin) {
-//                 console.log(admin);
-//                 const result = await admin.isPasswordMatch(password)
-//                 console.log(result);
-//                 if (result) {
-//                     const token = createToken(result._id)
-//                     res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })
-//                     res.status(200).json({ status: 200, result: admin })
-//                 } else {
-//                     res.status(500).json({ status: 500, error: "Phone/Password Error" })
-//                 }
-//             } else {
-//                 res.status(500).json({ status: 500, error: "Your are not register <0_0>" })
-//             }
-//         })
-// })
-
 const logout = (req, res) => {
     res.cookie('pwftoken', '', { maxAge: 1 })
     res.status(200).json({ status: 200, result: "You are log out" })
@@ -248,7 +226,6 @@ const getClients = catchAsync((req, res) => {
     client
         .find()
         .sort({ name: 0 })
-        .skip(2).limit(3)
         .then(clients => {
             if (clients.length > 0) {
                 res.status(200).json({ status: 200, result: clients })
@@ -258,26 +235,16 @@ const getClients = catchAsync((req, res) => {
         })
 })
 
-const getClientsWithPagination = catchAsync((req, res) => {
-    const page = (req.params.page) ? req.params.page : 1;
-    const limit = (req.params.limit) ? req.params.limit : 10;
-    
-    client
-        .paginate({}, { page, limit })
-        .sort({ name: 0 })
-        .then(clients => {
-            if (clients.length > 0) {
-                res.status(200).json({ status: 200, result: clients })
-            } else {
-                res.status(200).json({ status: 200, result: [] })
-            }
-        })
-})
+const findClient = catchAsync((req, res) => {
+    if (req?.query?.subscriptionDate) {
+        let start = new Date(req.query.date);
+        let end = new Date(req.query.date);
+        start.setHours(0,0,0,0);
+        end.setHours(23,59,59,999);
 
-const getAllMateriaux = catchAsync(async(req, res) => {
-    const page = (req.body.page) ? req.body.page : 1
-    const limit = (req.body.limit) ? req.body.limit : 10
-    return Material.paginate({}, { page, limit })
+        return Client
+        .find({subscriptionDate: {$gte: start, $lt: end}, customerReference: req.query.refId ? req.query.refId : undefined, IdCompteur: req.query.counterId ? req.query.counterId : undefined})
+        .sort({ subscriptionDate: (req.query?.order && req.query?.order === 'asc' ? 1 : - 1) })
         .then(response => {
             res.status(200).json({ status: 200, result: response });
         })
@@ -285,7 +252,52 @@ const getAllMateriaux = catchAsync(async(req, res) => {
             console.log(err)
             res.status(500).json({ status: 500, error: "Error" })
         })
-});
+    }
+
+    return Client
+    .find({ customerReference: req.query.refId ? req.query.refId : undefined, IdCompteur: req.query.counterId ? req.query.counterId : undefined})
+    .sort({ subscriptionDate: (req.query?.order && req.query?.order === 'asc' ? 1 : - 1) })
+    .then(clients => {
+        if (clients.length > 0) {
+            res.status(200).json({ status: 200, result: clients })
+        } else {
+            res.status(200).json({ status: 200, result: [] })
+        }
+    })
+})
+
+const getClientsWithPagination = catchAsync((req, res) => {
+    const page = (req.params.page) ? req.params.page : 1;
+    const limit = (req.params.limit) ? req.params.limit : 10;
+    return Client
+        .paginate({}, { page, limit })
+        .then(response => {
+            res.status(200).json({ status: 200, result: response });
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({ status: 500, error: "Error" })
+        })
+})
+
+const getClientsBySuscriptionDate = catchAsync((req, res) => {
+    const subscriptionDate = (req.params.subscriptionDate) ? req.params.subscriptionDate : '2022-08-30T09:45:38.000+00:00';
+    var start = new Date(subscriptionDate);
+    var end = new Date(subscriptionDate);
+
+    start.setHours(0,0,0,0);
+    end.setHours(23,59,59,999);
+
+    return Client.find({subscriptionDate: {$gte: start, $lt: end}})
+        .then(response => {
+            res.status(200).json({ status: 200, result: response });
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({ status: 500, error: "Error" })
+        })
+
+})
 
 const getAdmins = catchAsync((req, res) => {
     const token = authorization(req)
@@ -345,8 +357,10 @@ module.exports = {
     register,
     sendFirstAdmin,
     logout,
+    findClient,
     getClients,
     getClientsWithPagination,
+    getClientsBySuscriptionDate,
     getAdmins,
     update,
     updateById,

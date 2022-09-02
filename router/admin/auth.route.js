@@ -242,6 +242,72 @@ router
     .route('/getClient')
     .get(tokenVerifieAdmin, authAdmin.getClients);
 
+// get clients by subscription date
+/**
+ * @swagger
+ * /admin/auth/client/findBySubscriptionDate/{subscriptionDate}:
+ *  get:
+ *      summary: get all user by subscription date
+ *      tags: [Admin]
+ *      parameters:
+ *              -   in: path
+ *                  name: subscriptionDate
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: date went user has received abonment
+ *      responses: 
+ *          200:
+ *              description: get all user in the bd
+ *          500:
+ *              description: Error during the get
+ */
+ router
+ .route('/client/findBySubscriptionDate/:subscriptionDate')
+ .get(tokenVerifieAdmin, validate(adminAuth.getClientBySubsDate), authAdmin.getClientsBySuscriptionDate);
+
+ // get clients by subscription date
+/**
+ * @swagger
+ * /admin/auth/client/find:
+ *  get:
+ *      summary: find user in the bd by constraint
+ *      tags: [Admin]
+ *      parameters:
+ *              -   in: query
+ *                  name: date
+ *                  schema: 
+ *                      type: string
+ *                  description: The date represent date of subscription
+ *              -   in: query
+ *                  name: refId
+ *                  schema: 
+ *                      type: integer
+ *                  description: The customer reference.
+ *              -   in: query
+ *                  name: counterId
+ *                  schema: 
+ *                      type: string
+ *                  description:  The id of counter.
+ *              -   in: query
+ *                  name: order
+ *                  schema: 
+ *                      type: string
+ *                      enum: [asc, desc]
+ *                  description: >
+ *                      Sort order:
+ *                           `asc` - Ascending, from A to Z
+ *                           `desc` - Descending, from Z to A
+ *      responses: 
+ *          200:
+ *              description: get all user in the bd
+ *          500:
+ *              description: Error during the get
+ */
+ router
+ .route('/client/find/')
+ .get(tokenVerifieAdmin, validate(adminAuth.findClient), authAdmin.findClient);
+
 // get clients
 /**
  * @swagger

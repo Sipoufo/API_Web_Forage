@@ -57,6 +57,21 @@ const getClients = {
     }),
 }
 
+const findClient = {
+    params: Joi.object().keys({
+        date: Joi.string(),
+        order: Joi.string(),
+        refId: Joi.string(),
+        counterId: Joi.string(),
+    }),
+}
+
+const getClientBySubsDate = {
+    params: Joi.object().keys({
+        subscriptionDate: Joi.string().required(),
+    }),
+}
+
 const updatePassword = {
     body: Joi.object().keys({
         oldPassword: Joi.custom(password).required(),
@@ -68,7 +83,9 @@ module.exports = {
     register,
     login,
     update,
+    findClient,
     getClients,
+    getClientBySubsDate,
     updateById,
     getAdmin,
     updatePassword

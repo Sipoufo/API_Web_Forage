@@ -15,10 +15,10 @@ const register = catchAsync(async(req, res) => {
     console.log(req.body);
     const name = req.body.name
     const phone = req.body.phone
-    const email = req.body.email
+    const email = req.body.email || ''
     const description = (req.body.description) ? req.body.description : null
     const IdCompteur = req.body.IdCompteur
-    const password = req.body.password
+    const password = req.body.password  || 'forage';
     const profileImage = req.body.profileImage
     const longitude = (req.body.longitude) ? req.body.longitude : null
     const latitude = (req.body.latitude) ? req.body.longitude : null
@@ -164,29 +164,6 @@ const updateById = catchAsync(async(req, res) => {
             }
         })
 })
-
-// const login = catchAsync(async(req, res) => {
-//     const phone = req.query.phone
-//     const password = req.query.password
-//     console.log(req)
-//     return Client.findOne({ phone })
-//         .then(async admin => {
-//             if (admin) {
-//                 console.log(admin);
-//                 const result = await Client.isPasswordMatch(password)
-//                 console.log(result);
-//                 if (result) {
-//                     const token = createToken(result._id)
-//                     res.cookie('pwftoken', token, { httpOnly: true, maxAge: maxAge * 1000 })
-//                     res.status(200).json({ status: 200, result: admin })
-//                 } else {
-//                     res.status(500).json({ status: 500, error: "Phone/Password Error" })
-//                 }
-//             } else {
-//                 res.status(500).json({ status: 500, error: "Your are not register <0_0>" })
-//             }
-//         })
-// })
 
 const logout = (req, res) => {
     res.cookie('pwftoken', '', { maxAge: 1 })

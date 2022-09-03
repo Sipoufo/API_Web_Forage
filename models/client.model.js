@@ -14,7 +14,7 @@ const userSchema = new model({
             required: false
         },
         phone: {
-            type: String,
+            type: Array,
             require: true
         },
         subscription: {
@@ -35,7 +35,7 @@ const userSchema = new model({
                 required: false
             },
             description: {
-                type: String,
+                type: Array
             },
         },
         email: {

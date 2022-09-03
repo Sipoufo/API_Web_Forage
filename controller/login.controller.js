@@ -29,7 +29,7 @@ const login = catchAsync(async(req, res) => {
     const password = req.body.password
     console.log('log: ', req.body);
     
-    return Admin.findOne({ phone })
+    return Admin.findOne( { phone: { $all: [phone] } } )
         .then(async admin => {
             if (admin) {
                 const resultAdmin = await admin.isPasswordMatch(password)
@@ -42,8 +42,7 @@ const login = catchAsync(async(req, res) => {
                     res.status(500).json({ status: 500, error: "Phone/Password Error" })
                 }
             } else {
-                // res.status(500).json({ status: 500, error: "Your are not register <0_0>" })
-                return Client.findOne({ phone })
+                return Client.findOne( { phone: { $all: [phone] } } )
                     .then(async(client) => {
                         if (client) {
                             const result = await client.isPasswordMatch(password)

@@ -24,7 +24,7 @@ const authorization = (req) => {
 const register = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
-    const email = req.body.email
+    const email = req.body.email || ''
     const password = req.body.password || 'forage';
     const description = req.body.description
     const profileImage = req.body.profileImage

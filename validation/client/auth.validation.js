@@ -7,11 +7,11 @@ const register = {
         phone: Joi.array().required(),
         description: Joi.array(),
         subscriptionDate: Joi.string(),
-        subscriptionAmount: Joi.number().required(),
-        customerReference: Joi.number().required(),
+        subscriptionAmount: Joi.number(),
+        customerReference: Joi.number(),
         observation: Joi.string(),
         profileImage: Joi.string(),
-        IdCompteur: Joi.string().required(),
+        IdCompteur: Joi.array(),
         password: Joi.custom(password),
         longitude: Joi.number(),
         latitude: Joi.number()
@@ -21,8 +21,8 @@ const register = {
 const update = {
     body: Joi.object().keys({
         name: Joi.string().required(),
-        phone: Joi.number().required(),
-        email: Joi.string().required(),
+        phone: Joi.array().required(),
+        email: Joi.string(),
         profileImage: Joi.string(),
     })
 }
@@ -40,9 +40,9 @@ const updateById = {
     }),
     body: Joi.object().keys({
         name: Joi.string().required(),
-        phone: Joi.number().required(),
-        email: Joi.string().required(),
-        IdCompteur: Joi.string(),
+        phone: Joi.array().required(),
+        email: Joi.string(),
+        IdCompteur: Joi.array(),
         profileImage: Joi.string(),
     })
 }

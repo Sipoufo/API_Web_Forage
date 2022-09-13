@@ -18,7 +18,7 @@ const { Admin, Client } = require('../models/index')
 
 const tokenVerifie = (req, res, next) => {
     // const token = req.cookies.pwftoken;
-    console.log(req.headers.authorization)
+    // console.log(req.headers.authorization)
     const token = req.headers.authorization.split(" ")[1];
 
     // Check if the token exist
@@ -29,7 +29,7 @@ const tokenVerifie = (req, res, next) => {
                 console.log(err)
                 res.status(500).json({ status: 500, error: "Please login" })
             } else {
-                console.log(decodedToken);
+                console.log('token decodé', decodedToken);
                 next()
             }
         })
@@ -46,6 +46,8 @@ const tokenVerifieAdmin = (req, res, next) => {
     if (token) {
         jwt.verify(token, 'Admin web forage', (err, decodedToken) => {
             // Verified token
+            console.log('token decodé', decodedToken);
+
             if (err) {
                 res.status(500).json({ status: 500, error: "Please login" })
             } else {
@@ -76,6 +78,8 @@ const tokenVerifieClient = (req, res, next) => {
     if (token) {
         jwt.verify(token, 'Admin web forage', (err, decodedToken) => {
             // Verified token
+            console.log('token decodé', decodedToken);
+            
             if (err) {
                 console.log(err)
                 res.status(500).json({ status: 500, error: "Please login" })

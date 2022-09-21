@@ -15,9 +15,8 @@ const register = catchAsync(async(req, res) => {
     console.log(req.body);
     const name = req.body.name
     const phone = req.body.phone
-    const email = req.body.email || ''
     const description = (req.body.description) ? req.body.description : null
-    const IdCompteur = req.body.IdCompteur
+    const idCompteur = req.body.idCompteur;
     const password = req.body.password  || 'forage';
     const profileImage = req.body.profileImage
     const longitude = (req.body.longitude) ? req.body.longitude : null
@@ -33,7 +32,7 @@ const register = catchAsync(async(req, res) => {
                             return Client.findOne({ email })
                                 .then(async(mail) => {
                                     if (!mail) {
-                                        const result = await Client.create({ name, phone, IdCompteur, profileImage, email, password, localisation: { longitude, latitude, description } })
+                                        const result = await Client.create({ name, phone, idCompteur, profileImage, password, localisation: { longitude, latitude, description } })
                                         if (result) {
                                             res.status(200).json({ status: 200, result: result })
                                         } else {

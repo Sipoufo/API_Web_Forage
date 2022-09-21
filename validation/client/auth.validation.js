@@ -4,14 +4,14 @@ const { password, objectId } = require('../custom.validation');
 const register = {
     body: Joi.object().keys({
         name: Joi.string().required(),
-        phone: Joi.array().required(),
+        phone: Joi.array(),
         description: Joi.array(),
         subscriptionDate: Joi.string(),
         subscriptionAmount: Joi.number(),
-        customerReference: Joi.number(),
+        customerReference: Joi.number().required(),
         observation: Joi.string(),
         profileImage: Joi.string(),
-        IdCompteur: Joi.array(),
+        idCompteur: Joi.array(),
         password: Joi.custom(password),
         longitude: Joi.number(),
         latitude: Joi.number()
@@ -42,7 +42,7 @@ const updateById = {
         name: Joi.string().required(),
         phone: Joi.array().required(),
         email: Joi.string(),
-        IdCompteur: Joi.array(),
+        idCompteur: Joi.array(),
         profileImage: Joi.string(),
     })
 }

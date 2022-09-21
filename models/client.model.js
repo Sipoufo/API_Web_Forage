@@ -19,7 +19,7 @@ const userSchema = new model({
         },
         subscription: {
             type: Number,
-            require: true
+            require: false
         },
         customerReference: {
             type: Number,
@@ -56,8 +56,9 @@ const userSchema = new model({
             type: String,
             required: false
         },
-        IdCompteur: {
-            type: String,
+        idCompteur: {
+            type: Array,
+            require: false
         },
         status: {
             type: Boolean,

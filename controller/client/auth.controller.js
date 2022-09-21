@@ -27,22 +27,14 @@ const register = catchAsync(async(req, res) => {
         .then(admin => {
             if (!admin) {
                 return Client.findOne({ phone })
-                    .then(number => {
+                    .then(async number => {
                         if (!number) {
-                            return Client.findOne({ email })
-                                .then(async(mail) => {
-                                    if (!mail) {
-                                        const result = await Client.create({ name, phone, idCompteur, profileImage, password, localisation: { longitude, latitude, description } })
-                                        if (result) {
-                                            res.status(200).json({ status: 200, result: result })
-                                        } else {
-                                            res.status(500).json({ status: 500, error: "Error during the save" })
-                                        }
-                                    } else {
-                                        res.status(500).json({ status: 500, error: "this email exist <-_->" })
-                                    }
-
-                                })
+                            const result = await Client.create({ name, phone, idCompteur, profileImage, password, localisation: { longitude, latitude, description } })
+                            if (result) {
+                                res.status(200).json({ status: 200, result: result })
+                            } else {
+                                res.status(500).json({ status: 500, error: "Error during the save" })
+                            }
                         } else {
                             console.log()
                             res.status(500).json({ status: 500, error: "this number exist <-_->" })

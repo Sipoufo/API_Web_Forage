@@ -4,9 +4,11 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
+RUN npm install -g nodemon
+
 RUN npm install
 
 COPY . .
 
-# CMD [ "npm", "start" ]
-CMD [ "node", "index.js" ]
+# CMD [ "node", "index.js" ]
+CMD [ "nodemon", "index.js" ]

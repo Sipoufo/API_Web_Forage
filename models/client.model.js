@@ -15,15 +15,32 @@ const userSchema = new model({
         },
         phone: {
             type: Array,
+            default: [],
             require: true
         },
-        subscription: {
+        description: {
+            type: Array,
+            default: [],
+            require: true
+        },
+        subscriptionDate: {
+            type: String,
+            default: '',
+            require: false
+        },
+        subscriptionAmount: {
             type: Number,
+            default: 0,
             require: false
         },
         customerReference: {
             type: Number,
             require: true
+        },
+        observation: {
+            type: String,
+            default: '',
+            require: false
         },
         localisation: {
             longitude: {
@@ -35,7 +52,9 @@ const userSchema = new model({
                 required: false
             },
             description: {
-                type: Array
+                type: Array,
+                default: [],
+                require: true
             },
         },
         email: {
@@ -58,14 +77,17 @@ const userSchema = new model({
         },
         idCompteur: {
             type: Array,
+            default: [],
             require: false
         },
         status: {
             type: Boolean,
+            require: false,
             default: true
         },
         isDelete: {
             type: Boolean,
+            require: false,
             default: false
         },
         compteur: [{

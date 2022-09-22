@@ -16,12 +16,15 @@ const register = catchAsync(async(req, res) => {
     const name = req.body.name
     const phone = req.body.phone
     const description = (req.body.description) ? req.body.description : null
-    const idCompteur = req.body.idCompteur;
-    const password = req.body.password  || 'forage';
+    const subscriptionDate = req.body.subscriptionDate;
+    const subscriptionAmount = req.body.subscriptionAmount;
+    const customerReference = req.body.customerReference;
+    const observation = req.body.observation;
     const profileImage = req.body.profileImage
+    const idCompteur = req.body.idCompteur;
+    const password = req.body.password;
     const longitude = (req.body.longitude) ? req.body.longitude : null
     const latitude = (req.body.latitude) ? req.body.longitude : null
-
 
     return Admin.findOne({ phone })
         .then(admin => {
@@ -29,7 +32,21 @@ const register = catchAsync(async(req, res) => {
                 return Client.findOne({ phone })
                     .then(async number => {
                         if (!number) {
-                            const result = await Client.create({ name, phone, idCompteur, profileImage, password, localisation: { longitude, latitude, description } })
+                            const client = {
+                                name,
+                                password,
+                                phone,
+                                description,
+                                subscriptionDate,
+                                subscriptionAmount,
+                                customerReference,
+                                observation,
+                                localisation: { longitude, latitude, description },
+                                profileImage,
+                                idCompteur,
+                            }
+
+                            const result = await Client.create(client)
                             if (result) {
                                 res.status(200).json({ status: 200, result: result })
                             } else {

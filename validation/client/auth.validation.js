@@ -21,9 +21,17 @@ const register = {
 const update = {
     body: Joi.object().keys({
         name: Joi.string().required(),
-        phone: Joi.array().required(),
-        email: Joi.string(),
+        phone: Joi.array(),
+        description: Joi.array(),
+        subscriptionDate: Joi.string(),
+        subscriptionAmount: Joi.number(),
+        customerReference: Joi.number().required(),
+        observation: Joi.string(),
         profileImage: Joi.string(),
+        idCompteur: Joi.array(),
+        password: Joi.custom(password),
+        longitude: Joi.number(),
+        latitude: Joi.number()
     })
 }
 
@@ -40,10 +48,17 @@ const updateById = {
     }),
     body: Joi.object().keys({
         name: Joi.string().required(),
-        phone: Joi.array().required(),
-        email: Joi.string(),
-        idCompteur: Joi.array(),
+        phone: Joi.array(),
+        description: Joi.array(),
+        subscriptionDate: Joi.string(),
+        subscriptionAmount: Joi.number(),
+        customerReference: Joi.number().required(),
+        observation: Joi.string(),
         profileImage: Joi.string(),
+        idCompteur: Joi.array(),
+        password: Joi.custom(password),
+        longitude: Joi.number(),
+        latitude: Joi.number()
     })
 }
 

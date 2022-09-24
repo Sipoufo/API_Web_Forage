@@ -523,5 +523,27 @@ router
     .get(tokenVerifie, validate(FactureValidation.haveInvoice), FactureController.haveInvoice);
 
 
+//check if user have facture that match with entry date
+//if he don't have return user with all account
+/**
+ * @swagger
+ *  /admin/facture/userThatHaveNotPaidInvoiceWithDate/{date}:
+ *      get:
+ *          summary: See unpaid invoice with date
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: date
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: Date
+ *          responses: 
+ *              200:
+ *                  description: get factures
+ */
+ router
+    .route('userThatHaveNotPaidInvoiceWithDate/:date')
+    .get(tokenVerifieAdmin, validate(FactureValidation.getUserThatHaveNotPaidInvoiceWithDate), FactureController.getUserThatHaveNotPaidInvoiceWithDate)
 
 module.exports = router

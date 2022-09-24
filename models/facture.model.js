@@ -23,6 +23,10 @@ const factureSchema = new model({
             type: Number,
             required: true
         },
+        idCompteur: {
+            type: String,
+            required: true,
+        },
         // la consommation en M3
         consommation: {
             type: Number,

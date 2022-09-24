@@ -8,6 +8,7 @@ const addFacture = {
     body: Joi.object().keys({
         newIndex: Joi.number().required(),
         oldIndex: Joi.number(),
+        idCompteur: Joi.string().required(),
         dateReleveNewIndex: Joi.string().required(),
     })
 };
@@ -63,6 +64,12 @@ const updateFacture = {
     })
 }
 
+const deleteFacture = {
+    params: Joi.object().keys({
+        idFacture: Joi.custom(objectId).required()
+    }),
+}
+
 const statusPaidFacture = {
     params: Joi.object().keys({
         idFacture: Joi.custom(objectId).required()
@@ -106,6 +113,12 @@ const seeUnpaidInvoicewithDate = {
     })
 }
 
+const getUserThatHaveNotPaidInvoiceWithDate = {
+    params: Joi.object().keys({
+        date: Joi.date().required(),
+    })
+}
+
 const getClientFactures = {
     params: Joi.object().keys({
         idClient: Joi.custom(objectId).required()
@@ -126,5 +139,7 @@ module.exports = {
     haveInvoice,
     addPenalty,
     preCreate,
-    removePenalty
+    removePenalty,
+
+    getUserThatHaveNotPaidInvoiceWithDate
 }

@@ -1,5 +1,6 @@
 const catchAsync = require('../../utils/catchAsync');
 const { Admin, Facture, Client, StaticInf } = require('../../models/index');
+const {  } = require('../../models/index');
 const jwt = require('jsonwebtoken')
 
 const authorization = (req) => {
@@ -16,6 +17,7 @@ const addFacture = catchAsync(async(req, res) => {
             const idClient = req.params.idClient;
             const idAdmin = decodedToken.id;
             const newIndex = req.body.newIndex;
+            const idCompteur = req.body.idCompteur;
             // const montantVerse = req.body.montantVerse;
             const dateReleveNewIndex = new Date(req.body.dateReleveNewIndex);
             let oldIndex = (req.body.oldIndex) ? req.body.oldIndex : 0;
@@ -75,7 +77,7 @@ const addFacture = catchAsync(async(req, res) => {
                                     }
                                     const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 1, static[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
                                     console.log("Step 3");
-                                    await Facture.create({ idClient, idAdmin, surplus, facturePay, dateReleveNewIndex, newIndex, oldIndex, consommation, prixUnitaire, fraisEntretien, montantConsommation, dataLimitePaid, montantImpaye, facturePay, penalty: { montant: 0, date: dateReleveNewIndex } })
+                                    await Facture.create({ idClient, idAdmin, surplus, facturePay, dateReleveNewIndex, newIndex, oldIndex,idCompteur,consommation, prixUnitaire, fraisEntretien, montantConsommation, dataLimitePaid, montantImpaye, facturePay, penalty: { montant: 0, date: dateReleveNewIndex } })
                                         .then(resp => {
                                             if (resp) {
                                                 res.status(200).json({ status: 200, result: resp });
@@ -140,7 +142,7 @@ const preCreate = catchAsync(async(req, res) => {
                         const montantImpaye = montantConsommation;
                         const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 2, static[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
                         await Client.findByIdAndUpdate(idClient, { IdCompteur });
-                        Facture.create({ idClient, idAdmin: decodedToken.id, newIndex, oldIndex, consommation, prixUnitaire, montantConsommation, fraisEntretien, montantImpaye, surplus, preCreate, dataLimitePaid, dateReleveNewIndex, penalty: { montant: 0, date: dateReleveNewIndex } })
+                        Facture.create({ idClient, idAdmin: decodedToken.id, newIndex, oldIndex, IdCompteur, consommation, prixUnitaire, montantConsommation, fraisEntretien, montantImpaye, surplus, preCreate, dataLimitePaid, dateReleveNewIndex, penalty: { montant: 0, date: dateReleveNewIndex } })
                             .then( facture => {
                                 if(facture) {
                                     res.status(200).json({ status: 200, result: facture });
@@ -233,6 +235,60 @@ const seeUnpaidInvoicewithDate = catchAsync(async (req, res) => {
         })
 })
 
+const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
+    const dateUnpaidMonth = new Date(req.params.date).getMonth() + 1
+    const dateUnpaidYear= new Date(req.params.date).getFullYear()
+    let results = [
+        {
+            user: any,
+            idCompteur: []
+        }
+    ]
+    Client.find({isDelete: false})
+        .sort({name : 0})
+        .then(async customers => {
+            for (let i = 0; i < customers.length; i++) {
+                let invoiceCustomer = await Facture.aggregate([
+                    {
+                        $project: {_id: 1, client: '$idClient' , month: {$month: '$dateReleveNewIndex'}, year: {$year: '$dateReleveNewIndex'}}
+                    },
+                    {
+                        $match: {month: dateUnpaidMonth, year: dateUnpaidYear, client: customers[i]["_id"]}
+                    }
+                ]);
+                if (invoiceCustomer.length == 0) {
+                    results.push({
+                        user: customers[i],
+                        idCompteur: customers[i]?.idCompteur
+                    });
+                } else {
+                    for (let j = 0; j < invoiceCustomer.length; j++) {
+                        const element = invoiceCustomer[j];
+                        for (let i = 0; i < customers[i].idCompteur?.length; i++) {
+                            const idCompteur = customers[i].idCompteur[i];
+                            if (element.idCompteur !== idCompteur) {
+                                let index = results.findIndex(x => x.user === customers[i]);
+                                if (index > -1) {
+                                    let counters = results[index];
+                                    counters.idCompteur?.push(
+                                        idCompteur
+                                    )
+                                    results.splice(index, 1, counters);
+                                } else {
+                                    results.push({
+                                        user: customers[i],
+                                        idCompteur: [idCompteur]
+                                    });
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+            }
+            res.status(200).json({ status: 200, result: results })
+        })
+})
 const getStaticInformation = catchAsync((req, res) => {
     const staticInf = []
     StaticInf
@@ -471,4 +527,6 @@ module.exports = {
     seeUnpaidInvoicewithDate,
     haveInvoice,
     preCreate,
+
+    getUserThatHaveNotPaidInvoiceWithDate
 }

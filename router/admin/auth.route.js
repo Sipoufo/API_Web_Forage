@@ -270,30 +270,30 @@ router
 /**
  * @swagger
  * /admin/auth/client/find:
- *  post:
- *      summary: find user in the bd by constraint
- *      tags: [Admin]
- *      requestBody:
- *              required: true
- *              content:
- *                  application/json:  
- *                      schema:
- *                          type: object
- *                          properties:
- *                              date:
- *                                  type: string
- *                              refId:
- *                                  type: integer
- *                              counterId:
- *                                  type: string
- *                              order:
- *                                  type: string
- *                                  enum: [asc, desc]
- *                          example:
- *                              date: "2022-01-26"
- *                              order: desc
- *                              counterId: "778fs"
- *                              refId: 15
+ *      post:
+ *          summary: find user in the bd by constraint
+ *          tags: [Admin]
+ *          requestBody:
+ *                  required: true
+ *                  content:
+ *                      application/json:  
+ *                          schema:
+ *                              type: object
+ *                              properties:
+ *                                  date:
+ *                                      type: string
+ *                                  refId:
+ *                                      type: integer
+ *                                  counterId:
+ *                                      type: string
+ *                                  order:
+ *                                      type: string
+ *                                      enum: [asc, desc]
+ *                              example:
+ *                                  date: "2022-01-26"
+ *                                  order: desc
+ *                                  counterId: "778fs"
+ *                                  refId: 15
  *          responses: 
  *              200:
  *                  description: > 

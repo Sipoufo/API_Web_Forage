@@ -48,9 +48,17 @@ const updateClient = {
     }),
     body: Joi.object().keys({
         name: Joi.string().required(),
-        phone: Joi.number().required(),
-        email: Joi.string().required(),
-        profileImage: Joi.string().required(),
+        phone: Joi.array(),
+        description: Joi.array(),
+        subscriptionDate: Joi.string(),
+        subscriptionAmount: Joi.number(),
+        customerReference: Joi.number().required(),
+        observation: Joi.string(),
+        profileImage: Joi.string(),
+        idCompteur: Joi.array(),
+        password: Joi.custom(password),
+        longitude: Joi.number(),
+        latitude: Joi.number()
     })
 }
 

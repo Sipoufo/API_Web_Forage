@@ -151,39 +151,73 @@ const updateAdmin = catchAsync(async(req, res) => {
 
 const updateClient = catchAsync(async(req, res) => {
     const idClient = req.params.idClient
+    
     const name = req.body.name
     const phone = req.body.phone
-    const email = req.body.email
+    const description = (req.body.description) ? req.body.description : null
+    const subscriptionDate = req.body.subscriptionDate;
+    const subscriptionAmount = req.body.subscriptionAmount;
+    const customerReference = req.body.customerReference;
+    const observation = req.body.observation;
     const profileImage = req.body.profileImage
-    await Admin.findOne({ phone })
+    const idCompteur = req.body.idCompteur;
+    const password = req.body.password;
+    const longitude = (req.body.longitude) ? req.body.longitude : null
+    const latitude = (req.body.latitude) ? req.body.longitude : null
+
+    return Admin.findOne({ phone })
         .then(async admin => {
             if (!admin) {
-                await Client.findOne({ phone })
-                    .then(async number => {
-                        if ((number && number._id == idClient) || !number) {
-                            const emailAdmin = await Admin.findOne({ email })
-                            const emailClient = await Client.findOne({ email })
-                            if ((!emailAdmin && !emailClient) || ((emailClient && (emailClient._id == idClient)))) {
-                                const result = await Client.findByIdAndUpdate(idClient, { name, phone: phone, profileImage, email })
-                                if (result) {
-                                    res.status(200).json({ status: 200, result: result })
-                                } else {
-                                    res.status(500).json({ status: 500, error: "This admin don't exist" })
-                                }
-                            } else {
-                                res.status(500).json({ status: 500, error: "This email exist" })
-                            }
-
+                const user = await Client.findOne({ phone });
+                if ((user && user._id == idClient) || !user) {
+                    const client = {
+                        name,
+                        password,
+                        phone,
+                        description,
+                        subscriptionDate,
+                        subscriptionAmount,
+                        customerReference,
+                        observation,
+                        localisation: { longitude, latitude, description },
+                        profileImage,
+                        idCompteur,
+                    }
+                    const result = await Client.findByIdAndUpdate(idClient, checkField(user, client));
+                        if (result) {
+                            res.status(200).json({ status: 200, result: result });
                         } else {
-                            console.log()
-                            res.status(500).json({ status: 500, error: "this number exist <-_->" })
+                            res.status(500).json({ status: 500, error: "Error during the save" });
                         }
-                    })
+                } else {
+                    console.log();
+                    res.status(500).json({ status: 500, error: "this number exist <-_->" });
+                }
             } else {
-                res.status(500).json({ status: 500, error: "One User have this phone" })
+                res.status(500).json({ status: 500, error: "One Admin have this phone" })
             }
         })
 })
+
+const checkField = (clientOnBD, newInfoUser) => {
+    const client = {
+        name: (newInfoUser?.name) ? (newInfoUser?.name): clientOnBD?.name,
+        password: (newInfoUser?.password) ? (newInfoUser?.password): clientOnBD?.password,
+        phone: (newInfoUser?.phone) ? (newInfoUser?.phone): clientOnBD?.phone,
+        description: (newInfoUser?.description) ? (newInfoUser?.description): clientOnBD?.description,
+        subscriptionDate: (newInfoUser?.subscriptionDate) ? (newInfoUser?.subscriptionDate): clientOnBD?.subscriptionDate,
+        subscriptionAmount: (newInfoUser?.subscriptionAmount) ? (newInfoUser?.subscriptionAmount): clientOnBD?.subscriptionAmount,
+        customerReference: (newInfoUser?.customerReference) ? (newInfoUser?.customerReference): clientOnBD?.customerReference,
+        observation: (newInfoUser?.observation) ? (newInfoUser?.observation): clientOnBD?.observation,
+        profileImage: (newInfoUser?.profileImage) ? (newInfoUser?.profileImage): clientOnBD?.profileImage,
+        idCompteur: (newInfoUser?.idCompteur) ? (newInfoUser?.idCompteur): clientOnBD?.idCompteur,
+        localisation: { 
+            longitude: (newInfoUser?.longitude) ? (newInfoUser?.longitude): clientOnBD?.longitude,
+             latitude:(newInfoUser?.latitude) ? (newInfoUser?.latitude): clientOnBD?.latitude,
+             description: (newInfoUser?.description) ? (newInfoUser?.description): clientOnBD?.description},
+        }
+    return client;
+}
 
 const BlockCompteClient = catchAsync(async(req, res) => {
     const isBlock = req.body.isBlock

@@ -302,7 +302,7 @@ router
  */
  router
  .route('/client/find/')
- .get(tokenVerifieAdmin, validate(adminAuth.findClient), authAdmin.findClient);
+ .post(tokenVerifieAdmin, validate(adminAuth.findClient), authAdmin.findClient);
 
 // get clients
 /**

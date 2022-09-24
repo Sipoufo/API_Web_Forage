@@ -270,39 +270,35 @@ router
 /**
  * @swagger
  * /admin/auth/client/find:
- *  get:
+ *  post:
  *      summary: find user in the bd by constraint
  *      tags: [Admin]
- *      parameters:
- *              -   in: query
- *                  name: date
- *                  schema: 
- *                      type: string
- *                  description: The date represent date of subscription
- *              -   in: query
- *                  name: refId
- *                  schema: 
- *                      type: integer
- *                  description: The customer reference.
- *              -   in: query
- *                  name: counterId
- *                  schema: 
- *                      type: string
- *                  description:  The id of counter.
- *              -   in: query
- *                  name: order
- *                  schema: 
- *                      type: string
- *                      enum: [asc, desc]
- *                  description: >
- *                      Sort order:
- *                           `asc` - Ascending, from A to Z
- *                           `desc` - Descending, from Z to A
- *      responses: 
- *          200:
- *              description: get all user in the bd
- *          500:
- *              description: Error during the get
+ *      requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              date:
+ *                                  type: string
+ *                              refId:
+ *                                  type: integer
+ *                              counterId:
+ *                                  type: string
+ *                              order:
+ *                                  type: string
+ *                                  enum: [asc, desc]
+ *                          example:
+ *                              date: "2022-01-26"
+ *                              order: desc
+ *                              counterId: "778fs"
+ *                              refId: 15
+ *          responses: 
+ *              200:
+ *                  description: > 
+ *                      get all user in the bd
+ * 
  */
  router
  .route('/client/find/')

@@ -543,7 +543,7 @@ router
  *                  description: get factures
  */
  router
-    .route('userThatHaveNotPaidInvoiceWithDate/:date')
+    .route('/userThatHaveNotPaidInvoiceWithDate/:date')
     .get(tokenVerifieAdmin, validate(FactureValidation.getUserThatHaveNotPaidInvoiceWithDate), FactureController.getUserThatHaveNotPaidInvoiceWithDate)
 
 module.exports = router

@@ -234,61 +234,69 @@ const seeUnpaidInvoicewithDate = catchAsync(async (req, res) => {
             res.status(200).json({ status: 200, result: invoiceUnpaid })
         })
 })
-
 const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
     const dateUnpaidMonth = new Date(req.params.date).getMonth() + 1
     const dateUnpaidYear= new Date(req.params.date).getFullYear()
-    let results = [
-        {
-            user: any,
-            idCompteur: []
-        }
-    ]
+    let results = []
+
     Client.find({isDelete: false})
         .sort({name : 0})
         .then(async customers => {
             for (let i = 0; i < customers.length; i++) {
                 let invoiceCustomer = await Facture.aggregate([
                     {
-                        $project: {_id: 1, client: '$idClient' , month: {$month: '$dateReleveNewIndex'}, year: {$year: '$dateReleveNewIndex'}}
+                        $project: {_id: 1, client: '$idClient' , month: {$month: '$dateReleveNewIndex'}, year: {$year: '$dateReleveNewIndex'}, idCompteur: customers[i]["idCompteur"]}
                     },
                     {
                         $match: {month: dateUnpaidMonth, year: dateUnpaidYear, client: customers[i]["_id"]}
                     }
                 ]);
+                console.log('invoiceCustomer: ', invoiceCustomer);
                 if (invoiceCustomer.length == 0) {
                     results.push({
+                        user: customers[i],
+                        idCompteur: customers[i]?.idCompteur
+                    });
+
+                    console.log('yyt: ', {
                         user: customers[i],
                         idCompteur: customers[i]?.idCompteur
                     });
                 } else {
                     for (let j = 0; j < invoiceCustomer.length; j++) {
                         const element = invoiceCustomer[j];
-                        for (let i = 0; i < customers[i].idCompteur?.length; i++) {
-                            const idCompteur = customers[i].idCompteur[i];
-                            if (element.idCompteur !== idCompteur) {
-                                let index = results.findIndex(x => x.user === customers[i]);
-                                if (index > -1) {
-                                    let counters = results[index];
-                                    counters.idCompteur?.push(
-                                        idCompteur
-                                    )
-                                    results.splice(index, 1, counters);
-                                } else {
-                                    results.push({
-                                        user: customers[i],
-                                        idCompteur: [idCompteur]
-                                    });
+
+                        for (let k = 0; k < element?.idCompteur?.length; k++) {
+                            const element1 = element?.idCompteur[k];
+
+                            for (let x = 0; x < customers[i]?.idCompteur?.length; x++) {
+                                const idCompteur = customers[i]?.idCompteur[x];
+    
+                                if (element1 !== idCompteur) {
+                                    let index = results.findIndex(x => x.user === customers[i]);
+                                    if (index > -1) {
+                                        let counters = results[index];
+                                        counters.idCompteur?.push(
+                                            idCompteur
+                                        )
+                                        results.splice(index, 1, counters);
+                                    } else {
+                                        results.push({
+                                            user: customers[i],
+                                            idCompteur: [idCompteur]
+                                        });
+                                    }
                                 }
                             }
                         }
-                        
                     }
                 }
             }
             res.status(200).json({ status: 200, result: results })
         })
 })
+
+
 const getStaticInformation = catchAsync((req, res) => {
     const staticInf = []
     StaticInf

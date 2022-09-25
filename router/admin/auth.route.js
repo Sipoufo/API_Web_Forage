@@ -314,7 +314,7 @@ router
  * 
  */
  router
- .route('/client/find/')
+ .route('/client/find/:page/:limit')
  .post(tokenVerifieAdmin, validate(adminAuth.findClient), authAdmin.findClient);
 
 // get clients

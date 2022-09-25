@@ -236,6 +236,9 @@ const getClients = catchAsync((req, res) => {
 })
 
 const findClient = catchAsync((req, res) => {
+    const page = (req.params.page) ? req.params.page : 1;
+    const limit = (req.params.limit) ? req.params.limit : 10;
+
     if (req.body?.date) {
         let start = new Date(req.body?.date);
         let end = new Date(req.body?.date);
@@ -245,6 +248,7 @@ const findClient = catchAsync((req, res) => {
         return Client
         .find({subscriptionDate: {$gte: start, $lt: end}, customerReference: req.body?.refId ? req.body?.refId : undefined, IdCompteur: req.body?.counterId ? req.body?.counterId : undefined})
         .sort({ subscriptionDate: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
+        .paginate({}, { page, limit })
         .then(response => {
             res.status(200).json({ status: 200, result: response });
         })
@@ -257,6 +261,7 @@ const findClient = catchAsync((req, res) => {
     return Client
     .find({ customerReference: req.body?.refId ? req.body?.refId : undefined, IdCompteur: req.body?.counterId ? req.body?.counterId : undefined})
     .sort({ subscriptionDate: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
+    .paginate({}, { page, limit })
     .then(clients => {
         if (clients.length > 0) {
             res.status(200).json({ status: 200, result: clients })

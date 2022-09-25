@@ -269,7 +269,20 @@ router
  // get clients by subscription date
 /**
  * @swagger
- * /admin/auth/client/find:
+ * /admin/auth/client/find/{page}/{limit}:
+ *      parameters:
+ *              -   in: path
+ *                  name: limit
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: limit where you want on one page
+ *              -   in: path
+ *                  name: page
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: Page where you want to be
  *      post:
  *          summary: find user in the bd by constraint
  *          tags: [Admin]

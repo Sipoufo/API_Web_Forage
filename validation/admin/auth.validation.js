@@ -59,13 +59,13 @@ const getClients = {
 
 const findClient = {
     params: Joi.object().keys({
-        page: Joi.string(),
-        limit: Joi.string(),
+        page: Joi.number(),
+        limit: Joi.number(),
     }),
     body: Joi.object().keys({
         date: Joi.string(),
         order: Joi.string(),
-        refId: Joi.string(),
+        refId: Joi.number(),
         counterId: Joi.string(),
     }),
 }

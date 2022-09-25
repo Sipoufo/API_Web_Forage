@@ -238,6 +238,21 @@ const getClients = catchAsync((req, res) => {
 const findClient = catchAsync((req, res) => {
     const page = (req.params.page) ? req.params.page : 1;
     const limit = (req.params.limit) ? req.params.limit : 10;
+    
+    let filter = {};
+    if(req.body?.refId) {
+        let data = {
+            customerReference: req.body?.refId
+        }
+        filter = data;
+    }
+    if(req.body?.counterId) {
+        let data = {
+            ...filter,
+            idCompteur: req.body?.counterId
+        }
+        filter = data;
+    }
 
     if (req.body?.date) {
         let start = new Date(req.body?.date);
@@ -245,31 +260,70 @@ const findClient = catchAsync((req, res) => {
         start.setHours(0,0,0,0);
         end.setHours(23,59,59,999);
 
+        let data = {
+            ...filter,
+            subscriptionDate: {$gte: start, $lt: end}
+        }
+        filter = data;
+
         return Client
-        .find({subscriptionDate: {$gte: start, $lt: end}, customerReference: req.body?.refId ? req.body?.refId : undefined, IdCompteur: req.body?.counterId ? req.body?.counterId : undefined})
+        .find(filter)
         .sort({ subscriptionDate: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
-        .paginate({}, { page, limit })
+        .skip(page - 1)
+        .limit(limit)
         .then(response => {
-            res.status(200).json({ status: 200, result: response });
+            res.status(200).json({ status: 200, result:  generatePaginnation(response,limit, page) });
         })
         .catch(err => {
             console.log(err)
             res.status(500).json({ status: 500, error: "Error" })
         })
     }
-
+    const offset = page - 1;
     return Client
-    .find({ customerReference: req.body?.refId ? req.body?.refId : undefined, IdCompteur: req.body?.counterId ? req.body?.counterId : undefined})
+    .find(filter)
     .sort({ subscriptionDate: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
-    .paginate({}, { page, limit })
+    .skip(offset)
+    .limit(limit)
     .then(clients => {
         if (clients.length > 0) {
-            res.status(200).json({ status: 200, result: clients })
+            res.status(200).json({ status: 200, result: generatePaginnation(clients,limit, page) })
         } else {
-            res.status(200).json({ status: 200, result: [] })
+            res.status(200).json({ status: 200, result:  generatePaginnation([],limit, page)})
         }
     })
 })
+
+const generatePaginnation = (data, limit, page) => {
+    if (data?.length > 0) {
+        const totalPages = Math.floor(data.length/limit);
+        return {
+            docs: data,
+            totalDocs: data.length,
+            limit: limit,
+            totalPages: totalPages,
+            page: page,
+            pagingCounter: totalPages,
+            hasPrevPage: ( page > 1),
+            hasNextPage: (totalPages > page),
+            prevPage: (page - 1),
+            nextPage: (totalPages > page) ? page + 1 : page
+        }
+    } else {
+        return {
+            docs: [],
+            totalDocs: 0,
+            limit: limit,
+            totalPages: 0,
+            page: page,
+            pagingCounter: 0,
+            hasPrevPage: false,
+            hasNextPage: false,
+            prevPage: 1,
+            nextPage: 1
+        }
+    }
+}
 
 const getClientsWithPagination = catchAsync((req, res) => {
     const page = (req.params.page) ? req.params.page : 1;

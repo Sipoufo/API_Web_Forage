@@ -161,7 +161,6 @@ const updateClient = catchAsync(async(req, res) => {
     const observation = req.body.observation;
     const profileImage = req.body.profileImage
     const idCompteur = req.body.idCompteur;
-    const password = req.body.password;
     const longitude = (req.body.longitude) ? req.body.longitude : null
     const latitude = (req.body.latitude) ? req.body.longitude : null
 
@@ -172,7 +171,7 @@ const updateClient = catchAsync(async(req, res) => {
                 if ((user && user._id == idClient) || !user) {
                     const client = {
                         name,
-                        password,
+                        password: user.password,
                         phone,
                         description,
                         subscriptionDate,

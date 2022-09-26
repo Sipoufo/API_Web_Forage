@@ -240,13 +240,13 @@ const findClient = catchAsync((req, res) => {
     const limit = (req.params.limit) ? req.params.limit : 10;
     
     let filter = {};
-    if(req.body?.refId) {
+    if(req.body?.refId && req.body?.refId !== " " && req.body?.refId !== 0) {
         let data = {
             customerReference: req.body?.refId
         }
         filter = data;
     }
-    if(req.body?.counterId) {
+    if(req.body?.counterId && req.body?.counterId !== " ") {
         let data = {
             ...filter,
             idCompteur: req.body?.counterId
@@ -254,7 +254,8 @@ const findClient = catchAsync((req, res) => {
         filter = data;
     }
 
-    if (req.body?.date) {
+    console.log('filter', filter);
+    if (req.body?.date && req.body?.date !== " ") {
         let start = new Date(req.body?.date);
         let end = new Date(req.body?.date);
         start.setHours(0,0,0,0);
@@ -278,20 +279,21 @@ const findClient = catchAsync((req, res) => {
             console.log(err)
             res.status(500).json({ status: 500, error: "Error" })
         })
+    } else {
+        const offset = page - 1;
+        return Client
+        .find(filter)
+        .sort({ subscriptionDate: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
+        .skip(offset)
+        .limit(limit)
+        .then(clients => {
+            if (clients.length > 0) {
+                res.status(200).json({ status: 200, result: generatePaginnation(clients,limit, page) })
+            } else {
+                res.status(200).json({ status: 200, result:  generatePaginnation([],limit, page)})
+            }
+        })
     }
-    const offset = page - 1;
-    return Client
-    .find(filter)
-    .sort({ subscriptionDate: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
-    .skip(offset)
-    .limit(limit)
-    .then(clients => {
-        if (clients.length > 0) {
-            res.status(200).json({ status: 200, result: generatePaginnation(clients,limit, page) })
-        } else {
-            res.status(200).json({ status: 200, result:  generatePaginnation([],limit, page)})
-        }
-    })
 })
 
 const generatePaginnation = (data, limit, page) => {

@@ -1,16 +1,16 @@
 const catchAsync = require('../../utils/catchAsync');
 const { Admin, Facture, Client, StaticInf } = require('../../models/index');
-const {  } = require('../../models/index');
+const { } = require('../../models/index');
 const jwt = require('jsonwebtoken')
 
 const authorization = (req) => {
     return req.headers.authorization.split(" ")[1]
 }
 
-const addFacture = catchAsync(async(req, res) => {
+const addFacture = catchAsync(async (req, res) => {
     // const token = req.cookies.pwftoken
     const token = authorization(req)
-    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
             console.log(err);
         } else {
@@ -41,7 +41,7 @@ const addFacture = catchAsync(async(req, res) => {
                             if ((dateBilling.getMonth() + 1) == monthDate && dateBilling.getFullYear() == yearDate && factures[i].preCreate == false) {
                                 doFacture = false;
                                 break;
-                            }else if (factures[i].preCreate == false){
+                            } else if (factures[i].preCreate == false) {
                                 indexFacture = i
                                 isprecreate = false
                                 idFacturePre = factures[i]._id
@@ -59,7 +59,7 @@ const addFacture = catchAsync(async(req, res) => {
                     if (doFacture == true && isprecreate == false) {
                         console.log("Step 2");
                         await Admin.findById(decodedToken.id)
-                            .then(async(admin) => {
+                            .then(async (admin) => {
                                 if (admin) {
                                     const static = await StaticInf.find().sort({ createdAt: 1 })
                                     const prixUnitaire = static[0].prixUnitaire;
@@ -72,12 +72,12 @@ const addFacture = catchAsync(async(req, res) => {
                                     if (montantConsommation - surplus >= 0) {
                                         montantImpaye = montantConsommation - surplus;
                                     } else {
-                                        surplus = (montantConsommation- surplus) * (-1);
+                                        surplus = (montantConsommation - surplus) * (-1);
                                         facturePay = true
                                     }
                                     const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 1, static[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
                                     console.log("Step 3");
-                                    await Facture.create({ idClient, idAdmin, surplus, facturePay, dateReleveNewIndex, newIndex, oldIndex,idCompteur,consommation, prixUnitaire, fraisEntretien, montantConsommation, dataLimitePaid, montantImpaye, facturePay, penalty: { montant: 0, date: dateReleveNewIndex } })
+                                    await Facture.create({ idClient, idAdmin, surplus, facturePay, dateReleveNewIndex, newIndex, oldIndex, idCompteur, consommation, prixUnitaire, fraisEntretien, montantConsommation, dataLimitePaid, montantImpaye, facturePay, penalty: { montant: 0, date: dateReleveNewIndex } })
                                         .then(resp => {
                                             if (resp) {
                                                 res.status(200).json({ status: 200, result: resp });
@@ -89,7 +89,7 @@ const addFacture = catchAsync(async(req, res) => {
                                     res.status(500).json({ status: 500, error: "Error during the save" });
                                 }
                             });
-                    } else if(doFacture == true && isprecreate == true) {
+                    } else if (doFacture == true && isprecreate == true) {
                         const static = await StaticInf.find().sort({ createdAt: 1 })
                         const prixUnitaire = static[0].prixUnitaire;
                         const fraisEntretien = static[0].fraisEntretien;
@@ -99,8 +99,8 @@ const addFacture = catchAsync(async(req, res) => {
                         const montantConsommation = (final_Consommation * prixUnitaire) + fraisEntretien - surplus;
                         const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 2, static[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
                         console.log("Step 4");
-                        await Facture.findByIdAndUpdate(idFacturePre, {idClient, idAdmin, dateReleveNewIndex, newIndex : factures[indexFacture].newIndex, oldIndex : factures[indexFacture].oldIndex, consommation: final_Consommation, montantConsommation, dataLimitePaid, preCreate: false})
-                    }else {
+                        await Facture.findByIdAndUpdate(idFacturePre, { idClient, idAdmin, dateReleveNewIndex, newIndex: factures[indexFacture].newIndex, oldIndex: factures[indexFacture].oldIndex, consommation: final_Consommation, montantConsommation, dataLimitePaid, preCreate: false })
+                    } else {
                         res.status(500).json({ status: 500, error: "This customer already has an invoice for this month" });
                     }
 
@@ -111,7 +111,7 @@ const addFacture = catchAsync(async(req, res) => {
     })
 })
 
-const preCreate = catchAsync(async(req, res) => {
+const preCreate = catchAsync(async (req, res) => {
     const static = await StaticInf.find().sort({ createdAt: 1 })
     const token = authorization(req)
     const IdCompteur = req.body.IdCompteur;
@@ -125,15 +125,15 @@ const preCreate = catchAsync(async(req, res) => {
     const fraisEntretien = static[0].fraisEntretien;
     let surplus = 0;
 
-    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
             console.log(err);
         } else {
             Client.findById(idClient)
-                .then( async customer => {
-                    if(customer) {
+                .then(async customer => {
+                    if (customer) {
                         const factures = await Facture.find({ idClient }).sort({ dateReleveNewIndex: -1 });
-                        if(factures.length > 0){
+                        if (factures.length > 0) {
                             oldIndex = factures[0].oldIndex;
                             surplus = factures[0].surplus;
                         }
@@ -143,8 +143,8 @@ const preCreate = catchAsync(async(req, res) => {
                         const dataLimitePaid = new Date(dateReleveNewIndex.getFullYear(), dateReleveNewIndex.getMonth() + 2, static[0].limiteDay, dateReleveNewIndex.getHours() + 1, dateReleveNewIndex.getMinutes(), dateReleveNewIndex.getMilliseconds());
                         await Client.findByIdAndUpdate(idClient, { IdCompteur });
                         Facture.create({ idClient, idAdmin: decodedToken.id, newIndex, oldIndex, IdCompteur, consommation, prixUnitaire, montantConsommation, fraisEntretien, montantImpaye, surplus, preCreate, dataLimitePaid, dateReleveNewIndex, penalty: { montant: 0, date: dateReleveNewIndex } })
-                            .then( facture => {
-                                if(facture) {
+                            .then(facture => {
+                                if (facture) {
                                     res.status(200).json({ status: 200, result: facture });
                                 } else {
                                     res.status(500).json({ status: 500, error: "Error during the creation" });
@@ -158,12 +158,12 @@ const preCreate = catchAsync(async(req, res) => {
     })
 });
 
-const addInformation = catchAsync(async(req, res) => {
+const addInformation = catchAsync(async (req, res) => {
     const prixUnitaire = req.body.prixUnitaire
     const fraisEntretien = req.body.fraisEntretien
     const limiteDay = req.body.limiteDay
     const token = authorization(req)
-    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
             console.log(err);
         } else {
@@ -200,9 +200,9 @@ const haveInvoice = catchAsync((req, res) => {
     Facture
         .find({ idClient })
         .then(factures => {
-            if(factures.length > 0) {
+            if (factures.length > 0) {
                 have = true
-            }else {
+            } else {
                 have = false
             }
             res.status(200).json({ status: 200, result: have })
@@ -212,19 +212,19 @@ const haveInvoice = catchAsync((req, res) => {
 const seeUnpaidInvoicewithDate = catchAsync(async (req, res) => {
     // const dateUnpaid = new Date(req.params.dateUnpaid)
     const dateUnpaidMonth = new Date(req.params.dateUnpaid).getMonth() + 1
-    const dateUnpaidYear= new Date(req.params.dateUnpaid).getFullYear()
+    const dateUnpaidYear = new Date(req.params.dateUnpaid).getFullYear()
     let invoiceUnpaid = []
-    Client.find({isDelete: false})
-        .sort({name : 0})
+    Client.find({ isDelete: false })
+        .sort({ name: 0 })
         .then(async customers => {
             for (let i = 0; i < customers.length; i++) {
                 // console.log(customers[i])
                 let invoiceCustomer = await Facture.aggregate([
                     {
-                        $project: {_id: 1, client: '$idClient' , month: {$month: '$dateReleveNewIndex'}, year: {$year: '$dateReleveNewIndex'}}
+                        $project: { _id: 1, client: '$idClient', month: { $month: '$dateReleveNewIndex' }, year: { $year: '$dateReleveNewIndex' } }
                     },
                     {
-                        $match: {month: dateUnpaidMonth, year: dateUnpaidYear, client: customers[i]["_id"]}
+                        $match: { month: dateUnpaidMonth, year: dateUnpaidYear, client: customers[i]["_id"] }
                     }
                 ]);
                 if (invoiceCustomer.length == 0) {
@@ -236,31 +236,29 @@ const seeUnpaidInvoicewithDate = catchAsync(async (req, res) => {
 })
 const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
     const dateUnpaidMonth = new Date(req.params.date).getMonth() + 1
-    const dateUnpaidYear= new Date(req.params.date).getFullYear()
+    const dateUnpaidYear = new Date(req.params.date).getFullYear()
     let results = []
 
-    Client.find({isDelete: false})
-        .sort({name : 0})
+    Client.find({ isDelete: false })
+        .sort({ name: 0 })
         .then(async customers => {
             for (let i = 0; i < customers.length; i++) {
+                let factures = await Facture.find({ idClient: customers[i]["_id"] });
+                let hasAtLeastOneInvoice = (factures.length > 0) ? true : false;
+
                 let invoiceCustomer = await Facture.aggregate([
                     {
-                        $project: {_id: 1, client: '$idClient' , month: {$month: '$dateReleveNewIndex'}, year: {$year: '$dateReleveNewIndex'}, idCompteur: customers[i]["idCompteur"]}
+                        $project: { _id: 1, client: '$idClient', month: { $month: '$dateReleveNewIndex' }, year: { $year: '$dateReleveNewIndex' }, idCompteur: customers[i]["idCompteur"] }
                     },
                     {
-                        $match: {month: dateUnpaidMonth, year: dateUnpaidYear, client: customers[i]["_id"]}
+                        $match: { month: dateUnpaidMonth, year: dateUnpaidYear, client: customers[i]["_id"] }
                     }
                 ]);
-                console.log('invoiceCustomer: ', invoiceCustomer);
                 if (invoiceCustomer.length == 0) {
                     results.push({
                         user: customers[i],
-                        idCompteur: customers[i]?.idCompteur
-                    });
-
-                    console.log('yyt: ', {
-                        user: customers[i],
-                        idCompteur: customers[i]?.idCompteur
+                        idCompteur: customers[i]?.idCompteur,
+                        hasAtLeastOneInvoice
                     });
                 } else {
                     for (let j = 0; j < invoiceCustomer.length; j++) {
@@ -271,7 +269,7 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
 
                             for (let x = 0; x < customers[i]?.idCompteur?.length; x++) {
                                 const idCompteur = customers[i]?.idCompteur[x];
-    
+
                                 if (element1 !== idCompteur) {
                                     let index = results.findIndex(x => x.user === customers[i]);
                                     if (index > -1) {
@@ -283,7 +281,8 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
                                     } else {
                                         results.push({
                                             user: customers[i],
-                                            idCompteur: [idCompteur]
+                                            idCompteur: [idCompteur],
+                                            hasAtLeastOneInvoice
                                         });
                                     }
                                 }
@@ -405,7 +404,7 @@ const getOneInvoiceByYear = catchAsync((req, res) => {
         })
 })
 
-const getFactureAdvance = catchAsync(async(req, res) => {
+const getFactureAdvance = catchAsync(async (req, res) => {
     let EndFactureAdvance = []
     await Facture
         .find()
@@ -425,11 +424,11 @@ const getFactureAdvance = catchAsync(async(req, res) => {
         })
 })
 
-const updateFacture = catchAsync(async(req, res) => {
+const updateFacture = catchAsync(async (req, res) => {
     const idFacture = req.params.idFacture
     console.log(idFacture);
     const token = authorization(req)
-    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
             console.log(err);
         } else {
@@ -439,7 +438,7 @@ const updateFacture = catchAsync(async(req, res) => {
             const montantVerse = req.body.montantVerse;
             const dateReleveNewIndex = req.body.dateReleveOldIndex;
             await Admin.findById(decodedToken.id)
-                .then(async(res) => {
+                .then(async (res) => {
                     if (res) {
                         const consommation = newIndex - oldIndex
                         const static = await StaticInf.find().sort({ createdAt: 1 })
@@ -462,7 +461,7 @@ const updateFacture = catchAsync(async(req, res) => {
     })
 })
 
-const statusPaidFacture = catchAsync(async(req, res) => {
+const statusPaidFacture = catchAsync(async (req, res) => {
     const idFacture = req.params.idFacture
     let status = false
     const amount = req.body.amount
@@ -503,7 +502,7 @@ const statusPaidFacture = catchAsync(async(req, res) => {
         })
 })
 
-const getByStatus = catchAsync(async(req, res) => {
+const getByStatus = catchAsync(async (req, res) => {
     const status = req.params.status
     await Facture
         .find({ facturePay: status })
@@ -514,6 +513,15 @@ const getByStatus = catchAsync(async(req, res) => {
             } else {
                 res.status(500).json({ status: 500, error: "I don't see a facture with this status" })
             }
+        })
+})
+
+const removeInvoice = catchAsync(async (req, res) => {
+    const idInvoice = req.params?.idInvoice
+    await Facture
+        .remove({ _id: ObjectId(idInvoice) })
+        .then(val => {
+            res.status(200).json({ status: 200, result: "Removal successfully completed" })
         })
 })
 
@@ -536,5 +544,6 @@ module.exports = {
     haveInvoice,
     preCreate,
 
+    removeInvoice,
     getUserThatHaveNotPaidInvoiceWithDate
 }

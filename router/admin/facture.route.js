@@ -52,7 +52,7 @@ const router = express.Router()
  *                  description: Error while the get all the facture
  */
 router
-    .route('/:year/:month/:limit/:page')
+    .route('/:year?/:month?/:limit?/:page?')
     .get(tokenVerifieAdmin, validate(FactureValidation.getFactures), FactureController.getFactures);
 
 
@@ -70,7 +70,7 @@ router
  *                  description: Error during the get
  */
 router
-    .route('/')
+    .route('/all')
     .get(tokenVerifieAdmin, FactureController.getAllFacture);
 
 
@@ -545,5 +545,27 @@ router
  router
     .route('/userThatHaveNotPaidInvoiceWithDate/:date')
     .get(tokenVerifieAdmin, validate(FactureValidation.getUserThatHaveNotPaidInvoiceWithDate), FactureController.getUserThatHaveNotPaidInvoiceWithDate)
+
+
+/**
+ * @swagger
+ *  /admin/facture/userThatHaveNotPaidInvoiceWithDate/{date}:
+ *      get:
+ *          summary: Delete invoice to bd
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: idInvoice
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: Date
+ *          responses: 
+ *              200:
+ *                  description: remove facture
+ */
+router
+    .route('/remove/:idInvoice')
+    .get(tokenVerifieAdmin, validate(FactureValidation.removeInvoice), FactureController.removeInvoice)
 
 module.exports = router

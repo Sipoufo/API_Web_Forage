@@ -119,6 +119,12 @@ const getUserThatHaveNotPaidInvoiceWithDate = {
     })
 }
 
+const removeInvoice = {
+    params: Joi.object().keys({
+        idInvoice: Joi.string().required(),
+    })
+}
+
 const getClientFactures = {
     params: Joi.object().keys({
         idClient: Joi.custom(objectId).required()
@@ -141,5 +147,6 @@ module.exports = {
     preCreate,
     removePenalty,
 
+    removeInvoice,
     getUserThatHaveNotPaidInvoiceWithDate
 }

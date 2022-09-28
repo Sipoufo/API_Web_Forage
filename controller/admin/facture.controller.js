@@ -249,12 +249,16 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
 
                 let invoiceCustomer = await Facture.aggregate([
                     {
-                        $project: { _id: 1, client: '$idClient', month: { $month: '$dateReleveNewIndex' }, year: { $year: '$dateReleveNewIndex' }, idCompteur: customers[i]["idCompteur"] }
+                        $project: { _id: 1, client: '$idClient', month: { $month: '$dateReleveNewIndex' }, year: { $year: '$dateReleveNewIndex' }, idCompteur: 1}
                     },
                     {
                         $match: { month: dateUnpaidMonth, year: dateUnpaidYear, client: customers[i]["_id"] }
                     }
                 ]);
+
+                console.log('invoice user', invoiceCustomer);
+                console.log('\n');
+
                 if (invoiceCustomer.length == 0) {
                     results.push({
                         user: customers[i],
@@ -262,30 +266,27 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
                         hasAtLeastOneInvoice
                     });
                 } else {
+                    //if user has bill
                     for (let j = 0; j < invoiceCustomer.length; j++) {
-                        const element = invoiceCustomer[j];
+                        const element = invoiceCustomer[j]; //je recupère une facture
 
-                        for (let k = 0; k < element?.idCompteur?.length; k++) {
-                            const element1 = element?.idCompteur[k];
+                        for (let x = 0; x < customers[i]?.idCompteur?.length; x++) {
+                            const idCompteur = customers[i]?.idCompteur[x];
 
-                            for (let x = 0; x < customers[i]?.idCompteur?.length; x++) {
-                                const idCompteur = customers[i]?.idCompteur[x];
-
-                                if (element1 !== idCompteur) {
-                                    let index = results.findIndex(x => x.user === customers[i]);
-                                    if (index > -1) {
-                                        let counters = results[index];
-                                        counters.idCompteur?.push(
-                                            idCompteur
-                                        )
-                                        results.splice(index, 1, counters);
-                                    } else {
-                                        results.push({
-                                            user: customers[i],
-                                            idCompteur: [idCompteur],
-                                            hasAtLeastOneInvoice
-                                        });
-                                    }
+                            if (element?.idCompteur !== idCompteur) {
+                                let index = results.length > 0 ? results.findIndex(x => x.user === customers[i]) : -1;
+                                if (index > -1) {
+                                    let counters = results[index];
+                                    counters.idCompteur?.push(
+                                        idCompteur
+                                    )
+                                    results.splice(index, 1, counters);
+                                } else {
+                                    results.push({
+                                        user: customers[i],
+                                        idCompteur: [idCompteur],
+                                        hasAtLeastOneInvoice
+                                    });
                                 }
                             }
                         }

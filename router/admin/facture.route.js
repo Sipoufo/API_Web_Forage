@@ -567,7 +567,7 @@ router
 
 /**
  * @swagger
- *  /admin/facture/userThatHaveNotPaidInvoiceWithDate/{date}:
+ *  /admin/facture/remove/{idInvoice}:
  *      get:
  *          summary: Delete invoice to bd
  *          tags: [Facture_Admin]
@@ -577,13 +577,12 @@ router
  *                  schema: 
  *                      type: string
  *                  required: true
- *                  description: Date
  *          responses: 
  *              200:
  *                  description: remove facture
  */
  router
  .route('/remove/:idInvoice')
- .get(tokenVerifieAdmin, validate(FactureValidation.removeInvoice), FactureController.removeInvoice)
+ .delete(tokenVerifieAdmin, validate(FactureValidation.removeInvoice), FactureController.removeInvoice)
 
 module.exports = router

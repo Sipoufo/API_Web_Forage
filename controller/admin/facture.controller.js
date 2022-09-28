@@ -2,6 +2,7 @@ const catchAsync = require('../../utils/catchAsync');
 const { Admin, Facture, Client, StaticInf } = require('../../models/index');
 const {  } = require('../../models/index');
 const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose');
 
 const authorization = (req) => {
     return req.headers.authorization.split(" ")[1]
@@ -520,7 +521,7 @@ const getByStatus = catchAsync(async(req, res) => {
 const removeInvoice = catchAsync(async (req, res) => {
     const idInvoice = req.params?.idInvoice
     await Facture
-        .remove({ _id: ObjectId(idInvoice) })
+        .deleteOne({ _id: mongoose.Types.ObjectId("" + idInvoice) })
         .then(val => {
             res.status(200).json({ status: 200, result: "Removal successfully completed" })
         })

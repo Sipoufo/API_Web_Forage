@@ -517,6 +517,15 @@ const getByStatus = catchAsync(async(req, res) => {
         })
 })
 
+const removeInvoice = catchAsync(async (req, res) => {
+    const idInvoice = req.params?.idInvoice
+    await Facture
+        .remove({ _id: ObjectId(idInvoice) })
+        .then(val => {
+            res.status(200).json({ status: 200, result: "Removal successfully completed" })
+        })
+})
+
 
 module.exports = {
     addFacture,
@@ -536,5 +545,6 @@ module.exports = {
     haveInvoice,
     preCreate,
 
+    removeInvoice,
     getUserThatHaveNotPaidInvoiceWithDate
 }

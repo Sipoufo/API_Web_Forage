@@ -55,6 +55,24 @@ router
     .route('/:year/:month/:limit/:page')
     .get(tokenVerifieAdmin, validate(FactureValidation.getFactures), FactureController.getFactures);
 
+    
+//  get all facture advance
+/**
+ * @swagger
+ *  /admin/facture/:
+ *      get:
+ *          summary: get all facture without params
+ *          tags: [Facture_Admin]
+ *          responses: 
+ *              200:
+ *                  description: get advance facture save in the bd
+ *              500:
+ *                  description: Error during the get
+ */
+router
+.route('/')
+.get(tokenVerifieAdmin, FactureController.getFactures);
+
 
 //  get all facture advance
 /**
@@ -70,7 +88,7 @@ router
  *                  description: Error during the get
  */
 router
-    .route('/')
+    .route('/all')
     .get(tokenVerifieAdmin, FactureController.getAllFacture);
 
 
@@ -545,5 +563,27 @@ router
  router
     .route('/userThatHaveNotPaidInvoiceWithDate/:date')
     .get(tokenVerifieAdmin, validate(FactureValidation.getUserThatHaveNotPaidInvoiceWithDate), FactureController.getUserThatHaveNotPaidInvoiceWithDate)
+
+
+/**
+ * @swagger
+ *  /admin/facture/userThatHaveNotPaidInvoiceWithDate/{date}:
+ *      get:
+ *          summary: Delete invoice to bd
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: idInvoice
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: Date
+ *          responses: 
+ *              200:
+ *                  description: remove facture
+ */
+ router
+ .route('/remove/:idInvoice')
+ .get(tokenVerifieAdmin, validate(FactureValidation.removeInvoice), FactureController.removeInvoice)
 
 module.exports = router

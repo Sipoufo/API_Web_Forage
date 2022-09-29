@@ -33,7 +33,7 @@ const addFacture = catchAsync(async(req, res) => {
             let idFacturePre = null
             console.log(idClient);
             await Facture
-                .find({ idClient })
+                .find({ idClient, idCompteur})
                 .sort({ dateReleveNewIndex: -1 })
                 .then(async factures => {
                     if (factures.length > 0) {
@@ -57,6 +57,7 @@ const addFacture = catchAsync(async(req, res) => {
                         oldIndex = factures[0].newIndex;
                         surplus = factures[0].surplus
                     }
+
                     if (doFacture == true && isprecreate == false) {
                         console.log("Step 2");
                         await Admin.findById(decodedToken.id)
@@ -257,9 +258,6 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
                     }
                 ]);
 
-                console.log('invoice user', invoiceCustomer);
-                console.log('\n');
-
                 if (invoiceCustomer.length == 0) {
                     results.push({
                         user: customers[i],
@@ -268,26 +266,28 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
                     });
                 } else {
                     //if user has bill
-                    for (let j = 0; j < invoiceCustomer.length; j++) {
-                        const element = invoiceCustomer[j]; //je recupère une facture
-
-                        for (let x = 0; x < customers[i]?.idCompteur?.length; x++) {
-                            const idCompteur = customers[i]?.idCompteur[x];
-
-                            if (element?.idCompteur !== idCompteur) {
-                                let index = results.length > 0 ? results.findIndex(x => x.user === customers[i]) : -1;
-                                if (index > -1) {
-                                    let counters = results[index];
-                                    counters.idCompteur?.push(
-                                        idCompteur
-                                    )
-                                    results.splice(index, 1, counters);
-                                } else {
-                                    results.push({
-                                        user: customers[i],
-                                        idCompteur: [idCompteur],
-                                        hasAtLeastOneInvoice
-                                    });
+                    if (invoiceCustomer.length !== customers[i]?.idCompteur.length && invoiceCustomer.length < customers[i]?.idCompteur.length) {
+                        for (let j = 0; j < invoiceCustomer.length; j++) {
+                            const element = invoiceCustomer[j]; //je recupère une facture
+    
+                            for (let x = 0; x < customers[i]?.idCompteur?.length; x++) {
+                                const idCompteur = customers[i]?.idCompteur[x];
+    
+                                if (element?.idCompteur !== idCompteur) {
+                                    let index = results.length > 0 ? results.findIndex(x => x.user === customers[i]) : -1;
+                                    if (index > -1) {
+                                        let counters = results[index];
+                                        counters.idCompteur?.push(
+                                            idCompteur
+                                        )
+                                        results.splice(index, 1, counters);
+                                    } else {
+                                        results.push({
+                                            user: customers[i],
+                                            idCompteur: [idCompteur],
+                                            hasAtLeastOneInvoice
+                                        });
+                                    }
                                 }
                             }
                         }
@@ -297,6 +297,7 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
             res.status(200).json({ status: 200, result: results })
         })
 })
+
 
 const getStaticInformation = catchAsync((req, res) => {
     const staticInf = []

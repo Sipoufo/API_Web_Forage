@@ -57,8 +57,6 @@ const updateFacture = {
     }),
     body: Joi.object().keys({
         newIndex: Joi.number().required(),
-        observation: Joi.string(),
-        penalite: Joi.number(),
         montantVerse: Joi.number().required(),
         dateReleveNewIndex: Joi.date().required(),
     })

@@ -552,9 +552,8 @@ const updateFacture = catchAsync(async (req, res) => {
 
       const newIndex = req.body.newIndex;
       const montantVerse = req.body.montantVerse;
-      const dateReleveNewIndex = new Date(req.body.dateReleveNewIndex);
-      await Admin.findById(decodedToken.id).then(async (res) => {
-        if (res) {
+      await Admin.findById(decodedToken.id).then(async (resul) => {
+        if (resul) {
           let idInvoice = mongoose.Types.ObjectId("" + idFacture);
           const bill = await Facture.findById({_id: idInvoice});
           let penality = 0;
@@ -582,7 +581,7 @@ const updateFacture = catchAsync(async (req, res) => {
           await Facture.findByIdAndUpdate(idInvoice, {
             newIndex,
             montantVerse,
-            // dateReleveNewIndex,
+            date,
             consommation,
             montantConsommation,
             montantImpaye,

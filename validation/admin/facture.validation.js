@@ -58,7 +58,7 @@ const updateFacture = {
     body: Joi.object().keys({
         newIndex: Joi.number().required(),
         montantVerse: Joi.number().required(),
-        dateReleveNewIndex: Joi.date().required(),
+        dateReleveNewIndex: Joi.string().required(),
     })
 }
 
@@ -80,6 +80,14 @@ const statusPaidFacture = {
 const getByStatus = {
     params: Joi.object().keys({
         status: Joi.boolean().required(),
+    }),
+}
+
+const getByStatusWithPagination = {
+    params: Joi.object().keys({
+        status: Joi.boolean().required(),
+        limit: Joi.number(),
+        page: Joi.number(),
     }),
 }
 
@@ -129,6 +137,20 @@ const removeInvoice = {
     })
 }
 
+const searchInvoice = {
+    params: Joi.object().keys({
+        page: Joi.number(),
+        limit: Joi.number(),
+    }),
+    body: Joi.object().keys({
+        month: Joi.number(),
+        consumption: Joi.number(),
+        year: Joi.number(),
+        username: Joi.string(),
+        type: Joi.string().required()
+    }),
+}
+
 module.exports = {
     addFacture,
     updateFacture,
@@ -145,6 +167,8 @@ module.exports = {
     preCreate,
     removePenalty,
 
+    searchInvoice,
     removeInvoice,
+    getByStatusWithPagination,
     getUserThatHaveNotPaidInvoiceWithDate
 }

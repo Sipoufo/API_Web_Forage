@@ -261,6 +261,9 @@ router
     .route('/invoicePreCreate/:idClient')
     .post(tokenVerifie, validate(FactureValidation.preCreate), FactureController.preCreate);
 
+router
+    .route('/:status/:page/:limit')
+    .get(tokenVerifieAdmin, validate(FactureValidation.getByStatusWithPagination), FactureController.getByStatusWithPagination)
 
 
 // all facture by status
@@ -286,6 +289,7 @@ router
 router
     .route('/getByStatus/:status')
     .get(tokenVerifieAdmin, validate(FactureValidation.getByStatus), FactureController.getByStatus)
+
 
 /**
  * @swagger
@@ -584,5 +588,10 @@ router
  router
  .route('/remove/:idInvoice')
  .delete(tokenVerifieAdmin, validate(FactureValidation.removeInvoice), FactureController.removeInvoice)
+
+
+ router
+ .route('/search/:page/:limit')
+ .post(tokenVerifieAdmin, validate(FactureValidation.searchInvoice), FactureController.searchInvoice)
 
 module.exports = router

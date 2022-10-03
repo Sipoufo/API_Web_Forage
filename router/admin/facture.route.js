@@ -52,26 +52,8 @@ const router = express.Router()
  *                  description: Error while the get all the facture
  */
 router
-    .route('/:year/:month/:limit/:page')
+    .route('/all/:year/:month/:limit/:page')
     .get(tokenVerifieAdmin, validate(FactureValidation.getFactures), FactureController.getFactures);
-
-    
-//  get all facture advance
-/**
- * @swagger
- *  /admin/facture/:
- *      get:
- *          summary: get all facture without params
- *          tags: [Facture_Admin]
- *          responses: 
- *              200:
- *                  description: get advance facture save in the bd
- *              500:
- *                  description: Error during the get
- */
-router
-.route('/')
-.get(tokenVerifieAdmin, FactureController.getFactures);
 
 
 //  get all facture advance
@@ -262,7 +244,7 @@ router
     .post(tokenVerifie, validate(FactureValidation.preCreate), FactureController.preCreate);
 
 router
-    .route('/:status/:page/:limit')
+    .route('/getByStatusWithPagination/:status/:page/:limit')
     .get(tokenVerifieAdmin, validate(FactureValidation.getByStatusWithPagination), FactureController.getByStatusWithPagination)
 
 

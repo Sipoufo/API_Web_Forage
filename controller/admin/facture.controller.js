@@ -543,21 +543,16 @@ const updateFacture = catchAsync(async (req, res) => {
       console.log(err);
     } else {
       const [day, month, year] = req.body.dateReleveNewIndex.split('-')
-      console.log('month : ', month);
-      console.log('day : ', day);
-      console.log('year : ', year);
-
       const date = new Date(year, month - 1, day);
-      console.log('date : ', date);
-
       const newIndex = req.body.newIndex;
       const montantVerse = req.body.montantVerse;
+
       await Admin.findById(decodedToken.id).then(async (resul) => {
         if (resul) {
           let idInvoice = mongoose.Types.ObjectId("" + idFacture);
           const bill = await Facture.findById({_id: idInvoice});
           let penality = 0;
-          console.log('update 1');
+
           if (bill?.penalty && bill?.penalty?.length > 0) {
             let penalties = new Array();
             penalties = bill?.penalty;
@@ -567,8 +562,6 @@ const updateFacture = catchAsync(async (req, res) => {
             );
           }
 
-          console.log('update 2 : ', penality);
-
           const consommation = newIndex - bill?.oldIndex;
           const static = await StaticInf.find().sort({ createdAt: 1 });
           const prixUnitaire = static[0].prixUnitaire;
@@ -576,12 +569,11 @@ const updateFacture = catchAsync(async (req, res) => {
           const montantConsommation =
             consommation * prixUnitaire + fraisEntretien + penality;
           const montantImpaye = montantConsommation - montantVerse;
-          console.log('update 3 : ', montantConsommation);
 
           await Facture.findByIdAndUpdate(idInvoice, {
             newIndex,
             montantVerse,
-            date,
+            dateReleveNewIndex:date,
             consommation,
             montantConsommation,
             montantImpaye,
@@ -729,10 +721,10 @@ const searchInvoice = catchAsync(async (req, res) => {
   let invoices = [];
 
   if(username && username !== " ") {
-    client = await Client.find({ name: username });
+    client = await Client.findOne({ name: username });
     idClient = client?._id;
   }
-
+  console.log('client:', client);
   let factures = await Facture.find().sort({ createdAt: 1 });
   if (factures.length > 0) {
     for (let i = 0; i < factures.length; i++) {
@@ -750,13 +742,13 @@ const searchInvoice = catchAsync(async (req, res) => {
 
       if(month && month !== 0) {
         if (invoice && invoice !== null) {
-          const monthFacture = invoice.createdAt.getFullMonth();
+          const monthFacture = invoice.createdAt.getMonth() + 1;
           if (monthFacture !== month) {
             invoice = null;
             conform = "month";
           }
         } else {
-          const monthFacture = factures[i].createdAt.getFullMonth();
+          const monthFacture = factures[i].createdAt.getMonth() + 1;
           if (monthFacture == month) {
             invoice=factures[i];
             conform = "month";
@@ -822,6 +814,19 @@ const searchInvoice = catchAsync(async (req, res) => {
               user: client
             });
           }
+        }
+      }
+
+      if (invoice == null && conform === "start check") {
+        if(type && type !== " " && type === "all") {
+          let id = mongoose.Types.ObjectId("" + factures[i].idClient);
+          console.log('id', id);
+          client = await Client.findById({_id: id});
+
+          invoices.push({
+            invoice:factures[i],
+            user: client
+          });
         }
       }
     }

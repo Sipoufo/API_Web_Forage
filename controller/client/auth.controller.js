@@ -22,45 +22,114 @@ const register = catchAsync(async(req, res) => {
     const profileImage = req.body.profileImage
     const idCompteur = req.body.idCompteur;
     const password = req.body.password;
-    const longitude = (req.body.longitude) ? req.body.longitude : null
-    const latitude = (req.body.latitude) ? req.body.longitude : null
+    let error = '';
 
-    return Admin.findOne({ phone })
-        .then(admin => {
-            if (!admin) {
-                return Client.findOne({ phone })
-                    .then(async number => {
-                        if (!number) {
-                            const client = {
-                                name,
-                                password,
-                                phone,
-                                description,
-                                subscriptionDate,
-                                subscriptionAmount,
-                                customerReference,
-                                observation,
-                                localisation: { longitude, latitude, description },
-                                profileImage,
-                                idCompteur,
-                            }
-
-                            const result = await Client.create(client)
-                            if (result) {
-                                res.status(200).json({ status: 200, result: result })
-                            } else {
-                                res.status(500).json({ status: 500, error: "Error during the save" })
-                            }
-                        } else {
-                            console.log()
-                            res.status(500).json({ status: 500, error: "this number exist <-_->" })
-                        }
-                    })
-            } else {
-                res.status(500).json({ status: 500, error: "This phone existe" })
+    if (phone.length > 0) {
+        for (let index = 0; index < phone.length; index++) {
+            const element = phone[index];
+            if (error === '') {
+                const admins = await Admin.find({ phone: element });
+                console.log(admins);
+                if (admins.length <= 0) {
+                    let client = await Client.find({ phone: element });
+                    if (client.length > 0) {
+                        error = "User with this phone exist";
+                    }
+                } else {
+                    error = "Admin with this phone exist";
+                }
             }
-        })
+        }
 
+        if (error === '') {
+            return Client.findOne({ customerReference }).then(async result => {
+                if (!result) {
+                    let client = {};
+
+                    if (name && name !== '') {
+                        client = {
+                            name
+                        }
+                    }
+
+                    if (password && password !== 'not') {
+                        client = {
+                            ...client,
+                            password
+                        }
+                    }
+
+                    if (phone) {
+                        client = {
+                            ...client,
+                            phone
+                        }
+                    }
+
+                    if (description) {
+                        client = {
+                            ...client,
+                            description
+                        }
+                    }
+
+                    if (subscriptionDate && subscriptionDate !== 'not') {
+                        client = {
+                            ...client,
+                            subscriptionDate
+                        }
+                    }
+
+                    if (subscriptionAmount && subscriptionAmount !== 0) {
+                        client = {
+                            ...client,
+                            subscriptionAmount
+                        }
+                    }
+
+                    if (customerReference && customerReference !== 0) {
+                        client = {
+                            ...client,
+                            customerReference
+                        }
+                    }
+
+                    if (observation && observation !== 'not') {
+                        client = {
+                            ...client,
+                            observation
+                        }
+                    }
+
+                    if (profileImage && profileImage !== '') {
+                        client = {
+                            ...client,
+                            profileImage
+                        }
+                    }
+
+                    if (idCompteur) {
+                        client = {
+                            ...client,
+                            idCompteur
+                        }
+                    }
+                    const result = await Client.create(client)
+                    if (result) {
+                        res.status(200).json({ status: 200, result: result })
+                    } else {
+                        res.status(500).json({ status: 500, error: "Error during the save" })
+                    }
+                } else {
+                    res.status(500).json({ status: 500, error: "user with this id reference exist <-_->" })
+                }
+            });
+        } else {
+         res.status(500).json({ status: 500, error });
+        }
+    } else {
+         res.status(500).json({ status: 500, error: 'Please add phone number' });
+    }
 })
 
 const update = catchAsync(async(req, res) => {
@@ -75,30 +144,78 @@ const update = catchAsync(async(req, res) => {
     const observation = req.body.observation;
     const profileImage = req.body.profileImage
     const idCompteur = req.body.idCompteur;
-    const longitude = (req.body.longitude) ? req.body.longitude : null
-    const latitude = (req.body.latitude) ? req.body.longitude : null
 
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
-            console.log(err);
+            console.log('token error :' , err);
         } else {
             return Admin.findOne({ phone })
                 .then(async admin => {
                     if (!admin) {
                         const user = await Client.findOne({ phone });
                         if ((user && user._id == decodedToken.id) || !user) {
-                            const client = {
-                                name,
-                                password: user.password,
-                                phone,
-                                description,
-                                subscriptionDate,
-                                subscriptionAmount,
-                                customerReference,
-                                observation,
-                                localisation: { longitude, latitude, description },
-                                profileImage,
-                                idCompteur,
+                            let client = {};
+
+                            if (name && name !== '') {
+                                client = {
+                                    name
+                                }
+                            }
+
+                            if (phone) {
+                                client = {
+                                    ...client,
+                                    phone
+                                }
+                            }
+
+                            if (description) {
+                                client = {
+                                    ...client,
+                                    description
+                                }
+                            }
+
+                            if (subscriptionDate && subscriptionDate !== 'not') {
+                                client = {
+                                    ...client,
+                                    subscriptionDate
+                                }
+                            }
+
+                            if (subscriptionAmount && subscriptionAmount !== 0) {
+                                client = {
+                                    ...client,
+                                    subscriptionAmount
+                                }
+                            }
+
+                            if (customerReference && customerReference !== 0) {
+                                client = {
+                                    ...client,
+                                    customerReference
+                                }
+                            }
+
+                            if (observation && observation !== 'not') {
+                                client = {
+                                    ...client,
+                                    observation
+                                }
+                            }
+
+                            if (profileImage && profileImage !== '') {
+                                client = {
+                                    ...client,
+                                    profileImage
+                                }
+                            }
+
+                            if (idCompteur) {
+                                client = {
+                                    ...client,
+                                    idCompteur
+                                }
                             }
                             const result = await Client.findByIdAndUpdate(decodedToken.id, checkField(user, client));
                                 if (result) {
@@ -107,7 +224,6 @@ const update = catchAsync(async(req, res) => {
                                     res.status(500).json({ status: 500, error: "Error during the save" });
                                 }
                         } else {
-                            console.log();
                             res.status(500).json({ status: 500, error: "this number exist <-_->" });
                         }
                     } else {
@@ -120,16 +236,16 @@ const update = catchAsync(async(req, res) => {
 
 const checkField = (clientOnBD, newInfoUser) => {
     const client = {
-        name: (newInfoUser?.name) ? (newInfoUser?.name): clientOnBD?.name,
-        password: (newInfoUser?.password) ? (newInfoUser?.password): clientOnBD?.password,
+        name: (newInfoUser?.name && newInfoUser?.name !== '') ? (newInfoUser?.name): clientOnBD?.name,
+        password: (newInfoUser?.password && newInfoUser?.password !== 'not') ? (newInfoUser?.password): clientOnBD?.password,
         phone: (newInfoUser?.phone) ? (newInfoUser?.phone): clientOnBD?.phone,
         description: (newInfoUser?.description) ? (newInfoUser?.description): clientOnBD?.description,
-        subscriptionDate: (newInfoUser?.subscriptionDate) ? (newInfoUser?.subscriptionDate): clientOnBD?.subscriptionDate,
-        subscriptionAmount: (newInfoUser?.subscriptionAmount) ? (newInfoUser?.subscriptionAmount): clientOnBD?.subscriptionAmount,
-        customerReference: (newInfoUser?.customerReference) ? (newInfoUser?.customerReference): clientOnBD?.customerReference,
-        observation: (newInfoUser?.observation) ? (newInfoUser?.observation): clientOnBD?.observation,
-        profileImage: (newInfoUser?.profileImage) ? (newInfoUser?.profileImage): clientOnBD?.profileImage,
-        idCompteur: (newInfoUser?.idCompteur) ? (newInfoUser?.idCompteur): clientOnBD?.idCompteur,
+        subscriptionDate: (newInfoUser?.subscriptionDate && newInfoUser?.subscriptionDate !== 'not') ? (newInfoUser?.subscriptionDate): clientOnBD?.subscriptionDate,
+        subscriptionAmount: (newInfoUser?.subscriptionAmount && newInfoUser?.subscriptionAmount !== 0) ? (newInfoUser?.subscriptionAmount): clientOnBD?.subscriptionAmount,
+        customerReference: (newInfoUser?.customerReference && newInfoUser?.customerReference !== 0) ? (newInfoUser?.customerReference): clientOnBD?.customerReference,
+        observation: (newInfoUser?.observation && newInfoUser?.observation !== 'not') ? (newInfoUser?.observation): clientOnBD?.observation,
+        profileImage: (newInfoUser?.profileImage && newInfoUser?.profileImage !== '') ? (newInfoUser?.profileImage): clientOnBD?.profileImage,
+        idCompteur: (newInfoUser?.idCompteur && newInfoUser?.idCompteur !== '') ? (newInfoUser?.idCompteur): clientOnBD?.idCompteur,
         localisation: { 
             longitude: (newInfoUser?.longitude) ? (newInfoUser?.longitude): clientOnBD?.longitude,
              latitude:(newInfoUser?.latitude) ? (newInfoUser?.latitude): clientOnBD?.latitude,
@@ -144,7 +260,7 @@ const updatePassword = catchAsync((req, res) => {
     const newPassword = req.body.newPassword
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
-            console.log(err);
+            console.log('token error :' , err);
         } else {
             await Client
                 .findById(decodedToken.id)
@@ -183,28 +299,75 @@ const updateById = catchAsync(async(req, res) => {
     const observation = req.body.observation;
     const profileImage = req.body.profileImage
     const idCompteur = req.body.idCompteur;
-    const password = req.body.password;
-    const longitude = (req.body.longitude) ? req.body.longitude : null
-    const latitude = (req.body.latitude) ? req.body.longitude : null
 
     return Admin.findOne({ phone })
         .then(async admin => {
             if (!admin) {
                 const user = await Client.findOne({ phone });
                 if ((user && user._id == idClient) || !user) {
-                    const client = {
-                        name,
-                        password: user.password,
-                        phone,
-                        description,
-                        subscriptionDate,
-                        subscriptionAmount,
-                        customerReference,
-                        observation,
-                        localisation: { longitude, latitude, description },
-                        profileImage,
-                        idCompteur,
-                    }
+                    let client = {};
+
+                            if (name && name !== 'not') {
+                                client = {
+                                    name
+                                }
+                            }
+
+                            if (phone) {
+                                client = {
+                                    ...client,
+                                    phone
+                                }
+                            }
+
+                            if (description) {
+                                client = {
+                                    ...client,
+                                    description
+                                }
+                            }
+
+                            if (subscriptionDate && subscriptionDate !== 'not') {
+                                client = {
+                                    ...client,
+                                    subscriptionDate
+                                }
+                            }
+
+                            if (subscriptionAmount && subscriptionAmount !== 0) {
+                                client = {
+                                    ...client,
+                                    subscriptionAmount
+                                }
+                            }
+
+                            if (customerReference && customerReference !== 0) {
+                                client = {
+                                    ...client,
+                                    customerReference
+                                }
+                            }
+
+                            if (observation && observation !== 'not') {
+                                client = {
+                                    ...client,
+                                    observation
+                                }
+                            }
+
+                            if (profileImage && profileImage !== '') {
+                                client = {
+                                    ...client,
+                                    profileImage
+                                }
+                            }
+
+                            if (idCompteur) {
+                                client = {
+                                    ...client,
+                                    idCompteur
+                                }
+                            }
                     const result = await Client.findByIdAndUpdate(idClient, checkField(user, client));
                         if (result) {
                             res.status(200).json({ status: 200, result: result });
@@ -212,7 +375,7 @@ const updateById = catchAsync(async(req, res) => {
                             res.status(500).json({ status: 500, error: "Error during the save" });
                         }
                 } else {
-                    console.log();
+                    
                     res.status(500).json({ status: 500, error: "this number exist <-_->" });
                 }
             } else {
@@ -231,7 +394,6 @@ const getOneClient = catchAsync(async(req, res) => {
     return Client
         .findById(id)
         .then(response => {
-            console.log(id);
             if (response) {
                 res.status(200).json({ status: 200, result: response });
             } else {
@@ -239,7 +401,6 @@ const getOneClient = catchAsync(async(req, res) => {
             }
         })
         .catch(err => {
-            console.log(err)
             res.status(500).json({ status: 500, error: "Error" })
         })
 })
@@ -249,9 +410,8 @@ const getClientByToken = catchAsync((req, res) => {
 
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
-            console.log(err);
+            console.log('token error :' , err);
         } else {
-            console.log(decodedToken.id);
             return Client
                 .findById(decodedToken.id)
                 .then(response => {
@@ -262,7 +422,6 @@ const getClientByToken = catchAsync((req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(err)
                     res.status(500).json({ status: 500, error: "Error" })
                 })
         }
@@ -272,7 +431,6 @@ const getClientByToken = catchAsync((req, res) => {
 });
 
 const dashboard = catchAsync(async(req, res) => {
-    // console.log(await bcrypt.hash("Azerty12", 8));
     const token = authorization(req);
     let numberFacturePaid = 0;
     let numberFactureInvoice = 0;
@@ -282,7 +440,7 @@ const dashboard = catchAsync(async(req, res) => {
     let factureInvoice = [];
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
-            console.log(err);
+            console.log('token error :' , err);
         } else {
             await Facture
                 .find({ idClient: decodedToken.id })
@@ -303,11 +461,10 @@ const dashboard = catchAsync(async(req, res) => {
 
 const countClient = catchAsync((req, res) => {
     const token = authorization(req)
-    console.log('count count');
 
     jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
         if (err) {
-            console.log(err);
+            console.log('token error :' , err);
         } else {
             return Client
                 .find({})
@@ -319,7 +476,6 @@ const countClient = catchAsync((req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(err)
                     res.status(500).json({ status: 500, error: "Error" })
                 })
         }

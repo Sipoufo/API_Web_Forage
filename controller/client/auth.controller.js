@@ -74,6 +74,13 @@ const register = catchAsync(async(req, res) => {
                     }
 
                     if (subscriptionDate && subscriptionDate !== 'not') {
+                        const [day, month, year] = subscriptionDate.split('-')
+                        const date = new Date(year, month - 1, day);
+                        if (date > new Date()) {
+                            res.status(500).json({ status: 500, error: "date of subscription cannot be greater than date of today" })
+                            return ;
+                        }
+
                         client = {
                             ...client,
                             subscriptionDate
@@ -149,11 +156,30 @@ const update = catchAsync(async(req, res) => {
         if (err) {
             console.log('token error :' , err);
         } else {
-            return Admin.findOne({ phone })
-                .then(async admin => {
-                    if (!admin) {
-                        const user = await Client.findOne({ phone });
-                        if ((user && user._id == decodedToken.id) || !user) {
+            if (phone.length > 0) {
+                for (let index = 0; index < phone.length; index++) {
+                    const element = phone[index];
+                    if (error === '') {
+                        const admins = await Admin.find({ phone: element });
+                        console.log(admins);
+                        if (admins.length <= 0) {
+                            let clients = await Client.find({ phone: element });
+                            if (clients.length > 0) {
+                                let client = clients[0];
+
+                                if ((client && client._id !== decodedToken.id)) {
+                                    error = "User with this phone exist";
+                                }
+                            }
+                        } else {
+                            error = "One Admin have this phone";
+                        }
+                    }
+                }
+
+                if (error === '') {
+                    return Client.findOne({ customerReference }).then(async result => {
+                        if (result && result._id === decodedToken.id) {
                             let client = {};
 
                             if (name && name !== '') {
@@ -177,6 +203,13 @@ const update = catchAsync(async(req, res) => {
                             }
 
                             if (subscriptionDate && subscriptionDate !== 'not') {
+                                const [day, month, year] = subscriptionDate.split('-')
+                                const date = new Date(year, month - 1, day);
+                                if (date > new Date()) {
+                                    res.status(500).json({ status: 500, error: "date of subscription cannot be greater than date of today" })
+                                    return ;
+                                }
+
                                 client = {
                                     ...client,
                                     subscriptionDate
@@ -217,19 +250,23 @@ const update = catchAsync(async(req, res) => {
                                     idCompteur
                                 }
                             }
-                            const result = await Client.findByIdAndUpdate(decodedToken.id, checkField(user, client));
-                                if (result) {
-                                    res.status(200).json({ status: 200, result: result });
-                                } else {
-                                    res.status(500).json({ status: 500, error: "Error during the save" });
-                                }
+                            const idUser = mongoose.Types.ObjectId("" + decodedToken.id);
+                            const result = await Client.findByIdAndUpdate({_id: idUser}, checkField(user, client));
+                            if (result) {
+                                res.status(200).json({ status: 200, result: result })
+                            } else {
+                                res.status(500).json({ status: 500, error: "Error during the update" })
+                            }
                         } else {
-                            res.status(500).json({ status: 500, error: "this number exist <-_->" });
+                            res.status(500).json({ status: 500, error: "user with this id reference exist <-_->" })
                         }
-                    } else {
-                        res.status(500).json({ status: 500, error: "One Admin have this phone" })
-                    }
-                })
+                    });
+                } else {
+                res.status(500).json({ status: 500, error });
+                }
+            } else {
+                res.status(500).json({ status: 500, error: 'Please add phone number' });
+            }
         }
     })
 })
@@ -269,7 +306,8 @@ const updatePassword = catchAsync((req, res) => {
                         const bcryptPassword = await bcrypt.hash(newPassword, 8);
                         const comparePassword = await client.isPasswordMatch(oldPassword);
                         if (comparePassword) {
-                            const update = await Client.findByIdAndUpdate(decodedToken.id, { password: bcryptPassword })
+                            const idUser = mongoose.Types.ObjectId("" + decodedToken.id);
+                            const update = await Client.findByIdAndUpdate({_id: idUser}, { password: bcryptPassword })
                             if (update) {
                                 const find = await Client.findById(decodedToken.id)
                                 res.status(200).json({ status: 200, result: find });
@@ -300,88 +338,118 @@ const updateById = catchAsync(async(req, res) => {
     const profileImage = req.body.profileImage
     const idCompteur = req.body.idCompteur;
 
-    return Admin.findOne({ phone })
-        .then(async admin => {
-            if (!admin) {
-                const user = await Client.findOne({ phone });
-                if ((user && user._id == idClient) || !user) {
-                    let client = {};
-
-                            if (name && name !== 'not') {
-                                client = {
-                                    name
-                                }
-                            }
-
-                            if (phone) {
-                                client = {
-                                    ...client,
-                                    phone
-                                }
-                            }
-
-                            if (description) {
-                                client = {
-                                    ...client,
-                                    description
-                                }
-                            }
-
-                            if (subscriptionDate && subscriptionDate !== 'not') {
-                                client = {
-                                    ...client,
-                                    subscriptionDate
-                                }
-                            }
-
-                            if (subscriptionAmount && subscriptionAmount !== 0) {
-                                client = {
-                                    ...client,
-                                    subscriptionAmount
-                                }
-                            }
-
-                            if (customerReference && customerReference !== 0) {
-                                client = {
-                                    ...client,
-                                    customerReference
-                                }
-                            }
-
-                            if (observation && observation !== 'not') {
-                                client = {
-                                    ...client,
-                                    observation
-                                }
-                            }
-
-                            if (profileImage && profileImage !== '') {
-                                client = {
-                                    ...client,
-                                    profileImage
-                                }
-                            }
-
-                            if (idCompteur) {
-                                client = {
-                                    ...client,
-                                    idCompteur
-                                }
-                            }
-                    const result = await Client.findByIdAndUpdate(idClient, checkField(user, client));
-                        if (result) {
-                            res.status(200).json({ status: 200, result: result });
-                        } else {
-                            res.status(500).json({ status: 500, error: "Error during the save" });
+    if (phone.length > 0) {
+        for (let index = 0; index < phone.length; index++) {
+            const element = phone[index];
+            if (error === '') {
+                const admins = await Admin.find({ phone: element });
+                console.log(admins);
+                if (admins.length <= 0) {
+                    let clients = await Client.find({ phone: element });
+                    if (clients.length > 0) {
+                        let client = clients[0];
+    
+                        if ((client && client._id !== idClient)) {
+                            error = "User with this phone exist";
                         }
+                    }
                 } else {
-                    
-                    res.status(500).json({ status: 500, error: "this number exist <-_->" });
+                    error = "One Admin have this phone";
                 }
-            } else {
-                res.status(500).json({ status: 500, error: "One Admin have this phone" })
             }
-        })
+        }
+    
+        if (error === '') {
+            return Client.findOne({ customerReference }).then(async result => {
+                if (result && result._id === idClient) {
+                    let client = {};
+    
+                    if (name && name !== '') {
+                        client = {
+                            name
+                        }
+                    }
+    
+                    if (phone) {
+                        client = {
+                            ...client,
+                            phone
+                        }
+                    }
+    
+                    if (description) {
+                        client = {
+                            ...client,
+                            description
+                        }
+                    }
+    
+                    if (subscriptionDate && subscriptionDate !== 'not') {
+                        const [day, month, year] = subscriptionDate.split('-')
+                        const date = new Date(year, month - 1, day);
+                        if (date > new Date()) {
+                            res.status(500).json({ status: 500, error: "date of subscription cannot be greater than date of today" })
+                            return ;
+                        }
+    
+                        client = {
+                            ...client,
+                            subscriptionDate
+                        }
+                    }
+    
+                    if (subscriptionAmount && subscriptionAmount !== 0) {
+                        client = {
+                            ...client,
+                            subscriptionAmount
+                        }
+                    }
+    
+                    if (customerReference && customerReference !== 0) {
+                        client = {
+                            ...client,
+                            customerReference
+                        }
+                    }
+    
+                    if (observation && observation !== 'not') {
+                        client = {
+                            ...client,
+                            observation
+                        }
+                    }
+    
+                    if (profileImage && profileImage !== '') {
+                        client = {
+                            ...client,
+                            profileImage
+                        }
+                    }
+    
+                    if (idCompteur) {
+                        client = {
+                            ...client,
+                            idCompteur
+                        }
+                    }
+                    const idUser = mongoose.Types.ObjectId("" + idClient);
+                    const result = await Client.findByIdAndUpdate({_id: idUser}, checkField(user, client));
+                    // const result = await Client.findByIdAndUpdate(idClient, checkField(user, client));
+                    if (result) {
+                        res.status(200).json({ status: 200, result: result })
+                    } else {
+                        res.status(500).json({ status: 500, error: "Error during the update" })
+                    }
+                } else {
+                    res.status(500).json({ status: 500, error: "user with this id reference exist <-_->" })
+                }
+            });
+        } else {
+        res.status(500).json({ status: 500, error });
+        }
+    } else {
+        res.status(500).json({ status: 500, error: 'Please add phone number' });
+    }
 })
 
 const logout = (req, res) => {

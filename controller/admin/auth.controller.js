@@ -254,18 +254,22 @@ const findClient = catchAsync((req, res) => {
         filter = data;
     }
 
-    console.log('filter', filter);
     if (req.body?.date && req.body?.date !== " ") {
-        let start = new Date(req.body?.date);
-        let end = new Date(req.body?.date);
-        start.setHours(0,0,0,0);
+        const [year, day, month] = req.body?.date.split('-')
+        const start = new Date(year + '-' + month + '-' + day);
+        const end = new Date(year + '-' + month + '-' + day);
+
+        start.setHours(0,59,59,999);
         end.setHours(23,59,59,999);
 
         let data = {
-            ...filter,
             subscriptionDate: {$gte: start, $lt: end}
         }
-        filter = data;
+        
+        filter = {
+            ...filter,
+            subscriptionDate:req.body?.date
+        };
 
         return Client
         .find(filter)

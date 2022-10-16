@@ -41,96 +41,100 @@ const register = catchAsync(async(req, res) => {
             }
         }
 
+        const size = await Client.find({}).count();
+
         if (error === '') {
-            return Client.findOne({ customerReference }).then(async result => {
-                if (!result) {
-                    let client = {};
+            let client = {
+                customerReference: (size + 1)
+            };
 
-                    if (name && name !== '') {
-                        client = {
-                            name
-                        }
-                    }
-
-                    if (password && password !== 'not') {
-                        client = {
-                            ...client,
-                            password
-                        }
-                    }
-
-                    if (phone) {
-                        client = {
-                            ...client,
-                            phone
-                        }
-                    }
-
-                    if (description) {
-                        client = {
-                            ...client,
-                            description
-                        }
-                    }
-
-                    if (subscriptionDate && subscriptionDate !== 'not') {
-                        const [day, month, year] = subscriptionDate.split('-')
-                        const date = new Date(year, month - 1, day);
-                        if (date > new Date()) {
-                            res.status(500).json({ status: 500, error: "date of subscription cannot be greater than date of today" })
-                            return ;
-                        }
-
-                        client = {
-                            ...client,
-                            subscriptionDate
-                        }
-                    }
-
-                    if (subscriptionAmount && subscriptionAmount !== 0) {
-                        client = {
-                            ...client,
-                            subscriptionAmount
-                        }
-                    }
-
-                    if (customerReference && customerReference !== 0) {
-                        client = {
-                            ...client,
-                            customerReference
-                        }
-                    }
-
-                    if (observation && observation !== 'not') {
-                        client = {
-                            ...client,
-                            observation
-                        }
-                    }
-
-                    if (profileImage && profileImage !== '') {
-                        client = {
-                            ...client,
-                            profileImage
-                        }
-                    }
-
-                    if (idCompteur) {
-                        client = {
-                            ...client,
-                            idCompteur
-                        }
-                    }
-                    const result = await Client.create(client)
-                    if (result) {
-                        res.status(200).json({ status: 200, result: result })
-                    } else {
-                        res.status(500).json({ status: 500, error: "Error during the save" })
-                    }
-                } else {
-                    res.status(500).json({ status: 500, error: "user with this id reference exist <-_->" })
+            if (name && name !== '') {
+                let data = {
+                    ...client,
+                    name
                 }
-            });
+                client = data;
+            }
+
+            if (password && password !== 'not') {
+                let data = {
+                    ...client,
+                    password
+                }
+                client = data;
+            }
+
+            if (phone) {
+                let data = {
+                    ...client,
+                    phone
+                }
+                client = data;
+            }
+
+            if (description) {
+                let data = {
+                    ...client,
+                    description
+                }
+                client = data;
+            }
+            
+            if (subscriptionDate && subscriptionDate !== 'not') {
+                const [year, day, month] = subscriptionDate.split('-')
+                const date = new Date(year, month - 1, day);
+                if (date > new Date()) {
+                    res.status(500).json({ status: 500, error: "date of subscription cannot be greater than date of today" })
+                    return ;
+                }
+
+                let data = {
+                    ...client,
+                    subscriptionDate
+                }
+                client = data;
+            }
+
+            if (subscriptionAmount && subscriptionAmount !== 0) {
+                let data = {
+                    ...client,
+                    subscriptionAmount
+                }
+                client = data;
+            }
+
+            console.log('client: ', client);
+
+            if (observation && observation !== 'not') {
+                let data = {
+                    ...client,
+                    observation
+                }
+                client = data;
+            }
+
+            if (profileImage && profileImage !== '') {
+                let data = {
+                    ...client,
+                    profileImage
+                }
+                client = data;
+            }
+
+            if (idCompteur) {
+                let data = {
+                    ...client,
+                    idCompteur
+                }
+                client = data;
+            }
+
+            const result = await Client.create(client)
+            if (result) {
+                res.status(200).json({ status: 200, result: result })
+            } else {
+                res.status(500).json({ status: 500, error: "Error during the save" })
+            }
         } else {
          res.status(500).json({ status: 500, error });
         }
@@ -203,7 +207,7 @@ const update = catchAsync(async(req, res) => {
                             }
 
                             if (subscriptionDate && subscriptionDate !== 'not') {
-                                const [day, month, year] = subscriptionDate.split('-')
+                                const [year, day, month] = subscriptionDate.split('-')
                                 const date = new Date(year, month - 1, day);
                                 if (date > new Date()) {
                                     res.status(500).json({ status: 500, error: "date of subscription cannot be greater than date of today" })
@@ -385,7 +389,7 @@ const updateById = catchAsync(async(req, res) => {
                     }
     
                     if (subscriptionDate && subscriptionDate !== 'not') {
-                        const [day, month, year] = subscriptionDate.split('-')
+                        const [year, day, month] = subscriptionDate.split('-')
                         const date = new Date(year, month - 1, day);
                         if (date > new Date()) {
                             res.status(500).json({ status: 500, error: "date of subscription cannot be greater than date of today" })

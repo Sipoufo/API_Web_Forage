@@ -238,7 +238,7 @@ const getClients = catchAsync((req, res) => {
 const findClient = catchAsync((req, res) => {
     const page = (req.params.page) ? req.params.page : 1;
     const limit = (req.params.limit) ? req.params.limit : 10;
-    
+
     let filter = {};
     if(req.body?.refId && req.body?.refId !== " " && req.body?.refId !== 0) {
         let data = {
@@ -246,6 +246,7 @@ const findClient = catchAsync((req, res) => {
         }
         filter = data;
     }
+
     if(req.body?.counterId && req.body?.counterId !== " ") {
         let data = {
             ...filter,
@@ -273,7 +274,7 @@ const findClient = catchAsync((req, res) => {
 
         return Client
         .find(filter)
-        .sort({ subscriptionDate: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
+        .sort({ name: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
         .skip(page - 1)
         .limit(limit)
         .then(response => {
@@ -287,7 +288,7 @@ const findClient = catchAsync((req, res) => {
         const offset = page - 1;
         return Client
         .find(filter)
-        .sort({ subscriptionDate: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
+        .sort({ name: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
         .skip(offset)
         .limit(limit)
         .then(clients => {

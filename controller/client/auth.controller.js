@@ -81,8 +81,13 @@ const register = catchAsync(async(req, res) => {
             }
             
             if (subscriptionDate && subscriptionDate !== 'not') {
-                const [year, day, month] = subscriptionDate.split('-')
+                const [year, month, day] = subscriptionDate.split('-')
                 const date = new Date(year, month - 1, day);
+                console.log('year: ', year);
+                console.log('day: ', day);
+                console.log('month: ', month);
+                console.log('date: ', month);
+
                 if (date > new Date()) {
                     res.status(500).json({ status: 500, error: "date of subscription cannot be greater than date of today" })
                     return ;
@@ -207,7 +212,7 @@ const update = catchAsync(async(req, res) => {
                             }
 
                             if (subscriptionDate && subscriptionDate !== 'not') {
-                                const [year, day, month] = subscriptionDate.split('-')
+                                const [year, month, day] = subscriptionDate.split('-')
                                 const date = new Date(year, month - 1, day);
                                 if (date > new Date()) {
                                     res.status(500).json({ status: 500, error: "date of subscription cannot be greater than date of today" })
@@ -389,7 +394,7 @@ const updateById = catchAsync(async(req, res) => {
                     }
     
                     if (subscriptionDate && subscriptionDate !== 'not') {
-                        const [year, day, month] = subscriptionDate.split('-')
+                        const [year, month, day] = subscriptionDate.split('-')
                         const date = new Date(year, month - 1, day);
                         if (date > new Date()) {
                             res.status(500).json({ status: 500, error: "date of subscription cannot be greater than date of today" })

@@ -544,7 +544,7 @@ const countClient = catchAsync((req, res) => {
             console.log('token error :' , err);
         } else {
             return Client
-                .find({})
+                .find({status: true})
                 .then(response => {
                     if (response) {
                         res.status(200).json({ status: 200, result: response.length });

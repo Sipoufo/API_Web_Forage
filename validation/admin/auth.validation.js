@@ -67,6 +67,7 @@ const findClient = {
         order: Joi.string(),
         refId: Joi.number(),
         counterId: Joi.string(),
+        status: Joi.string(),
     }),
 }
 

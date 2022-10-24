@@ -224,7 +224,7 @@ const logout = (req, res) => {
 
 const getClients = catchAsync((req, res) => {
     client
-        .find()
+        .find({ status: true })
         .sort({ name: 0 })
         .then(clients => {
             if (clients.length > 0) {
@@ -243,6 +243,14 @@ const findClient = catchAsync((req, res) => {
     if(req.body?.refId && req.body?.refId !== " " && req.body?.refId !== 0) {
         let data = {
             customerReference: req.body?.refId
+        }
+        filter = data;
+    }
+
+    if(req.body?.status && req.body?.status !== " ") {
+        let data = {
+            ...filter,
+            status: req.body?.status === 'block' ? false : true
         }
         filter = data;
     }
@@ -336,7 +344,7 @@ const getClientsWithPagination = catchAsync((req, res) => {
     const page = (req.params.page) ? req.params.page : 1;
     const limit = (req.params.limit) ? req.params.limit : 10;
     return Client
-        .paginate({}, { page, limit })
+        .paginate({status: true}, { page, limit })
         .then(response => {
             res.status(200).json({ status: 200, result: response });
         })

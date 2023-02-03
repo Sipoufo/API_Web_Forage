@@ -558,7 +558,6 @@ const updateFacture = catchAsync(async (req, res) => {
       const [day, month, year] = req.body.dateReleveNewIndex.split('-')
       const date = new Date(year, month - 1, day);
       const newIndex = req.body.newIndex;
-      const montantVerse = req.body.montantVerse;
 
       await Admin.findById(decodedToken.id).then(async (resul) => {
         if (resul) {
@@ -581,15 +580,12 @@ const updateFacture = catchAsync(async (req, res) => {
           const fraisEntretien = static[0].fraisEntretien;
           const montantConsommation =
             consommation * prixUnitaire + fraisEntretien + penality;
-          const montantImpaye = montantConsommation - montantVerse;
 
           await Facture.findByIdAndUpdate(idInvoice, {
             newIndex,
-            montantVerse,
             dateReleveNewIndex: date,
             consommation,
             montantConsommation,
-            montantImpaye,
           }).then((response) => {
             if (response) {
               res.status(200).json({ status: 200, result: response });

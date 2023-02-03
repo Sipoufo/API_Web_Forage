@@ -1,6 +1,7 @@
 const catchAsync = require('../../utils/catchAsync');
 const { Admin, Facture, Client } = require('../../models/index');
 const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
 
 const authorization = (req) => {
     return req.headers.authorization.split(" ")[1]
@@ -150,8 +151,9 @@ const updateAdmin = catchAsync(async (req, res) => {
 })
 
 const updateClient = catchAsync(async (req, res) => {
+    const token = authorization(req)
     const idClient = req.params.idClient
-
+    let error = '';
     const name = req.body.name
     const phone = req.body.phone
     const description = (req.body.description) ? req.body.description : null
@@ -175,8 +177,7 @@ const updateClient = catchAsync(async (req, res) => {
                             let clients = await Client.find({ phone: element });
                             if (clients.length > 0) {
                                 let client = clients[0];
-
-                                if ((client && client._id !== decodedToken.id)) {
+                                if ((client && client._id !== idClient)) {
                                     error = "User with this phone exist";
                                 }
                             }
@@ -187,8 +188,8 @@ const updateClient = catchAsync(async (req, res) => {
                 }
 
                 if (error === '') {
-                    return Client.findOne({ customerReference }).then(async result => {
-                        if (result && result._id === idClient) {
+                    return Client.findOne({ customerReference }).then(async user => {
+                        if (user && user._id + "" === idClient) {
                             let client = {};
 
                             if (name && name !== '') {
@@ -259,7 +260,9 @@ const updateClient = catchAsync(async (req, res) => {
                                     idCompteur
                                 }
                             }
-                            const idUser = mongoose.Types.ObjectId("" + decodedToken.id);
+                            console.log("client: ", client);
+
+                            const idUser = mongoose.Types.ObjectId("" + idClient);
                             const result = await Client.findByIdAndUpdate({ _id: idUser }, checkField(user, client));
                             if (result) {
                                 res.status(200).json({ status: 200, result: result })

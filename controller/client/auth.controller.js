@@ -11,9 +11,9 @@ const authorization = (req) => {
     return req.headers.authorization.split(" ")[1]
 }
 
-const register = catchAsync(async(req, res) => {
+const register = catchAsync(async (req, res) => {
     const name = req.body.name
-    const phone = req.body.phone
+    let phone = req.body.phone
     const description = (req.body.description) ? req.body.description : null
     const subscriptionDate = req.body.subscriptionDate;
     const subscriptionAmount = req.body.subscriptionAmount;
@@ -22,9 +22,24 @@ const register = catchAsync(async(req, res) => {
     const profileImage = req.body.profileImage
     const idCompteur = req.body.idCompteur;
     const password = req.body.password;
+    const hasPhoneNumber = true;
     let error = '';
 
-    if (phone.length > 0) {
+    try {
+        if (phone.length == 0) {
+            let phones = [];
+            hasPhoneNumber = false;
+            const clients = await Client.find({ hasPhoneNumber });
+
+            for (let index = 0; index < clients.length; index++) {
+                phones.push(clients[index].phone[0]);
+            }
+
+            phones = phones.sort((a, b) => a - b);
+            let tel = phones.length > 0 ? phones[phones.length] + 1 : 1;
+            phone = [tel];
+        }
+
         for (let index = 0; index < phone.length; index++) {
             const element = phone[index];
             if (error === '') {
@@ -45,7 +60,8 @@ const register = catchAsync(async(req, res) => {
 
         if (error === '') {
             let client = {
-                customerReference: (size + 1)
+                customerReference: (size + 1),
+                hasPhoneNumber
             };
 
             if (name && name !== '') {
@@ -79,18 +95,14 @@ const register = catchAsync(async(req, res) => {
                 }
                 client = data;
             }
-            
+
             if (subscriptionDate && subscriptionDate !== 'not') {
                 const [year, month, day] = subscriptionDate.split('-')
                 const date = new Date(year, month - 1, day);
-                console.log('year: ', year);
-                console.log('day: ', day);
-                console.log('month: ', month);
-                console.log('date: ', month);
 
                 if (date > new Date()) {
                     res.status(500).json({ status: 500, error: "date of subscription cannot be greater than date of today" })
-                    return ;
+                    return;
                 }
 
                 let data = {
@@ -107,8 +119,6 @@ const register = catchAsync(async(req, res) => {
                 }
                 client = data;
             }
-
-            console.log('client: ', client);
 
             if (observation && observation !== 'not') {
                 let data = {
@@ -141,14 +151,14 @@ const register = catchAsync(async(req, res) => {
                 res.status(500).json({ status: 500, error: "Error during the save" })
             }
         } else {
-         res.status(500).json({ status: 500, error });
+            res.status(500).json({ status: 500, error });
         }
-    } else {
-         res.status(500).json({ status: 500, error: 'Please add phone number' });
+    } catch (error) {
+        res.status(500).json({ status: 500, error: error.message });
     }
 })
 
-const update = catchAsync(async(req, res) => {
+const update = catchAsync(async (req, res) => {
     const token = authorization(req)
 
     const name = req.body.name
@@ -161,16 +171,15 @@ const update = catchAsync(async(req, res) => {
     const profileImage = req.body.profileImage
     const idCompteur = req.body.idCompteur;
 
-    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
-            console.log('token error :' , err);
+            console.log('token error :', err);
         } else {
             if (phone.length > 0) {
                 for (let index = 0; index < phone.length; index++) {
                     const element = phone[index];
                     if (error === '') {
                         const admins = await Admin.find({ phone: element });
-                        console.log(admins);
                         if (admins.length <= 0) {
                             let clients = await Client.find({ phone: element });
                             if (clients.length > 0) {
@@ -216,7 +225,7 @@ const update = catchAsync(async(req, res) => {
                                 const date = new Date(year, month - 1, day);
                                 if (date > new Date()) {
                                     res.status(500).json({ status: 500, error: "date of subscription cannot be greater than date of today" })
-                                    return ;
+                                    return;
                                 }
 
                                 client = {
@@ -260,7 +269,7 @@ const update = catchAsync(async(req, res) => {
                                 }
                             }
                             const idUser = mongoose.Types.ObjectId("" + decodedToken.id);
-                            const result = await Client.findByIdAndUpdate({_id: idUser}, checkField(user, client));
+                            const result = await Client.findByIdAndUpdate({ _id: idUser }, checkField(user, client));
                             if (result) {
                                 res.status(200).json({ status: 200, result: result })
                             } else {
@@ -271,7 +280,7 @@ const update = catchAsync(async(req, res) => {
                         }
                     });
                 } else {
-                res.status(500).json({ status: 500, error });
+                    res.status(500).json({ status: 500, error });
                 }
             } else {
                 res.status(500).json({ status: 500, error: 'Please add phone number' });
@@ -282,21 +291,22 @@ const update = catchAsync(async(req, res) => {
 
 const checkField = (clientOnBD, newInfoUser) => {
     const client = {
-        name: (newInfoUser?.name && newInfoUser?.name !== '') ? (newInfoUser?.name): clientOnBD?.name,
-        password: (newInfoUser?.password && newInfoUser?.password !== 'not') ? (newInfoUser?.password): clientOnBD?.password,
-        phone: (newInfoUser?.phone) ? (newInfoUser?.phone): clientOnBD?.phone,
-        description: (newInfoUser?.description) ? (newInfoUser?.description): clientOnBD?.description,
-        subscriptionDate: (newInfoUser?.subscriptionDate && newInfoUser?.subscriptionDate !== 'not') ? (newInfoUser?.subscriptionDate): clientOnBD?.subscriptionDate,
-        subscriptionAmount: (newInfoUser?.subscriptionAmount && newInfoUser?.subscriptionAmount !== 0) ? (newInfoUser?.subscriptionAmount): clientOnBD?.subscriptionAmount,
-        customerReference: (newInfoUser?.customerReference && newInfoUser?.customerReference !== 0) ? (newInfoUser?.customerReference): clientOnBD?.customerReference,
-        observation: (newInfoUser?.observation && newInfoUser?.observation !== 'not') ? (newInfoUser?.observation): clientOnBD?.observation,
-        profileImage: (newInfoUser?.profileImage && newInfoUser?.profileImage !== '') ? (newInfoUser?.profileImage): clientOnBD?.profileImage,
-        idCompteur: (newInfoUser?.idCompteur && newInfoUser?.idCompteur !== '') ? (newInfoUser?.idCompteur): clientOnBD?.idCompteur,
-        localisation: { 
-            longitude: (newInfoUser?.longitude) ? (newInfoUser?.longitude): clientOnBD?.longitude,
-             latitude:(newInfoUser?.latitude) ? (newInfoUser?.latitude): clientOnBD?.latitude,
-             description: (newInfoUser?.description) ? (newInfoUser?.description): clientOnBD?.description},
-        }
+        name: (newInfoUser?.name && newInfoUser?.name !== '') ? (newInfoUser?.name) : clientOnBD?.name,
+        password: (newInfoUser?.password && newInfoUser?.password !== 'not') ? (newInfoUser?.password) : clientOnBD?.password,
+        phone: (newInfoUser?.phone) ? (newInfoUser?.phone) : clientOnBD?.phone,
+        description: (newInfoUser?.description) ? (newInfoUser?.description) : clientOnBD?.description,
+        subscriptionDate: (newInfoUser?.subscriptionDate && newInfoUser?.subscriptionDate !== 'not') ? (newInfoUser?.subscriptionDate) : clientOnBD?.subscriptionDate,
+        subscriptionAmount: (newInfoUser?.subscriptionAmount && newInfoUser?.subscriptionAmount !== 0) ? (newInfoUser?.subscriptionAmount) : clientOnBD?.subscriptionAmount,
+        customerReference: (newInfoUser?.customerReference && newInfoUser?.customerReference !== 0) ? (newInfoUser?.customerReference) : clientOnBD?.customerReference,
+        observation: (newInfoUser?.observation && newInfoUser?.observation !== 'not') ? (newInfoUser?.observation) : clientOnBD?.observation,
+        profileImage: (newInfoUser?.profileImage && newInfoUser?.profileImage !== '') ? (newInfoUser?.profileImage) : clientOnBD?.profileImage,
+        idCompteur: (newInfoUser?.idCompteur && newInfoUser?.idCompteur !== '') ? (newInfoUser?.idCompteur) : clientOnBD?.idCompteur,
+        localisation: {
+            longitude: (newInfoUser?.longitude) ? (newInfoUser?.longitude) : clientOnBD?.longitude,
+            latitude: (newInfoUser?.latitude) ? (newInfoUser?.latitude) : clientOnBD?.latitude,
+            description: (newInfoUser?.description) ? (newInfoUser?.description) : clientOnBD?.description
+        },
+    }
     return client;
 }
 
@@ -304,9 +314,9 @@ const updatePassword = catchAsync((req, res) => {
     const token = authorization(req)
     const oldPassword = req.body.oldPassword
     const newPassword = req.body.newPassword
-    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
-            console.log('token error :' , err);
+            console.log('token error :', err);
         } else {
             await Client
                 .findById(decodedToken.id)
@@ -316,7 +326,7 @@ const updatePassword = catchAsync((req, res) => {
                         const comparePassword = await client.isPasswordMatch(oldPassword);
                         if (comparePassword) {
                             const idUser = mongoose.Types.ObjectId("" + decodedToken.id);
-                            const update = await Client.findByIdAndUpdate({_id: idUser}, { password: bcryptPassword })
+                            const update = await Client.findByIdAndUpdate({ _id: idUser }, { password: bcryptPassword })
                             if (update) {
                                 const find = await Client.findById(decodedToken.id)
                                 res.status(200).json({ status: 200, result: find });
@@ -334,9 +344,9 @@ const updatePassword = catchAsync((req, res) => {
     })
 })
 
-const updateById = catchAsync(async(req, res) => {
+const updateById = catchAsync(async (req, res) => {
     const idClient = req.params.idClient
-    
+
     const name = req.body.name
     const phone = req.body.phone
     const description = (req.body.description) ? req.body.description : null
@@ -357,7 +367,7 @@ const updateById = catchAsync(async(req, res) => {
                     let clients = await Client.find({ phone: element });
                     if (clients.length > 0) {
                         let client = clients[0];
-    
+
                         if ((client && client._id !== idClient)) {
                             error = "User with this phone exist";
                         }
@@ -367,74 +377,74 @@ const updateById = catchAsync(async(req, res) => {
                 }
             }
         }
-    
+
         if (error === '') {
             return Client.findOne({ customerReference }).then(async result => {
                 if (result && result._id === idClient) {
                     let client = {};
-    
+
                     if (name && name !== '') {
                         client = {
                             name
                         }
                     }
-    
+
                     if (phone) {
                         client = {
                             ...client,
                             phone
                         }
                     }
-    
+
                     if (description) {
                         client = {
                             ...client,
                             description
                         }
                     }
-    
+
                     if (subscriptionDate && subscriptionDate !== 'not') {
                         const [year, month, day] = subscriptionDate.split('-')
                         const date = new Date(year, month - 1, day);
                         if (date > new Date()) {
                             res.status(500).json({ status: 500, error: "date of subscription cannot be greater than date of today" })
-                            return ;
+                            return;
                         }
-    
+
                         client = {
                             ...client,
                             subscriptionDate
                         }
                     }
-    
+
                     if (subscriptionAmount && subscriptionAmount !== 0) {
                         client = {
                             ...client,
                             subscriptionAmount
                         }
                     }
-    
+
                     if (customerReference && customerReference !== 0) {
                         client = {
                             ...client,
                             customerReference
                         }
                     }
-    
+
                     if (observation && observation !== 'not') {
                         client = {
                             ...client,
                             observation
                         }
                     }
-    
+
                     if (profileImage && profileImage !== '') {
                         client = {
                             ...client,
                             profileImage
                         }
                     }
-    
+
                     if (idCompteur) {
                         client = {
                             ...client,
@@ -442,7 +452,7 @@ const updateById = catchAsync(async(req, res) => {
                         }
                     }
                     const idUser = mongoose.Types.ObjectId("" + idClient);
-                    const result = await Client.findByIdAndUpdate({_id: idUser}, checkField(user, client));
+                    const result = await Client.findByIdAndUpdate({ _id: idUser }, checkField(user, client));
                     // const result = await Client.findByIdAndUpdate(idClient, checkField(user, client));
                     if (result) {
                         res.status(200).json({ status: 200, result: result })
@@ -454,7 +464,7 @@ const updateById = catchAsync(async(req, res) => {
                 }
             });
         } else {
-        res.status(500).json({ status: 500, error });
+            res.status(500).json({ status: 500, error });
         }
     } else {
         res.status(500).json({ status: 500, error: 'Please add phone number' });
@@ -466,7 +476,7 @@ const logout = (req, res) => {
     res.status(200).json({ status: 200, result: "You are log out" })
 }
 
-const getOneClient = catchAsync(async(req, res) => {
+const getOneClient = catchAsync(async (req, res) => {
     const id = req.params.idClient
     return Client
         .findById(id)
@@ -485,9 +495,9 @@ const getOneClient = catchAsync(async(req, res) => {
 const getClientByToken = catchAsync((req, res) => {
     const token = authorization(req)
 
-    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
-            console.log('token error :' , err);
+            console.log('token error :', err);
         } else {
             return Client
                 .findById(decodedToken.id)
@@ -507,7 +517,7 @@ const getClientByToken = catchAsync((req, res) => {
 
 });
 
-const dashboard = catchAsync(async(req, res) => {
+const dashboard = catchAsync(async (req, res) => {
     const token = authorization(req);
     let numberFacturePaid = 0;
     let numberFactureInvoice = 0;
@@ -515,9 +525,9 @@ const dashboard = catchAsync(async(req, res) => {
     let client = null;
     let facturePaid = [];
     let factureInvoice = [];
-    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
-            console.log('token error :' , err);
+            console.log('token error :', err);
         } else {
             await Facture
                 .find({ idClient: decodedToken.id })
@@ -539,12 +549,12 @@ const dashboard = catchAsync(async(req, res) => {
 const countClient = catchAsync((req, res) => {
     const token = authorization(req)
 
-    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
-            console.log('token error :' , err);
+            console.log('token error :', err);
         } else {
             return Client
-                .find({status: true})
+                .find({ status: true })
                 .then(response => {
                     if (response) {
                         res.status(200).json({ status: 200, result: response.length });

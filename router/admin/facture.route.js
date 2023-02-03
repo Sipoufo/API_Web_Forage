@@ -451,7 +451,7 @@ router
     .route('/factureByYear/:year')
     .get(tokenVerifieAdmin, validate(FactureValidation.findByYear), FactureController.findByYear);
 
-    // get one Facture By Year
+// get one Facture By Year
 /**
  * @swagger
  *  /admin/facture/clientFactureByYear/{year}/{idClient}:
@@ -546,9 +546,33 @@ router
  *              200:
  *                  description: get factures
  */
- router
-    .route('/userThatHaveNotPaidInvoiceWithDate/:date')
+router
+    .route('/userThatHaveNotPaidInvoiceWithDate/:date/:page/:limit')
     .get(tokenVerifieAdmin, validate(FactureValidation.getUserThatHaveNotPaidInvoiceWithDate), FactureController.getUserThatHaveNotPaidInvoiceWithDate)
+
+
+//check if user have facture that match with entry date
+//if he don't have return user with all account
+/**
+ * @swagger
+ *  /admin/facture/userThatHaveNotPaidInvoiceWithDate/{date}:
+ *      post:
+ *          summary: See unpaid invoice with date
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: date
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: Date
+ *          responses: 
+ *              200:
+ *                  description: get factures
+ */
+router
+    .route('/userThatHaveNotPaidInvoiceWithDate/:date/:page/:limit')
+    .post(tokenVerifieAdmin, validate(FactureValidation.getUserThatHaveNotPaidInvoiceWithDate), FactureController.getUserThatHaveNotPaidInvoiceWithDate)
 
 
 /**
@@ -567,13 +591,13 @@ router
  *              200:
  *                  description: remove facture
  */
- router
- .route('/remove/:idInvoice')
- .delete(tokenVerifieAdmin, validate(FactureValidation.removeInvoice), FactureController.removeInvoice)
+router
+    .route('/remove/:idInvoice')
+    .delete(tokenVerifieAdmin, validate(FactureValidation.removeInvoice), FactureController.removeInvoice)
 
 
- router
- .route('/search/:page/:limit')
- .post(tokenVerifieAdmin, validate(FactureValidation.searchInvoice), FactureController.searchInvoice)
+router
+    .route('/search/:page/:limit')
+    .post(tokenVerifieAdmin, validate(FactureValidation.searchInvoice), FactureController.searchInvoice)
 
 module.exports = router

@@ -122,7 +122,12 @@ const seeUnpaidInvoicewithDate = {
 const getUserThatHaveNotPaidInvoiceWithDate = {
     params: Joi.object().keys({
         date: Joi.date().required(),
-    })
+        page: Joi.number(),
+        limit: Joi.number(),
+    }),
+    body: Joi.object().keys({
+        username: Joi.string(),
+    }),
 }
 
 const getClientFactures = {

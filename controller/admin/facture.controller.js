@@ -1,6 +1,6 @@
 const catchAsync = require("../../utils/catchAsync");
 const { Admin, Facture, Client, StaticInf } = require("../../models/index");
-const {} = require("../../models/index");
+const { } = require("../../models/index");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
@@ -339,8 +339,14 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
   const dateUnpaidMonth = new Date(req.params.date).getMonth() + 1;
   const dateUnpaidYear = new Date(req.params.date).getFullYear();
   let results = [];
+  let query = {};
+  console.log('username: ', req.body?.username);
+  if (req.body?.username) {
+    query = { 'name': { '$regex': '' + req.body.username, '$options': 'i' } }
+  }
+  query = { ...query, isDelete: false };
 
-  Client.find({ isDelete: false })
+  Client.find(query)
     .sort({ name: 0 })
     .then(async (customers) => {
       for (let i = 0; i < customers.length; i++) {
@@ -406,7 +412,14 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
           }
         }
       }
-      res.status(200).json({ status: 200, result: results });
+
+      if (req.params.page && req.params.limit) {
+        const page = (req.params.page - 1) * req.params.limit;
+        const finalResults = results.slice(page, req.params.limit * req.params.page);
+        res.status(200).json({ status: 200, result: generatePaginnation(finalResults, results, req.params.limit, req.params.page) });
+      } else {
+        res.status(200).json({ status: 200, result: generatePaginnation(results, results, results.length, 1) });
+      }
     });
 });
 
@@ -550,7 +563,7 @@ const updateFacture = catchAsync(async (req, res) => {
       await Admin.findById(decodedToken.id).then(async (resul) => {
         if (resul) {
           let idInvoice = mongoose.Types.ObjectId("" + idFacture);
-          const bill = await Facture.findById({_id: idInvoice});
+          const bill = await Facture.findById({ _id: idInvoice });
           let penality = 0;
 
           if (bill?.penalty && bill?.penalty?.length > 0) {
@@ -573,7 +586,7 @@ const updateFacture = catchAsync(async (req, res) => {
           await Facture.findByIdAndUpdate(idInvoice, {
             newIndex,
             montantVerse,
-            dateReleveNewIndex:date,
+            dateReleveNewIndex: date,
             consommation,
             montantConsommation,
             montantImpaye,
@@ -615,7 +628,7 @@ const statusPaidFacture = catchAsync(async (req, res) => {
           status = true;
         }
 
-        console.log('yyy: ',newAmountPaid );
+        console.log('yyy: ', newAmountPaid);
         await Facture.findByIdAndUpdate(idFacture, {
           facturePay: status,
           montantImpaye: newUnpaid,
@@ -665,25 +678,25 @@ const getByStatusWithPagination = catchAsync(async (req, res) => {
   const status = req.params.status;
   const page = (req.params.page) ? req.params.page : 1;
   const limit = (req.params.limit) ? req.params.limit : 5;
-  
+
   await Facture.find({ facturePay: status })
     .sort({ createdAt: -1 })
     .then(async (factures) => {
       if (factures.length > 0) {
         let invoices = factures.slice((page - 1), (page - 1) + limit);
-      let bills = [];
-      for (let index = 0; index < invoices.length; index++) {
-        const element = invoices[index];
-        let id = mongoose.Types.ObjectId("" + element?.idClient);
-        console.log('id', id);
-        let client = await Client.findById({_id: id});
-        bills.push({
-          invoice:element,
-          user: client
-        });
-      }
-      
-        res.status(200).json({ status: 200, result: generatePaginnation(bills, factures, limit, page)});
+        let bills = [];
+        for (let index = 0; index < invoices.length; index++) {
+          const element = invoices[index];
+          let id = mongoose.Types.ObjectId("" + element?.idClient);
+          console.log('id', id);
+          let client = await Client.findById({ _id: id });
+          bills.push({
+            invoice: element,
+            user: client
+          });
+        }
+
+        res.status(200).json({ status: 200, result: generatePaginnation(bills, factures, limit, page) });
       } else {
         res
           .status(500)
@@ -720,7 +733,7 @@ const searchInvoice = catchAsync(async (req, res) => {
 
   let invoices = [];
 
-  if(username && username !== " ") {
+  if (username && username !== " ") {
     client = await Client.findOne({ name: username });
     idClient = client?._id;
   }
@@ -733,14 +746,14 @@ const searchInvoice = catchAsync(async (req, res) => {
       let invoice = null;
       let conform = "start check";
 
-      if(year && year !== 0) {
+      if (year && year !== 0) {
         if (yearFacture == year) {
-          invoice=factures[i];
+          invoice = factures[i];
           conform = "year";
         }
       }
 
-      if(month && month !== 0) {
+      if (month && month !== 0) {
         if (invoice && invoice !== null) {
           const monthFacture = invoice.createdAt.getMonth() + 1;
           if (monthFacture !== month) {
@@ -750,20 +763,20 @@ const searchInvoice = catchAsync(async (req, res) => {
         } else {
           const monthFacture = factures[i].createdAt.getMonth() + 1;
           if (monthFacture == month) {
-            invoice=factures[i];
+            invoice = factures[i];
             conform = "month";
           }
         }
       }
 
-      if(consumption && consumption !== 0) {
+      if (consumption && consumption !== 0) {
         if (conform === "start check" && factures[i]?.consommation === consumption) {
-          invoice=factures[i];
+          invoice = factures[i];
           conform = "consumption";
         }
         if (conform !== "start check") {
-          if(invoice && invoice !== null) {
-            if(invoice?.consommation !== consumption) {
+          if (invoice && invoice !== null) {
+            if (invoice?.consommation !== consumption) {
               invoice = null;
               conform = "consumption";
             }
@@ -771,14 +784,14 @@ const searchInvoice = catchAsync(async (req, res) => {
         }
       }
 
-      if(idClient && idClient !== null) {
+      if (idClient && idClient !== null) {
         if (conform === "start check" && factures[i]?.idClient === idClient) {
-          invoice=factures[i];
+          invoice = factures[i];
           conform = "idClient";
         }
         if (conform !== "start check") {
-          if(invoice && invoice !== null) {
-            if(invoice?.idClient !== idClient) {
+          if (invoice && invoice !== null) {
+            if (invoice?.idClient !== idClient) {
               invoice = null;
               conform = "idClient";
             }
@@ -787,18 +800,18 @@ const searchInvoice = catchAsync(async (req, res) => {
       } else {
         let id = mongoose.Types.ObjectId("" + factures[i].idClient);
         console.log('id', id);
-        client = await Client.findById({_id: id});
+        client = await Client.findById({ _id: id });
       }
 
-      if(invoice && invoice !== null) {
-        if(type && type !== " " && type === "all") {
+      if (invoice && invoice !== null) {
+        if (type && type !== " " && type === "all") {
           invoices.push({
             invoice,
             user: client
           });
         }
 
-        if(type && type !== " " && type === "paid") {
+        if (type && type !== " " && type === "paid") {
           if (invoice?.facturePay === true) {
             invoices.push({
               invoice,
@@ -807,7 +820,7 @@ const searchInvoice = catchAsync(async (req, res) => {
           }
         }
 
-        if(type && type !== " " && type === "unpaid") {
+        if (type && type !== " " && type === "unpaid") {
           if (invoice?.facturePay === false) {
             invoices.push({
               invoice,
@@ -818,13 +831,13 @@ const searchInvoice = catchAsync(async (req, res) => {
       }
 
       if (invoice == null && conform === "start check") {
-        if(type && type !== " " && type === "all") {
+        if (type && type !== " " && type === "all") {
           let id = mongoose.Types.ObjectId("" + factures[i].idClient);
           console.log('id', id);
-          client = await Client.findById({_id: id});
+          client = await Client.findById({ _id: id });
 
           invoices.push({
-            invoice:factures[i],
+            invoice: factures[i],
             user: client
           });
         }
@@ -833,39 +846,39 @@ const searchInvoice = catchAsync(async (req, res) => {
   }
 
   res
-  .status(200)
-  .json({ status: 200, result: generatePaginnation(invoices.slice((page - 1), (page - 1) + limit), invoices, limit, page)});
+    .status(200)
+    .json({ status: 200, result: generatePaginnation(invoices.slice((page - 1), (page - 1) + limit), invoices, limit, page) });
 
 });
 
 const generatePaginnation = (result, data, limit, page) => {
   if (data?.length > 0) {
-      const totalPages = Math.floor(data.length/limit);
-      return {
-          docs: result,
-          totalDocs: data.length,
-          limit: limit,
-          totalPages: totalPages,
-          page: page,
-          pagingCounter: totalPages,
-          hasPrevPage: ( page > 1),
-          hasNextPage: (totalPages > page),
-          prevPage: (page - 1),
-          nextPage: (totalPages > page) ? page + 1 : page
-      }
+    const totalPages = Math.floor(data.length / limit);
+    return {
+      docs: result,
+      totalDocs: data.length,
+      limit: limit,
+      totalPages: totalPages,
+      page: page,
+      pagingCounter: totalPages,
+      hasPrevPage: (page > 1),
+      hasNextPage: (totalPages > page),
+      prevPage: (page - 1),
+      nextPage: (totalPages > page) ? page + 1 : page
+    }
   } else {
-      return {
-          docs: [],
-          totalDocs: 0,
-          limit: limit,
-          totalPages: 0,
-          page: page,
-          pagingCounter: 0,
-          hasPrevPage: false,
-          hasNextPage: false,
-          prevPage: 1,
-          nextPage: 1
-      }
+    return {
+      docs: [],
+      totalDocs: 0,
+      limit: limit,
+      totalPages: 0,
+      page: page,
+      pagingCounter: 0,
+      hasPrevPage: false,
+      hasNextPage: false,
+      prevPage: 1,
+      nextPage: 1
+    }
   }
 }
 

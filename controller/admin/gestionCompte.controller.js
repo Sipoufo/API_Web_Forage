@@ -167,22 +167,25 @@ const updateClient = catchAsync(async (req, res) => {
     jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
             console.log('token error :', err);
+            res.status(500).json({ status: 500, error: err.message });
         } else {
-            if (phone.length > 0) {
-                for (let index = 0; index < phone.length; index++) {
-                    const element = phone[index];
-                    if (error === '') {
-                        const admins = await Admin.find({ phone: element });
-                        if (admins.length <= 0) {
-                            let clients = await Client.find({ phone: element });
-                            if (clients.length > 0) {
-                                let client = clients[0];
-                                if ((client && client._id !== idClient)) {
-                                    error = "User with this phone exist";
+            try {
+                if (phone?.length > 0) {
+                    for (let index = 0; index < phone?.length; index++) {
+                        const element = phone[index];
+                        if (error === '') {
+                            const admins = await Admin.find({ phone: element });
+                            if (admins.length <= 0) {
+                                let clients = await Client.find({ phone: element });
+                                if (clients.length > 0) {
+                                    let client = clients[0];
+                                    if ((client && client._id !== idClient)) {
+                                        error = "User with this phone exist";
+                                    }
                                 }
+                            } else {
+                                error = "One Admin have this phone";
                             }
-                        } else {
-                            error = "One Admin have this phone";
                         }
                     }
                 }
@@ -198,7 +201,7 @@ const updateClient = catchAsync(async (req, res) => {
                                 }
                             }
 
-                            if (phone) {
+                            if (phone && phone?.length > 0) {
                                 client = {
                                     ...client,
                                     phone
@@ -276,8 +279,8 @@ const updateClient = catchAsync(async (req, res) => {
                 } else {
                     res.status(500).json({ status: 500, error });
                 }
-            } else {
-                res.status(500).json({ status: 500, error: 'Please add phone number' });
+            } catch (error) {
+                res.status(500).json({ status: 500, error });
             }
         }
     })

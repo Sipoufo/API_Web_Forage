@@ -13,7 +13,7 @@ const authorization = (req) => {
 
 const register = catchAsync(async (req, res) => {
     const name = req.body.name
-    let phone = req.body.phone
+    let tels = req.body.phone
     const description = (req.body.description) ? req.body.description : null
     const subscriptionDate = req.body.subscriptionDate;
     const subscriptionAmount = req.body.subscriptionAmount;
@@ -22,24 +22,29 @@ const register = catchAsync(async (req, res) => {
     const profileImage = req.body.profileImage
     const idCompteur = req.body.idCompteur;
     const password = req.body.password;
-    const hasPhoneNumber = true;
+    let hasPhoneNumber = true;
     let error = '';
+    let phone = [];
+    tels.forEach((value, index, array) => {
+        if (value != null && value != undefined) {
+            phone.push(value);
+        }
+    })
 
     try {
-        if (phone.length == 0) {
+        if (phone.length <= 0) {
             let phones = [];
             hasPhoneNumber = false;
             const clients = await Client.find({ hasPhoneNumber });
-
             for (let index = 0; index < clients.length; index++) {
-                phones.push(clients[index].phone[0]);
+                const elt = clients[index];
+                phones.push(parseInt(elt.phone[0], 10));
             }
-
             phones = phones.sort((a, b) => a - b);
-            let tel = phones.length > 0 ? phones[phones.length] + 1 : 1;
+            let tel = phones.length > 0 ? parseInt(phones[phones.length - 1], 10) + 1 : 1;
+
             phone = [tel];
         }
-
         for (let index = 0; index < phone.length; index++) {
             const element = phone[index];
             if (error === '') {

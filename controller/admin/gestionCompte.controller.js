@@ -155,7 +155,7 @@ const updateClient = catchAsync(async (req, res) => {
     const idClient = req.params.idClient
     let error = '';
     const name = req.body.name
-    const phone = req.body.phone
+    let tels = req.body.phone
     const description = (req.body.description) ? req.body.description : null
     const subscriptionDate = req.body.subscriptionDate;
     const subscriptionAmount = req.body.subscriptionAmount;
@@ -163,6 +163,7 @@ const updateClient = catchAsync(async (req, res) => {
     const observation = req.body.observation;
     const profileImage = req.body.profileImage
     const idCompteur = req.body.idCompteur;
+    let phone = [];
 
     jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
@@ -170,6 +171,12 @@ const updateClient = catchAsync(async (req, res) => {
             res.status(500).json({ status: 500, error: err.message });
         } else {
             try {
+                tels.forEach((value, index, array) => {
+                    if (value != null && value != undefined) {
+                        phone.push(value);
+                    }
+                })
+
                 if (phone?.length > 0) {
                     for (let index = 0; index < phone?.length; index++) {
                         const element = phone[index];

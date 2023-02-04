@@ -186,7 +186,7 @@ const updateClient = catchAsync(async (req, res) => {
                                 let clients = await Client.find({ phone: element });
                                 if (clients.length > 0) {
                                     let client = clients[0];
-                                    if ((client && client._id !== idClient)) {
+                                    if ((client && client._id + "" !== idClient)) {
                                         error = "User with this phone exist";
                                     }
                                 }

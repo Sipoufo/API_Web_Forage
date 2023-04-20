@@ -21,7 +21,7 @@ const authorization = (req) => {
 }
 
 
-const register = catchAsync(async(req, res) => {
+const register = catchAsync(async (req, res) => {
     const name = req.body.name
     const phone = req.body.phone
     const email = req.body.email || ''
@@ -54,7 +54,7 @@ const register = catchAsync(async(req, res) => {
         })
 })
 
-const update = catchAsync(async(req, res) => {
+const update = catchAsync(async (req, res) => {
     const token = authorization(req)
     const name = req.body.name
     const phone = req.body.phone
@@ -64,13 +64,15 @@ const update = catchAsync(async(req, res) => {
     const longitude = req.body.longitude
     const latitude = req.body.latitude
 
-    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
+            console.log('update: ')
             console.log(err);
         } else {
             return client.findOne({ phone })
                 .then(clien => {
                     if (!clien) {
+                        console.log('update: ')
                         return admin.findOne({ phone })
                             .then(async number => {
                                 if ((number && number._id == decodedToken.id) || !number) {
@@ -103,7 +105,7 @@ const updatePassword = catchAsync((req, res) => {
     const token = authorization(req)
     const oldPassword = req.body.oldPassword
     const newPassword = req.body.newPassword
-    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
             console.log(err);
         } else {
@@ -132,7 +134,7 @@ const updatePassword = catchAsync((req, res) => {
     })
 })
 
-const updateById = catchAsync(async(req, res) => {
+const updateById = catchAsync(async (req, res) => {
     const idAdmin = req.params.idAdmin
     const name = req.body.name
     const phone = req.body.phone
@@ -172,7 +174,7 @@ const updateById = catchAsync(async(req, res) => {
         })
 })
 
-const sendFirstAdmin = catchAsync(async(req, res) => {
+const sendFirstAdmin = catchAsync(async (req, res) => {
     const name = "Sipoufo Yvan"
     const phone = 695914926
     const email = "sipoufoknj@gmail.com"
@@ -200,7 +202,7 @@ const sendFirstAdmin = catchAsync(async(req, res) => {
         })
 })
 
-const getOneAdmin = catchAsync(async(req, res) => {
+const getOneAdmin = catchAsync(async (req, res) => {
     const id = req.params.idAdmin
     return admin
         .findById(id)
@@ -240,14 +242,14 @@ const findClient = catchAsync((req, res) => {
     const limit = (req.params.limit) ? req.params.limit : 10;
 
     let filter = {};
-    if(req.body?.refId && req.body?.refId !== " " && req.body?.refId !== 0) {
+    if (req.body?.refId && req.body?.refId !== " " && req.body?.refId !== 0) {
         let data = {
             customerReference: req.body?.refId
         }
         filter = data;
     }
 
-    if(req.body?.status && req.body?.status !== " ") {
+    if (req.body?.status && req.body?.status !== " ") {
         let data = {
             ...filter,
             status: req.body?.status === 'block' ? false : true
@@ -255,7 +257,7 @@ const findClient = catchAsync((req, res) => {
         filter = data;
     }
 
-    if(req.body?.counterId && req.body?.counterId !== " ") {
+    if (req.body?.counterId && req.body?.counterId !== " ") {
         let data = {
             ...filter,
             idCompteur: req.body?.counterId
@@ -268,50 +270,50 @@ const findClient = catchAsync((req, res) => {
         const start = new Date(year + '-' + month + '-' + day);
         const end = new Date(year + '-' + month + '-' + day);
 
-        start.setHours(0,59,59,999);
-        end.setHours(23,59,59,999);
+        start.setHours(0, 59, 59, 999);
+        end.setHours(23, 59, 59, 999);
 
         let data = {
-            subscriptionDate: {$gte: start, $lt: end}
+            subscriptionDate: { $gte: start, $lt: end }
         }
-        
+
         filter = {
             ...filter,
-            subscriptionDate:req.body?.date
+            subscriptionDate: req.body?.date
         };
 
         return Client
-        .find(filter)
-        .sort({ name: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
-        .skip(page - 1)
-        .limit(limit)
-        .then(response => {
-            res.status(200).json({ status: 200, result:  generatePaginnation(response,limit, page) });
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).json({ status: 500, error: "Error" })
-        })
+            .find(filter)
+            .sort({ name: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
+            .skip(page - 1)
+            .limit(limit)
+            .then(response => {
+                res.status(200).json({ status: 200, result: generatePaginnation(response, limit, page) });
+            })
+            .catch(err => {
+                console.log(err)
+                res.status(500).json({ status: 500, error: "Error" })
+            })
     } else {
         const offset = page - 1;
         return Client
-        .find(filter)
-        .sort({ name: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
-        .skip(offset)
-        .limit(limit)
-        .then(clients => {
-            if (clients.length > 0) {
-                res.status(200).json({ status: 200, result: generatePaginnation(clients,limit, page) })
-            } else {
-                res.status(200).json({ status: 200, result:  generatePaginnation([],limit, page)})
-            }
-        })
+            .find(filter)
+            .sort({ name: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
+            .skip(offset)
+            .limit(limit)
+            .then(clients => {
+                if (clients.length > 0) {
+                    res.status(200).json({ status: 200, result: generatePaginnation(clients, limit, page) })
+                } else {
+                    res.status(200).json({ status: 200, result: generatePaginnation([], limit, page) })
+                }
+            })
     }
 })
 
 const generatePaginnation = (data, limit, page) => {
     if (data?.length > 0) {
-        const totalPages = Math.floor(data.length/limit);
+        const totalPages = Math.floor(data.length / limit);
         return {
             docs: data,
             totalDocs: data.length,
@@ -319,7 +321,7 @@ const generatePaginnation = (data, limit, page) => {
             totalPages: totalPages,
             page: page,
             pagingCounter: totalPages,
-            hasPrevPage: ( page > 1),
+            hasPrevPage: (page > 1),
             hasNextPage: (totalPages > page),
             prevPage: (page - 1),
             nextPage: (totalPages > page) ? page + 1 : page
@@ -344,7 +346,7 @@ const getClientsWithPagination = catchAsync((req, res) => {
     const page = (req.params.page) ? req.params.page : 1;
     const limit = (req.params.limit) ? req.params.limit : 10;
     return Client
-        .paginate({status: true}, { page, limit })
+        .paginate({ status: true }, { page, limit })
         .then(response => {
             res.status(200).json({ status: 200, result: response });
         })
@@ -359,10 +361,10 @@ const getClientsBySuscriptionDate = catchAsync((req, res) => {
     var start = new Date(subscriptionDate);
     var end = new Date(subscriptionDate);
 
-    start.setHours(0,0,0,0);
-    end.setHours(23,59,59,999);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
 
-    return Client.find({subscriptionDate: {$gte: start, $lt: end}})
+    return Client.find({ subscriptionDate: { $gte: start, $lt: end } })
         .then(response => {
             res.status(200).json({ status: 200, result: response });
         })
@@ -380,7 +382,7 @@ const getAdmins = catchAsync((req, res) => {
         .find()
         .sort({ name: 0 })
         .then(admins => {
-            jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+            jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
                 if (err) {
                     console.log(err);
                 } else {
@@ -405,7 +407,7 @@ const getAdmins = catchAsync((req, res) => {
 const getAdminByToken = catchAsync((req, res) => {
     const token = authorization(req)
 
-    jwt.verify(token, 'Admin web forage', async(err, decodedToken) => {
+    jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
             console.log(err);
         } else {

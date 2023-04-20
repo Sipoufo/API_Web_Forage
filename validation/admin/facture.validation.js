@@ -136,6 +136,12 @@ const getClientFactures = {
     }),
 }
 
+const getInfoForPrint = {
+    params: Joi.object().keys({
+        idFacture: Joi.custom(objectId).required()
+    }),
+}
+
 const removeInvoice = {
     params: Joi.object().keys({
         idInvoice: Joi.string().required(),
@@ -171,7 +177,7 @@ module.exports = {
     addPenalty,
     preCreate,
     removePenalty,
-
+    getInfoForPrint,
     searchInvoice,
     removeInvoice,
     getByStatusWithPagination,

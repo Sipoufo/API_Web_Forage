@@ -600,4 +600,28 @@ router
     .route('/search/:page/:limit')
     .post(tokenVerifieAdmin, validate(FactureValidation.searchInvoice), FactureController.searchInvoice)
 
+
+/**
+ * @swagger
+ *  /admin/facture/getInfoForPrint/{idFacture}:
+ *      get: 
+ *          summary: get all the information for print the facture
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: idFacture
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: id of facture
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      return body content the information to print like client, admin, amountUnPaid, facture
+ *                                    
+ */
+router
+    .route('/getInfoForPrint/:idFacture')
+    .get(tokenVerifieAdmin, validate(FactureValidation.getInfoForPrint), FactureController.getInfoForPrint)
+
 module.exports = router

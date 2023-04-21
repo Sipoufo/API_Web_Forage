@@ -34,8 +34,9 @@ const swaggerDef = {
     }],
     servers: [{
         url: `http://localhost:4000`,
+    }, {
         url: `http://194.31.52.20:4000`,
-    },],
+    }],
 };
 
 const specs = swaggerJsdoc({

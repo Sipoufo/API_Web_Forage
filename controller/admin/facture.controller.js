@@ -608,72 +608,75 @@ const statusPaidFacture = catchAsync(async (req, res) => {
   let surplus = 0;
   let error = "";
 
-  // Get all un paid facture
-  let unPaidInvoices = await Facture.find({ facturePay: false })
-  for (let index = 0; index < unPaidInvoices.length; index++) {
-    if (amount > 0) {
-      const unPaidInvoice = unPaidInvoices[index];
-      let reste = amount - unPaidInvoice.montantImpaye;
-      await Facture.findByIdAndUpdate(mongoose.Types.ObjectId("" + unPaidInvoice._id), {
-        facturePay: true,
-        montantImpaye: reste > 0 ? 0 : (-1 * reste),
-        montantVerse: (unPaidInvoice.montantVerse + (reste >= 0 ? unPaidInvoice.montantImpaye : amount)),
-        $push: { tranche: { montant: amount, date: new Date() } },
-      }).then((facture) => {
-        if (!facture) {
-          error += "Error during the update facture " + unPaidInvoice._id + " \n";
-        }
-      });
-      amount = reste >= 0 ? reste : 0;
-    } else {
-      continue;
-    }
-  }
+  let facture = await Facture.findById(idFacture);
+  let idClient = mongoose.Types.ObjectId("" + facture.idClient);
 
-  if (amount > 0) {
-    await Facture.findById(idFacture).then(async (result) => {
-      if (result) {
-        if (result.facturePay != true) {
-          let newUnpaid = result.montantImpaye - amount;
-          const newAmountPaid = result.montantVerse + amount;
-          if (newUnpaid >= 0) {
-            if (newUnpaid != 0) {
-              status = false;
-            } else {
-              status = true;
-            }
+  if (facture) {
+    // Get all un paid facture
+    let unPaidInvoices = await Facture.find({ facturePay: false, idClient })
+    for (let index = 0; index < unPaidInvoices.length; index++) {
+      if (amount > 0) {
+        const unPaidInvoice = unPaidInvoices[index];
+        let reste = amount - unPaidInvoice.montantImpaye;
+        await Facture.findByIdAndUpdate(mongoose.Types.ObjectId("" + unPaidInvoice._id), {
+          facturePay: true,
+          montantImpaye: reste > 0 ? 0 : (-1 * reste),
+          montantVerse: (unPaidInvoice.montantVerse + (reste >= 0 ? unPaidInvoice.montantImpaye : amount)),
+          $push: { tranche: { montant: amount, date: new Date() } },
+        }).then((facture) => {
+          if (!facture) {
+            error += "Error during the update facture " + unPaidInvoice._id + " \n";
+          }
+        });
+        amount = reste >= 0 ? reste : 0;
+      } else {
+        continue;
+      }
+    }
+
+    if (amount > 0) {
+      if (facture.facturePay != true) {
+        let newUnpaid = facture.montantImpaye - amount;
+        const newAmountPaid = facture.montantVerse + amount;
+        if (newUnpaid >= 0) {
+          if (newUnpaid != 0) {
+            status = false;
           } else {
-            surplus = newUnpaid * -1;
-            newUnpaid = 0;
             status = true;
           }
-
-          await Facture.findByIdAndUpdate(idFacture, {
-            facturePay: status,
-            montantImpaye: newUnpaid,
-            montantVerse: newAmountPaid,
-            surplus,
-            $push: { tranche: { montant: amount, date: new Date() } },
-          }).then((facture) => {
-            if (facture) {
-              res.status(200).json({ status: 200, result: facture });
-            } else {
-              res
-                .status(500)
-                .json({ status: 500, error: error + "Error during the update facture " + result._id + " \n" });
-            }
-          });
         } else {
-          res
-            .status(500)
-            .json({ status: 500, error: error + "This facture is already paid " + result._id + " \n" });
+          surplus = newUnpaid * -1;
+          newUnpaid = 0;
+          status = true;
         }
+
+        await Facture.findByIdAndUpdate(idFacture, {
+          facturePay: status,
+          montantImpaye: newUnpaid,
+          montantVerse: newAmountPaid,
+          surplus,
+          $push: { tranche: { montant: amount, date: new Date() } },
+        }).then((facture1) => {
+          if (facture1) {
+            res.status(200).json({ status: 200, result: facture1 });
+          } else {
+            res
+              .status(500)
+              .json({ status: 500, error: error + "Error during the update facture " + facture._id + " \n" });
+          }
+        });
       } else {
-        res.status(500).json({ status: 500, error: error + "This facture don't exist " + result._id + " \n" });
+        res
+          .status(500)
+          .json({ status: 500, error: error + "This facture is already paid " + facture._id + " \n" });
       }
-    });
+    }
+  } else {
+    res.status(500).json({ status: 500, error: error + "This facture don't exist " + facture._id + " \n" });
   }
 });
+
+
 
 const getByStatus = catchAsync(async (req, res) => {
   const status = req.params.status;
@@ -913,7 +916,7 @@ const getInfoForPrint = catchAsync(async (req, res) => {
   let idAdmin = mongoose.Types.ObjectId("" + facture.idAdmin);
   let admin = await Admin.findById({ _id: idAdmin });
 
-  let unPaidInvoices = await Facture.find({ facturePay: false })
+  let unPaidInvoices = await Facture.find({ facturePay: false, idClient })
   let montantImpaye = 0;
   if (unPaidInvoices.length > 0) {
     for (let index = 0; index < unPaidInvoices.length; index++) {

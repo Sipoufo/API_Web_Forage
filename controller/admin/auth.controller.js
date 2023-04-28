@@ -421,19 +421,32 @@ const getAdminByToken = catchAsync((req, res) => {
 
 const getClientsWithTotalCostUnpaid = catchAsync(async (req, res) => {
 
+
     client
         .find({ status: true })
         .sort({ createdAt: 'ascending' })
         .then(async clients => {
             if (clients.length > 0) {
                 let resuls = [];
+
                 for (let index = 0; index < clients.length; index++) {
                     const element = clients[index];
-                    let amount = await totalCostUnpaidByClient(element._id)
-                    resuls.push({
-                        client: element,
-                        unpaid: amount
-                    })
+                    let idClient = mongoose.Types.ObjectId("" + element._id);
+                    let unPaidInvoices = await Facture.find({ facturePay: false, idClient })
+                    if (unPaidInvoices.length > 0) {
+                        let montantImpaye = 0;
+                        for (let index = 0; index < unPaidInvoices.length; index++) {
+                            const unPaidInvoice = unPaidInvoices[index];
+                            montantImpaye += unPaidInvoice.montantImpaye;
+                        }
+
+                        resuls.push({
+                            client: element,
+                            unpaidAmount: montantImpaye,
+                        })
+                    } else {
+                        continue;
+                    }
                 }
                 res.status(200).json({ status: 200, result: resuls })
             } else {
@@ -455,14 +468,27 @@ const getClientsWithTotalCostUnpaidWithPagination = catchAsync(async (req, res) 
         .then(async clients => {
             if (clients.length > 0) {
                 let resuls = [];
+
                 for (let index = 0; index < clients.length; index++) {
                     const element = clients[index];
-                    let amount = await totalCostUnpaidByClient(element._id)
-                    resuls.push({
-                        client: element,
-                        unpaid: amount
-                    })
+                    let idClient = mongoose.Types.ObjectId("" + element._id);
+                    let unPaidInvoices = await Facture.find({ facturePay: false, idClient })
+                    if (unPaidInvoices.length > 0) {
+                        let montantImpaye = 0;
+                        for (let index = 0; index < unPaidInvoices.length; index++) {
+                            const unPaidInvoice = unPaidInvoices[index];
+                            montantImpaye += unPaidInvoice.montantImpaye;
+                        }
+
+                        resuls.push({
+                            client: element,
+                            unpaidAmount: montantImpaye,
+                        })
+                    } else {
+                        continue;
+                    }
                 }
+
                 res.status(200).json({ status: 200, result: generatePaginnation(resuls, limit, page) })
             } else {
                 res.status(200).json({ status: 200, result: generatePaginnation([], limit, page) })
@@ -477,15 +503,28 @@ const getClientsWithTotalUnpaidInvoice = catchAsync(async (req, res) => {
         .then(async clients => {
             if (clients.length > 0) {
                 let resuls = [];
+
                 for (let index = 0; index < clients.length; index++) {
                     const element = clients[index];
-                    let result = await totalUnpaidInvoiceByClient(element._id)
-                    resuls.push({
-                        client: element,
-                        unpaidAmount: result.unpaidAmount,
-                        unPaidInvoices: result.unPaidInvoices
-                    })
+                    let idClient = mongoose.Types.ObjectId("" + element._id);
+                    let unPaidInvoices = await Facture.find({ facturePay: false, idClient })
+                    if (unPaidInvoices.length > 0) {
+                        let montantImpaye = 0;
+                        for (let index = 0; index < unPaidInvoices.length; index++) {
+                            const unPaidInvoice = unPaidInvoices[index];
+                            montantImpaye += unPaidInvoice.montantImpaye;
+                        }
+
+                        resuls.push({
+                            client: element,
+                            unpaidAmount: montantImpaye,
+                            unPaidInvoices: unPaidInvoices
+                        })
+                    } else {
+                        continue;
+                    }
                 }
+
                 res.status(200).json({ status: 200, result: resuls })
             } else {
                 res.status(200).json({ status: 200, result: [] })
@@ -506,14 +545,26 @@ const getClientsWithTotalUnpaidInvoiceWithPagination = catchAsync(async (req, re
         .then(async clients => {
             if (clients.length > 0) {
                 let resuls = [];
+
                 for (let index = 0; index < clients.length; index++) {
                     const element = clients[index];
-                    let result = await totalUnpaidInvoiceByClient(element._id)
-                    resuls.push({
-                        client: element,
-                        unpaidAmount: result.unpaidAmount,
-                        unPaidInvoices: result.unPaidInvoices
-                    })
+                    let idClient = mongoose.Types.ObjectId("" + element._id);
+                    let unPaidInvoices = await Facture.find({ facturePay: false, idClient })
+                    if (unPaidInvoices.length > 0) {
+                        let montantImpaye = 0;
+                        for (let index = 0; index < unPaidInvoices.length; index++) {
+                            const unPaidInvoice = unPaidInvoices[index];
+                            montantImpaye += unPaidInvoice.montantImpaye;
+                        }
+
+                        resuls.push({
+                            client: element,
+                            unpaidAmount: montantImpaye,
+                            unPaidInvoices: unPaidInvoices
+                        })
+                    } else {
+                        continue;
+                    }
                 }
                 res.status(200).json({ status: 200, result: generatePaginnation(resuls, limit, page) })
             } else {

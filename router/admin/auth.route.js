@@ -261,10 +261,23 @@ router
 // get clients
 /**
  * @swagger
- * /admin/auth/getClientsWithTotalCostUnpaidWithPagination:
+ * /admin/auth/getClientsWithTotalCostUnpaidWithPagination/{page}/{limit}:
  *  get:
  *      summary: get all user with total cost unpaid by order with pagination
  *      tags: [Admin]
+ *      parameters:
+ *              -   in: path
+ *                  name: limit
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: limit where you want on one page
+ *              -   in: path
+ *                  name: page
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: Page where you want to be
  *      responses: 
  *          200:
  *              description: get all user with total cost unpaid in the bd
@@ -272,7 +285,7 @@ router
  *              description: Error during the get
  */
 router
-    .route('/getClientsWithTotalCostUnpaidWithPagination')
+    .route('/getClientsWithTotalCostUnpaidWithPagination/:page/:limit')
     .get(tokenVerifieAdmin, validate(adminAuth.pagination), authAdmin.getClientsWithTotalCostUnpaidWithPagination);
 
 // get clients
@@ -295,10 +308,23 @@ router
 // get clients
 /**
  * @swagger
- * /admin/auth/getClientsWithTotalUnpaidInvoiceWithPagination:
+ * /admin/auth/getClientsWithTotalUnpaidInvoiceWithPagination/{page}/{limit}:
  *  get:
  *      summary: get all user with total unpaid invoice by order with pagination
  *      tags: [Admin]
+ *      parameters:
+ *              -   in: path
+ *                  name: limit
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: limit where you want on one page
+ *              -   in: path
+ *                  name: page
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: Page where you want to be
  *      responses: 
  *          200:
  *              description: get all user with total unpaid invoice in the bd with pagination
@@ -306,7 +332,7 @@ router
  *              description: Error during the get
  */
 router
-    .route('/getClientsWithTotalUnpaidInvoiceWithPagination')
+    .route('/getClientsWithTotalUnpaidInvoiceWithPagination/:page/:limit')
     .get(tokenVerifieAdmin, validate(adminAuth.pagination), authAdmin.getClientsWithTotalUnpaidInvoiceWithPagination);
 
 // get clients by subscription date

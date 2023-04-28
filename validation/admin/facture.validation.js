@@ -24,6 +24,12 @@ const preCreate = {
     })
 };
 
+const totalCostUnpaidByClient = {
+    params: Joi.object().keys({
+        idClient: Joi.custom(objectId).required()
+    }),
+};
+
 const removePenalty = {
     params: Joi.object().keys({
         idFacture: Joi.custom(objectId).required()
@@ -68,7 +74,7 @@ const deleteFacture = {
     }),
 }
 
-const statusPaidFacture = {
+const payFactureByUser = {
     params: Joi.object().keys({
         idFacture: Joi.custom(objectId).required()
     }),
@@ -166,9 +172,10 @@ module.exports = {
     addFacture,
     updateFacture,
     getClientFactures,
-    statusPaidFacture,
+    payFactureByUser,
     getByStatus,
     findByYear,
+    totalCostUnpaidByClient,
     getOneInvoiceByYear,
     getFactures,
     addInformation,

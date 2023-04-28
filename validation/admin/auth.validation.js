@@ -71,6 +71,13 @@ const findClient = {
     }),
 }
 
+const pagination = {
+    params: Joi.object().keys({
+        page: Joi.number(),
+        limit: Joi.number(),
+    }),
+}
+
 const getClientBySubsDate = {
     params: Joi.object().keys({
         subscriptionDate: Joi.string().required(),
@@ -92,6 +99,7 @@ module.exports = {
     getClients,
     getClientBySubsDate,
     updateById,
+    pagination,
     getAdmin,
     updatePassword
 }

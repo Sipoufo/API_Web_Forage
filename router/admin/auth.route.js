@@ -204,8 +204,6 @@ router
     .route('/updatePassword')
     .put(tokenVerifieAdmin, validate(adminAuth.updatePassword), authAdmin.updatePassword);
 
-
-
 /**
  * @swagger
  * /admin/auth/logout:
@@ -242,6 +240,75 @@ router
     .route('/getClient')
     .get(tokenVerifieAdmin, authAdmin.getClients);
 
+
+// get clients
+/**
+ * @swagger
+ * /admin/auth/getClientsWithTotalCostUnpaid:
+ *  get:
+ *      summary: get all user with total cost unpaid by order
+ *      tags: [Admin]
+ *      responses: 
+ *          200:
+ *              description: get all user with total cost unpaid in the bd
+ *          500:
+ *              description: Error during the get
+ */
+router
+    .route('/getClientsWithTotalCostUnpaid')
+    .get(tokenVerifieAdmin, authAdmin.getClientsWithTotalCostUnpaid);
+
+// get clients
+/**
+ * @swagger
+ * /admin/auth/getClientsWithTotalCostUnpaidWithPagination:
+ *  get:
+ *      summary: get all user with total cost unpaid by order with pagination
+ *      tags: [Admin]
+ *      responses: 
+ *          200:
+ *              description: get all user with total cost unpaid in the bd
+ *          500:
+ *              description: Error during the get
+ */
+router
+    .route('/getClientsWithTotalCostUnpaidWithPagination')
+    .get(tokenVerifieAdmin, validate(adminAuth.pagination), authAdmin.getClientsWithTotalCostUnpaidWithPagination);
+
+// get clients
+/**
+ * @swagger
+ * /admin/auth/getClientsWithTotalUnpaidInvoice:
+ *  get:
+ *      summary: get all user with total unpaid invoice by order
+ *      tags: [Admin]
+ *      responses: 
+ *          200:
+ *              description: get all user with total unpaid invoice in the bd
+ *          500:
+ *              description: Error during the get
+ */
+router
+    .route('/getClientsWithTotalUnpaidInvoice')
+    .get(tokenVerifieAdmin, authAdmin.getClientsWithTotalUnpaidInvoice);
+
+// get clients
+/**
+ * @swagger
+ * /admin/auth/getClientsWithTotalUnpaidInvoiceWithPagination:
+ *  get:
+ *      summary: get all user with total unpaid invoice by order with pagination
+ *      tags: [Admin]
+ *      responses: 
+ *          200:
+ *              description: get all user with total unpaid invoice in the bd with pagination
+ *          500:
+ *              description: Error during the get
+ */
+router
+    .route('/getClientsWithTotalUnpaidInvoiceWithPagination')
+    .get(tokenVerifieAdmin, validate(adminAuth.pagination), authAdmin.getClientsWithTotalUnpaidInvoiceWithPagination);
+
 // get clients by subscription date
 /**
  * @swagger
@@ -262,11 +329,11 @@ router
  *          500:
  *              description: Error during the get
  */
- router
- .route('/client/findBySubscriptionDate/:subscriptionDate')
- .get(tokenVerifieAdmin, validate(adminAuth.getClientBySubsDate), authAdmin.getClientsBySuscriptionDate);
+router
+    .route('/client/findBySubscriptionDate/:subscriptionDate')
+    .get(tokenVerifieAdmin, validate(adminAuth.getClientBySubsDate), authAdmin.getClientsBySuscriptionDate);
 
- // get clients by subscription date
+// get clients by subscription date
 /**
  * @swagger
  * /admin/auth/client/find/{page}/{limit}:
@@ -313,9 +380,9 @@ router
  *                      get all user in the bd
  * 
  */
- router
- .route('/client/find/:page/:limit')
- .post(tokenVerifieAdmin, validate(adminAuth.findClient), authAdmin.findClient);
+router
+    .route('/client/find/:page/:limit')
+    .post(tokenVerifieAdmin, validate(adminAuth.findClient), authAdmin.findClient);
 
 // get clients
 /**
@@ -343,7 +410,7 @@ router
  *          500:
  *              description: Error during the get
  */
- router
+router
     .route('/client/:page/:limit')
     .get(tokenVerifieAdmin, validate(adminAuth.getClients), authAdmin.getClientsWithPagination);
 

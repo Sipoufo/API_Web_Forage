@@ -6,7 +6,8 @@ const client = require('../../models/client.model')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer')
-const { Client } = require('../../models/index');
+const { Facture, Client } = require('../../models/index');
+const mongoose = require("mongoose");
 
 const maxAge = 3 * 24 * 60 * 60
 
@@ -19,7 +20,6 @@ const createToken = (id) => {
 const authorization = (req) => {
     return req.headers.authorization.split(" ")[1]
 }
-
 
 const register = catchAsync(async (req, res) => {
     const name = req.body.name
@@ -44,7 +44,6 @@ const register = catchAsync(async (req, res) => {
                                 res.status(500).json({ status: 500, error: "Error during the save" })
                             }
                         } else {
-                            console.log()
                             res.status(500).json({ status: 500, error: "this number exist <-_->" })
                         }
                     })
@@ -66,13 +65,11 @@ const update = catchAsync(async (req, res) => {
 
     jwt.verify(token, 'Admin web forage', async (err, decodedToken) => {
         if (err) {
-            console.log('update: ')
             console.log(err);
         } else {
             return client.findOne({ phone })
                 .then(clien => {
                     if (!clien) {
-                        console.log('update: ')
                         return admin.findOne({ phone })
                             .then(async number => {
                                 if ((number && number._id == decodedToken.id) || !number) {
@@ -89,7 +86,6 @@ const update = catchAsync(async (req, res) => {
                                         res.status(500).json({ status: 500, error: "This email exist" })
                                     }
                                 } else {
-                                    console.log()
                                     res.status(500).json({ status: 500, error: "this number exist <-_->" })
                                 }
                             })
@@ -149,7 +145,6 @@ const updateById = catchAsync(async (req, res) => {
             if (!userClient) {
                 return admin.findOne({ phone })
                     .then(async number => {
-                        console.log(number._id == idAdmin);
                         if ((number && number._id == idAdmin) || !number) {
                             const emailAdmin = await admin.findOne({ email })
                             const emailClient = await client.findOne({ email })
@@ -164,7 +159,6 @@ const updateById = catchAsync(async (req, res) => {
                                 res.status(500).json({ status: 500, error: "This email don't exist" })
                             }
                         } else {
-                            console.log()
                             res.status(500).json({ status: 500, error: "this number exist <-_->" })
                         }
                     })
@@ -183,7 +177,6 @@ const sendFirstAdmin = catchAsync(async (req, res) => {
     const latitude = 12
     const profileImage = "noPath"
 
-    console.log(req)
     return admin.findOne({ phone })
         .then(async number => {
             if (!number) {
@@ -196,7 +189,6 @@ const sendFirstAdmin = catchAsync(async (req, res) => {
                     res.status(500).json({ status: 500, error: "Error during the save" })
                 }
             } else {
-                console.log()
                 res.status(500).json({ status: 500, error: "this number exist <-_->" })
             }
         })
@@ -388,7 +380,6 @@ const getAdmins = catchAsync((req, res) => {
                 } else {
                     if (admins.length > 0) {
                         for (let i = 0; i < admins.length; i++) {
-                            console.log(admins[i]._id != decodedToken.id);
                             if (admins[i]._id != decodedToken.id) {
                                 allAdmin.push(admins[i])
                             }
@@ -428,10 +419,156 @@ const getAdminByToken = catchAsync((req, res) => {
     })
 })
 
+const getClientsWithTotalCostUnpaid = catchAsync(async (req, res) => {
+
+    client
+        .find({ status: true })
+        .sort({ createdAt: 'ascending' })
+        .then(async clients => {
+            if (clients.length > 0) {
+                let resuls = [];
+                for (let index = 0; index < clients.length; index++) {
+                    const element = clients[index];
+                    let amount = await totalCostUnpaidByClient(element._id)
+                    resuls.push({
+                        client: element,
+                        unpaid: amount
+                    })
+                }
+                res.status(200).json({ status: 200, result: resuls })
+            } else {
+                res.status(200).json({ status: 200, result: [] })
+            }
+        })
+})
+
+const getClientsWithTotalCostUnpaidWithPagination = catchAsync(async (req, res) => {
+    const page = (req.params.page) ? req.params.page : 1;
+    const limit = (req.params.limit) ? req.params.limit : 10;
+    const offset = page - 1;
+
+    client
+        .find({ status: true })
+        .sort({ createdAt: 'ascending' })
+        .skip(offset)
+        .limit(limit)
+        .then(async clients => {
+            if (clients.length > 0) {
+                let resuls = [];
+                for (let index = 0; index < clients.length; index++) {
+                    const element = clients[index];
+                    let amount = await totalCostUnpaidByClient(element._id)
+                    resuls.push({
+                        client: element,
+                        unpaid: amount
+                    })
+                }
+                res.status(200).json({ status: 200, result: generatePaginnation(resuls, limit, page) })
+            } else {
+                res.status(200).json({ status: 200, result: generatePaginnation([], limit, page) })
+            }
+        })
+})
+
+const getClientsWithTotalUnpaidInvoice = catchAsync(async (req, res) => {
+    client
+        .find({ status: true })
+        .sort({ createdAt: 'ascending' })
+        .then(async clients => {
+            if (clients.length > 0) {
+                let resuls = [];
+                for (let index = 0; index < clients.length; index++) {
+                    const element = clients[index];
+                    let result = await totalUnpaidInvoiceByClient(element._id)
+                    resuls.push({
+                        client: element,
+                        unpaidAmount: result.unpaidAmount,
+                        unPaidInvoices: result.unPaidInvoices
+                    })
+                }
+                res.status(200).json({ status: 200, result: resuls })
+            } else {
+                res.status(200).json({ status: 200, result: [] })
+            }
+        })
+})
+
+const getClientsWithTotalUnpaidInvoiceWithPagination = catchAsync(async (req, res) => {
+    const page = (req.params.page) ? req.params.page : 1;
+    const limit = (req.params.limit) ? req.params.limit : 10;
+    const offset = page - 1;
+
+    client
+        .find({ status: true })
+        .sort({ createdAt: 'ascending' })
+        .skip(offset)
+        .limit(limit)
+        .then(async clients => {
+            if (clients.length > 0) {
+                let resuls = [];
+                for (let index = 0; index < clients.length; index++) {
+                    const element = clients[index];
+                    let result = await totalUnpaidInvoiceByClient(element._id)
+                    resuls.push({
+                        client: element,
+                        unpaidAmount: result.unpaidAmount,
+                        unPaidInvoices: result.unPaidInvoices
+                    })
+                }
+                res.status(200).json({ status: 200, result: generatePaginnation(resuls, limit, page) })
+            } else {
+                res.status(200).json({ status: 200, result: generatePaginnation([], limit, page) })
+            }
+        })
+})
+
+const totalCostUnpaidByClient = async (idClient) => {
+    try {
+        idClient = mongoose.Types.ObjectId("" + idClient);
+        let unPaidInvoices = await Facture.find({ facturePay: false, idClient })
+        let montantImpaye = 0;
+        if (unPaidInvoices.length > 0) {
+            for (let index = 0; index < unPaidInvoices.length; index++) {
+                const unPaidInvoice = unPaidInvoices[index];
+                montantImpaye += unPaidInvoice.montantImpaye;
+            }
+        }
+        return montantImpaye;
+    } catch (error) {
+        return 0;
+    }
+};
+
+const totalUnpaidInvoiceByClient = async (idClient) => {
+    try {
+        idClient = mongoose.Types.ObjectId("" + idClient);
+        let unPaidInvoices = await Facture.find({ facturePay: false, idClient })
+        let montantImpaye = 0;
+        if (unPaidInvoices.length > 0) {
+            for (let index = 0; index < unPaidInvoices.length; index++) {
+                const unPaidInvoice = unPaidInvoices[index];
+                montantImpaye += unPaidInvoice.montantImpaye;
+            }
+        }
+        return {
+            unpaidAmount: montantImpaye,
+            unPaidInvoices: unPaidInvoices.length > 0 ? unPaidInvoices : []
+        };
+    } catch (error) {
+        return {
+            unpaidAmount: 0,
+            unPaidInvoices: []
+        };
+    }
+};
 
 module.exports = {
     register,
     sendFirstAdmin,
+    getClientsWithTotalCostUnpaid,
+    getClientsWithTotalUnpaidInvoice,
+    getClientsWithTotalUnpaidInvoiceWithPagination,
+    getClientsWithTotalCostUnpaidWithPagination,
     logout,
     findClient,
     getClients,

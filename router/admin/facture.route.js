@@ -243,10 +243,57 @@ router
     .route('/invoicePreCreate/:idClient')
     .post(tokenVerifie, validate(FactureValidation.preCreate), FactureController.preCreate);
 
+//  information
+/**
+ * @swagger
+ *  /admin/facture/getTotalCostUnpaidByClient/{idClient}:
+ *      get: 
+ *          summary: get total cost unpaid by client
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: idClient
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The id of user
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      get unpaid cost by idClient
+ *                                    
+ */
+router
+    .route('/getTotalCostUnpaidByClient/:idClient')
+    .get(tokenVerifie, validate(FactureValidation.totalCostUnpaidByClient), FactureController.getTotalCostUnpaidByClient);
+
+//  information
+/**
+ * @swagger
+ *  /admin/facture/getTotalUnpaidInvoiceByClient/{idClient}:
+ *      get: 
+ *          summary: get total cost unpaid by client
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: idClient
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: The id of user
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      get unpaid invoice by idClient
+ *                                    
+ */
+router
+    .route('/getTotalUnpaidInvoiceByClient/:idClient')
+    .get(tokenVerifie, validate(FactureValidation.totalCostUnpaidByClient), FactureController.getTotalUnpaidInvoiceByClient);
+
 router
     .route('/getByStatusWithPagination/:status/:page/:limit')
     .get(tokenVerifieAdmin, validate(FactureValidation.getByStatusWithPagination), FactureController.getByStatusWithPagination)
-
 
 // all facture by status
 /**
@@ -331,17 +378,17 @@ router
 
 /**
  * @swagger
- *  /admin/facture/statusPaidFacture/{idFacture}:
+ *  /admin/facture/payFactureByUser/{idUser}:
  *      put: 
  *          summary: Add facture
  *          tags: [Facture_Admin]
  *          parameters:
  *              -   in: path
- *                  name: idFacture
+ *                  name: idUser
  *                  schema: 
  *                      type: string
  *                  required: true
- *                  description: The id of facture
+ *                  description: The id of user
  *          requestBody:
  *              required: true
  *              content:
@@ -360,8 +407,8 @@ router
  *                                    
  */
 router
-    .route('/statusPaidFacture/:idFacture')
-    .put(tokenVerifie, validate(FactureValidation.statusPaidFacture), FactureController.statusPaidFacture);
+    .route('/payFactureByUser/:idUser')
+    .put(tokenVerifie, validate(FactureValidation.payFactureByUser), FactureController.payFactureByUser);
 
 /**
  * @swagger

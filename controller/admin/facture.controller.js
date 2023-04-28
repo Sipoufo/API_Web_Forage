@@ -601,82 +601,109 @@ const updateFacture = catchAsync(async (req, res) => {
   });
 });
 
-const statusPaidFacture = catchAsync(async (req, res) => {
-  const idFacture = req.params.idFacture;
-  let status = false;
+const payFactureByUser = catchAsync(async (req, res) => {
+  let idClient = req.params.idFacture;
   const amount = req.body.amount;
-  let surplus = 0;
   let error = "";
 
-  let facture = await Facture.findById(idFacture);
-  let idClient = mongoose.Types.ObjectId("" + facture.idClient);
+  idClient = mongoose.Types.ObjectId("" + idClient);
 
-  if (facture) {
-    // Get all un paid facture
-    let unPaidInvoices = await Facture.find({ facturePay: false, idClient })
-    for (let index = 0; index < unPaidInvoices.length; index++) {
-      if (amount > 0) {
-        const unPaidInvoice = unPaidInvoices[index];
-        let reste = amount - unPaidInvoice.montantImpaye;
-        await Facture.findByIdAndUpdate(mongoose.Types.ObjectId("" + unPaidInvoice._id), {
-          facturePay: true,
-          montantImpaye: reste > 0 ? 0 : (-1 * reste),
-          montantVerse: (unPaidInvoice.montantVerse + (reste >= 0 ? unPaidInvoice.montantImpaye : amount)),
-          $push: { tranche: { montant: amount, date: new Date() } },
-        }).then((facture) => {
-          if (!facture) {
-            error += "Error during the update facture " + unPaidInvoice._id + " \n";
-          }
-        });
-        amount = reste >= 0 ? reste : 0;
-      } else {
-        continue;
-      }
-    }
-
+  // Get all un paid facture
+  let unPaidInvoices = await Facture.find({ facturePay: false, idClient }).sort({ dateReleveNewIndex: 'ascending' })
+  for (let index = 0; index < unPaidInvoices.length; index++) {
     if (amount > 0) {
-      if (facture.facturePay != true) {
-        let newUnpaid = facture.montantImpaye - amount;
-        const newAmountPaid = facture.montantVerse + amount;
-        if (newUnpaid >= 0) {
-          if (newUnpaid != 0) {
-            status = false;
-          } else {
-            status = true;
-          }
-        } else {
-          surplus = newUnpaid * -1;
-          newUnpaid = 0;
-          status = true;
+      const unPaidInvoice = unPaidInvoices[index];
+      let reste = amount - unPaidInvoice.montantImpaye;
+      await Facture.findByIdAndUpdate(mongoose.Types.ObjectId("" + unPaidInvoice._id), {
+        facturePay: reste >= 0 ? true : false,
+        montantImpaye: reste >= 0 ? 0 : (-1 * reste),
+        montantVerse: (unPaidInvoice.montantVerse + (reste >= 0 ? unPaidInvoice.montantImpaye : amount)),
+        $push: { tranche: { montant: amount, date: new Date() } },
+      }).then((facture) => {
+        if (!facture) {
+          error += "Error during the update facture " + unPaidInvoice._id + " \n";
         }
-
-        await Facture.findByIdAndUpdate(idFacture, {
-          facturePay: status,
-          montantImpaye: newUnpaid,
-          montantVerse: newAmountPaid,
-          surplus,
-          $push: { tranche: { montant: amount, date: new Date() } },
-        }).then((facture1) => {
-          if (facture1) {
-            res.status(200).json({ status: 200, result: facture1 });
-          } else {
-            res
-              .status(500)
-              .json({ status: 500, error: error + "Error during the update facture " + facture._id + " \n" });
-          }
-        });
-      } else {
-        res
-          .status(500)
-          .json({ status: 500, error: error + "This facture is already paid " + facture._id + " \n" });
-      }
+      });
+      amount = reste >= 0 ? reste : 0;
+    } else {
+      let amount = await totalCostUnpaidByClient(idClient);
+      res.status(200).json({ status: 200, result: "Toute les factures impayées n'ont pas été payées, cette somme n'a pas suffi à regler vos detes en incluant la consommation de ce mois. Vous devez encore payer: " + amount });
+      continue;
     }
-  } else {
-    res.status(500).json({ status: 500, error: error + "This facture don't exist " + facture._id + " \n" });
+  }
+
+  if (amount >= 0) {
+    if (error == "") {
+      res.status(200).json({ status: 200, result: "Toute les factures impayées sont payées" });
+    } else {
+      res
+        .status(500)
+        .json({ status: 500, error: error + " \n" });
+    }
   }
 });
 
+const getTotalCostUnpaidByClient = catchAsync(async (req, res) => {
+  const idClient = req.params.idClient;
+  let montantImpaye = await totalCostUnpaidByClient(idClient);
+  res
+    .status(200)
+    .json({
+      status: 200, result: {
+        montantImpaye
+      }
+    });
+});
 
+const getTotalUnpaidInvoiceByClient = catchAsync(async (req, res) => {
+  const idClient = req.params.idClient;
+  let results = await totalUnpaidInvoiceByClient(idClient);
+  res
+    .status(200)
+    .json({
+      status: 200, result: results
+    });
+});
+
+const totalCostUnpaidByClient = async (idClient) => {
+  try {
+    idClient = mongoose.Types.ObjectId("" + idClient);
+    let unPaidInvoices = await Facture.find({ facturePay: false, idClient })
+    let montantImpaye = 0;
+    if (unPaidInvoices.length > 0) {
+      for (let index = 0; index < unPaidInvoices.length; index++) {
+        const unPaidInvoice = unPaidInvoices[index];
+        montantImpaye += unPaidInvoice.montantImpaye;
+      }
+    }
+    return montantImpaye;
+  } catch (error) {
+    return 0;
+  }
+};
+
+const totalUnpaidInvoiceByClient = async (idClient) => {
+  try {
+    idClient = mongoose.Types.ObjectId("" + idClient);
+    let unPaidInvoices = await Facture.find({ facturePay: false, idClient })
+    let montantImpaye = 0;
+    if (unPaidInvoices.length > 0) {
+      for (let index = 0; index < unPaidInvoices.length; index++) {
+        const unPaidInvoice = unPaidInvoices[index];
+        montantImpaye += unPaidInvoice.montantImpaye;
+      }
+    }
+    return {
+      unpaidAmount: montantImpaye,
+      unPaidInvoices: unPaidInvoices.length > 0 ? unPaidInvoices : []
+    };
+  } catch (error) {
+    return {
+      unpaidAmount: 0,
+      unPaidInvoices: []
+    };
+  }
+};
 
 const getByStatus = catchAsync(async (req, res) => {
   const status = req.params.status;
@@ -695,7 +722,6 @@ const getByStatus = catchAsync(async (req, res) => {
       }
     });
 });
-
 
 const getByStatusWithPagination = catchAsync(async (req, res) => {
   const status = req.params.status;
@@ -940,8 +966,11 @@ module.exports = {
   getFactures,
   getClientFactures,
   updateFacture,
-  statusPaidFacture,
+  payFactureByUser,
   getFactureAdvance,
+  totalUnpaidInvoiceByClient,
+  getTotalUnpaidInvoiceByClient,
+  totalCostUnpaidByClient,
   getByStatus,
   getFactureOne,
   findByYear,
@@ -956,4 +985,6 @@ module.exports = {
   getByStatusWithPagination,
   removeInvoice,
   getUserThatHaveNotPaidInvoiceWithDate,
+  getTotalCostUnpaidByClient,
+  totalCostUnpaidByClient
 };

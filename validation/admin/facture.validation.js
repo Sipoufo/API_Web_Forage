@@ -76,7 +76,7 @@ const deleteFacture = {
 
 const payFactureByUser = {
     params: Joi.object().keys({
-        idFacture: Joi.custom(objectId).required()
+        idUser: Joi.custom(objectId).required()
     }),
     body: Joi.object().keys({
         amount: Joi.number().required()

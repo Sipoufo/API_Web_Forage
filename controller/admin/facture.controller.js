@@ -340,8 +340,8 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
   const dateUnpaidYear = new Date(req.params.date).getFullYear();
   let results = [];
   let query = {};
-  console.log('username: ', req.body?.username);
   if (req.body?.username) {
+    console.log('username: ', req.body?.username);
     query = { 'name': { '$regex': '' + req.body.username, '$options': 'i' } }
   }
   query = { ...query, isDelete: false };
@@ -602,8 +602,8 @@ const updateFacture = catchAsync(async (req, res) => {
 });
 
 const payFactureByUser = catchAsync(async (req, res) => {
-  let idClient = req.params.idFacture;
-  const amount = req.body.amount;
+  let idClient = req.params.idUser;
+  let amount = req.body.amount;
   let error = "";
 
   idClient = mongoose.Types.ObjectId("" + idClient);
@@ -624,22 +624,25 @@ const payFactureByUser = catchAsync(async (req, res) => {
           error += "Error during the update facture " + unPaidInvoice._id + " \n";
         }
       });
-      amount = reste >= 0 ? reste : 0;
+      amount = reste;
     } else {
       let amount = await totalCostUnpaidByClient(idClient);
-      res.status(200).json({ status: 200, result: "Toute les factures impayées n'ont pas été payées, cette somme n'a pas suffi à regler vos detes en incluant la consommation de ce mois. Vous devez encore payer: " + amount });
+      res.status(200).json({ status: 200, result: "Une partie de vos factures impayées a été payée. Vous devez encore verser une somme de " + amount + " pour être à jour." });
       continue;
     }
   }
 
-  if (amount >= 0) {
-    if (error == "") {
-      res.status(200).json({ status: 200, result: "Toute les factures impayées sont payées" });
+  if (error == "") {
+    if (amount >= 0) {
+      res.status(200).json({ status: 200, result: "Toutes les factures impayées sont payées. Vous êtes à jour" });
     } else {
-      res
-        .status(500)
-        .json({ status: 500, error: error + " \n" });
+      amount = amount < 0 ? -1 * amount : amount;
+      res.status(200).json({ status: 200, result: "Une partie de vos factures impayées a été payée. Vous devez encore verser une somme de " + amount + " pour être à jour." });
     }
+  } else {
+    res
+      .status(500)
+      .json({ status: 500, error: error + " \n" });
   }
 });
 

@@ -620,6 +620,42 @@ router
     .route('/userThatHaveNotPaidInvoiceWithDate/:date/:page/:limit')
     .post(tokenVerifieAdmin, validate(FactureValidation.getUserThatHaveNotPaidInvoiceWithDate), FactureController.getUserThatHaveNotPaidInvoiceWithDate)
 
+
+//check if user have facture that match with entry date
+//if he don't have return user with all account
+/**
+ * @swagger
+ *  /admin/facture/userThatHaveNotPaidInvoiceWithDate/{date}/{limit}/{page}:
+ *      get:
+ *          summary: See unpaid invoice with date
+ *          tags: [Facture_Admin]
+ *          parameters:
+ *              -   in: path
+ *                  name: date
+ *                  schema: 
+ *                      type: string
+ *                  required: true
+ *                  description: Date
+ *              -   in: path
+ *                  name: limit
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: limit where you want on one page
+ *              -   in: path
+ *                  name: page
+ *                  schema: 
+ *                      type: integer
+ *                  required: true
+ *                  description: Page where you want to be
+ *          responses: 
+ *              200:
+ *                  description: get factures
+ */
+router
+    .route('/userThatHaveNotPaidInvoiceWithDate/:date/:page/:limit')
+    .get(tokenVerifieAdmin, validate(FactureValidation.getUserThatHaveNotPaidInvoiceWithDate), FactureController.getUserThatHaveNotPaidInvoiceWithDate)
+
 /**
  * @swagger
  *  /admin/facture/remove/{idInvoice}:

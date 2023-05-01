@@ -677,6 +677,29 @@ router
     .delete(tokenVerifieAdmin, validate(FactureValidation.removeInvoice), FactureController.removeInvoice)
 
 
+/**
+* @swagger
+*  /admin/facture/search/{page}/{limit}:
+*      post:
+*          summary: search invoice with pagination
+*          tags: [Facture_Admin]
+*          parameters:
+*              -   in: path
+*                  name: limit
+*                  schema: 
+*                      type: integer
+*                  required: true
+*                  description: limit where you want on one page
+*              -   in: path
+*                  name: page
+*                  schema: 
+*                      type: integer
+*                  required: true
+*                  description: Page where you want to be
+*          responses: 
+*              200:
+*                  description: search factures
+*/
 router
     .route('/search/:page/:limit')
     .post(tokenVerifieAdmin, validate(FactureValidation.searchInvoice), FactureController.searchInvoice)

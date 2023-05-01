@@ -219,7 +219,7 @@ const logout = (req, res) => {
 const getClients = catchAsync((req, res) => {
     client
         .find({ status: true })
-        .sort({ name: 0 })
+        .sort({ createdAt: 'descending' })
         .then(clients => {
             if (clients.length > 0) {
                 res.status(200).json({ status: 200, result: clients })
@@ -278,7 +278,6 @@ const findClient = catchAsync((req, res) => {
             .find(filter)
             .sort({ name: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
             .skip(page - 1)
-            .limit(limit)
             .then(response => {
                 res.status(200).json({ status: 200, result: generatePaginnation(response, limit, page) });
             })
@@ -292,7 +291,7 @@ const findClient = catchAsync((req, res) => {
             .find(filter)
             .sort({ name: (req.body?.order && req.body?.order === 'asc' ? 1 : - 1) })
             .skip(offset)
-            .limit(limit)
+
             .then(clients => {
                 if (clients.length > 0) {
                     res.status(200).json({ status: 200, result: generatePaginnation(clients, limit, page) })
@@ -306,8 +305,10 @@ const findClient = catchAsync((req, res) => {
 const generatePaginnation = (data, limit, page) => {
     if (data?.length > 0) {
         const totalPages = Math.floor(data.length / limit);
+        let result = [];
+        result = data.slice(limit * (page - 1), limit * page);
         return {
-            docs: data,
+            docs: result,
             totalDocs: data.length,
             limit: limit,
             totalPages: totalPages,
@@ -420,11 +421,9 @@ const getAdminByToken = catchAsync((req, res) => {
 })
 
 const getClientsWithTotalCostUnpaid = catchAsync(async (req, res) => {
-
-
     client
         .find({ status: true })
-        .sort({ createdAt: 'ascending' })
+        .sort({ createdAt: 'descending' })
         .then(async clients => {
             if (clients.length > 0) {
                 let resuls = [];
@@ -464,7 +463,7 @@ const getClientsWithTotalCostUnpaidWithPagination = catchAsync(async (req, res) 
         .find({ status: true })
         .sort({ createdAt: 'ascending' })
         .skip(offset)
-        .limit(limit)
+
         .then(async clients => {
             if (clients.length > 0) {
                 let resuls = [];
@@ -541,7 +540,7 @@ const getClientsWithTotalUnpaidInvoiceWithPagination = catchAsync(async (req, re
         .find({ status: true })
         .sort({ createdAt: 'ascending' })
         .skip(offset)
-        .limit(limit)
+
         .then(async clients => {
             if (clients.length > 0) {
                 let resuls = [];

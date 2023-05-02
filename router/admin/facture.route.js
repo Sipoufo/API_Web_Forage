@@ -59,7 +59,7 @@ router
 //  get all facture advance
 /**
  * @swagger
- *  /admin/facture/:
+ *  /admin/facture/all:
  *      get:
  *          summary: get all facture without params
  *          tags: [Facture_Admin]

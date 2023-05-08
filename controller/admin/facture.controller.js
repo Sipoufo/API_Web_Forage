@@ -365,7 +365,23 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
           }
         });
 
+        let bills = await Facture.find({
+          $expr: {
+            $and: [
+
+              { idClient: customers[i]["_id"] },
+
+              { $eq: [{ $month: "$createdAt" }, (dateUnpaidMonth + 1)] },
+
+              { $eq: [{ $year: "$createdAt" }, new Date(req.params.date).getFullYear()] }
+
+            ]
+          }
+        });
+
         let hasAtLeastOneInvoice = factures.length > 0 ? true : false;
+        let hasDirectNextInvoice = hasAtLeastOneInvoice ? false : (bills.length > 0 ? true : false);
+
 
         let invoiceCustomer = await Facture.aggregate([
           {
@@ -391,6 +407,8 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
             user: customers[i],
             idCompteur: customers[i]?.idCompteur,
             hasAtLeastOneInvoice,
+            hasDirectNextInvoice,
+            newIndex: hasDirectNextInvoice ? bills[0].oldIndex : 0,
           });
         } else {
           //if user has bill
@@ -418,6 +436,8 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
                       user: customers[i],
                       idCompteur: [idCompteur],
                       hasAtLeastOneInvoice,
+                      hasDirectNextInvoice,
+                      newIndex: hasDirectNextInvoice ? bills[0].oldIndex : 0,
                     });
                   }
                 }
@@ -794,31 +814,35 @@ const searchInvoice = catchAsync(async (req, res) => {
   const username = req.body?.username;
   const type = req.body?.type;
 
+  let nbrOfCriteria = 0;
+
   let query = null;
 
-  if (month) {
+  if (month && month != 0) {
+    nbrOfCriteria += 1;
     query = [{ $eq: [{ $month: "$createdAt" }, month] }];
   }
 
-  if (consumption) {
-    console.log('query: ', query == null);
+  if (consumption && consumption != 0) {
+    nbrOfCriteria += 1;
     query = (query == null) ? [{ consommation: consumption }] : [...query, { consommation: consumption }];
-    console.log('query: ', query);
   }
 
-  if (year) {
+  if (year && year != 0) {
+    nbrOfCriteria += 1;
     query = (query == null) ? [{ $eq: [{ $year: "$createdAt" }, year] }] : [...query, { $eq: [{ $year: "$createdAt" }, year] }];
   }
 
-  let factures = await Facture.find((query != null) ? {
-    $expr: {
+  let expression = (query != null) ? {
+    $expr: nbrOfCriteria > 1 ? {
       $and: query
-    }
-  } : {});
+    } : query
+  } : {};
 
+  let factures = await Facture.find(expression);
   let goodBills = [];
 
-  if (username) {
+  if (username && username != " ") {
     let customers = await Client.find({ 'name': { '$regex': '' + req.body.username, '$options': 'i' } });
     for (let index = 0; index < factures.length; index++) {
       const facture = factures[index];
@@ -841,14 +865,14 @@ const searchInvoice = catchAsync(async (req, res) => {
   }
 
   if (type === "paid") {
-    let invoices = goodBills.filter(x => x.montantImpaye = 0);
+    let invoices = goodBills.filter(x => x.facturePay == true);
     res
       .status(200)
       .json({ status: 200, result: generatePaginnation(invoices.slice((page - 1), (page - 1) + limit), invoices, limit, page) });
   }
 
   if (type === "unpaid") {
-    let invoices = goodBills.filter(x => x.montantImpaye > 0);
+    let invoices = goodBills.filter(x => x.facturePay == false);
 
     res
       .status(200)

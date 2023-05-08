@@ -794,25 +794,27 @@ const searchInvoice = catchAsync(async (req, res) => {
   const username = req.body?.username;
   const type = req.body?.type;
 
-  let query = {};
+  let query = null;
 
   if (month) {
     query = [{ $eq: [{ $month: "$createdAt" }, month] }];
   }
 
   if (consumption) {
-    query = [...query, { consommation: consumption }];
+    console.log('query: ', query == null);
+    query = (query == null) ? [{ consommation: consumption }] : [...query, { consommation: consumption }];
+    console.log('query: ', query);
   }
 
   if (year) {
-    query = [...query, { $eq: [{ $year: "$createdAt" }, year] }];
+    query = (query == null) ? [{ $eq: [{ $year: "$createdAt" }, year] }] : [...query, { $eq: [{ $year: "$createdAt" }, year] }];
   }
 
-  let factures = await Facture.find({
+  let factures = await Facture.find((query != null) ? {
     $expr: {
       $and: query
     }
-  });
+  } : {});
 
   let goodBills = [];
 

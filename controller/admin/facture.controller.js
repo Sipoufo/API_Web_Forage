@@ -850,12 +850,17 @@ const searchInvoice = catchAsync(async (req, res) => {
       for (let j = 0; j < customers.length; j++) {
         const user = customers[j];
         if (facture.idClient + '' === user._id + '') {
-          goodBills.push(facture);
+          goodBills.push({ ...facture._doc, user });
         }
       }
     }
   } else {
-    goodBills = factures;
+    for (let index = 0; index < factures.length; index++) {
+      const facture = factures[index];
+      let id = mongoose.Types.ObjectId("" + facture?.idClient);
+      let user = await Client.findById({ _id: id });
+      goodBills.push({ ...facture._doc, user });
+    }
   }
 
   if (type === "all") {
@@ -942,6 +947,14 @@ const getInfoForPrint = catchAsync(async (req, res) => {
 
 });
 
+const deleteAllInvoice = catchAsync(async (req, res) => {
+  await Facture.deleteMany({}).then((val) => {
+    res
+      .status(200)
+      .json({ status: 200, result: "Remove all invoiices successfully done" });
+  });
+});
+
 module.exports = {
   addFacture,
   getAllFacture,
@@ -949,6 +962,7 @@ module.exports = {
   getClientFactures,
   updateFacture,
   payFactureByUser,
+  deleteAllInvoice,
   getFactureAdvance,
   totalUnpaidInvoiceByClient,
   getTotalUnpaidInvoiceByClient,

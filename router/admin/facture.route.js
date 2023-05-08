@@ -747,4 +747,20 @@ router
     .route('/getInfoForPrint/:idFacture')
     .get(tokenVerifieAdmin, validate(FactureValidation.getInfoForPrint), FactureController.getInfoForPrint)
 
+/**
+ * @swagger
+ *  /admin/facture/deleteAllInvoice:
+ *      delete: 
+ *          summary: remove all invoice
+ *          tags: [Facture_Admin]
+ *          responses:
+ *              '201':
+ *                  description: >
+ *                      return Remove all invoiices successfully done
+ *                                    
+ */
+router
+    .route('/deleteAllInvoice')
+    .delete(tokenVerifieAdmin, FactureController.deleteAllInvoice)
+
 module.exports = router

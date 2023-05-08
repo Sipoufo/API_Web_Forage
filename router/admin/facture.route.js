@@ -696,6 +696,25 @@ router
 *                      type: integer
 *                  required: true
 *                  description: Page where you want to be
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:  
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              month:
+ *                                  type: number
+ *                              consumption:
+ *                                  type: number
+ *                              year:
+ *                                  type: number
+ *                              type:
+ *                                  type: string
+ *                              username:
+ *                                  type: string
+ *                          example:
+ *                              username: christ
 *          responses: 
 *              200:
 *                  description: search factures

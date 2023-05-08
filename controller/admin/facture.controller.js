@@ -357,9 +357,9 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
 
               { idClient: customers[i]["_id"] },
 
-              { $eq: [{ $month: "$createdAt" }, new Date().getMonth()] },
+              { $eq: [{ $month: "$createdAt" }, new Date(req.params.date).getMonth()] },
 
-              { $eq: [{ $year: "$createdAt" }, new Date().getFullYear()] }
+              { $eq: [{ $year: "$createdAt" }, new Date(req.params.date).getFullYear()] }
 
             ]
           }
@@ -794,126 +794,65 @@ const searchInvoice = catchAsync(async (req, res) => {
   const username = req.body?.username;
   const type = req.body?.type;
 
-  let idClient;
-  let client;
+  let query = {};
 
-  let invoices = [];
-
-  if (username && username !== " ") {
-    client = await Client.findOne({ name: username });
-    idClient = client?._id;
+  if (month) {
+    query = [{ $eq: [{ $month: "$createdAt" }, month] }];
   }
 
-  let factures = await Facture.find().sort({ createdAt: 1 });
-  if (factures.length > 0) {
-    for (let i = 0; i < factures.length; i++) {
-      const yearFacture = factures[i].createdAt.getFullYear();
+  if (consumption) {
+    query = [...query, { consommation: consumption }];
+  }
 
-      let invoice = null;
-      let conform = "start check";
+  if (year) {
+    query = [...query, { $eq: [{ $year: "$createdAt" }, year] }];
+  }
 
-      if (year && year !== 0) {
-        if (yearFacture == year) {
-          invoice = factures[i];
-          conform = "year";
-        }
-      }
+  let factures = await Facture.find({
+    $expr: {
+      $and: query
+    }
+  });
 
-      if (month && month !== 0) {
-        if (invoice && invoice !== null) {
-          const monthFacture = invoice.createdAt.getMonth() + 1;
-          if (monthFacture !== month) {
-            invoice = null;
-            conform = "month";
-          }
-        } else {
-          const monthFacture = factures[i].createdAt.getMonth() + 1;
-          if (monthFacture == month) {
-            invoice = factures[i];
-            conform = "month";
-          }
-        }
-      }
+  let goodBills = [];
 
-      if (consumption && consumption !== 0) {
-        if (conform === "start check" && factures[i]?.consommation === consumption) {
-          invoice = factures[i];
-          conform = "consumption";
-        }
-        if (conform !== "start check") {
-          if (invoice && invoice !== null) {
-            if (invoice?.consommation !== consumption) {
-              invoice = null;
-              conform = "consumption";
-            }
-          }
-        }
-      }
+  if (username) {
+    let customers = await Client.find({ 'name': { '$regex': '' + req.body.username, '$options': 'i' } });
+    for (let index = 0; index < factures.length; index++) {
+      const facture = factures[index];
 
-      if (idClient && idClient !== null) {
-        if (conform === "start check" && factures[i]?.idClient === idClient) {
-          invoice = factures[i];
-          conform = "idClient";
-        }
-        if (conform !== "start check") {
-          if (invoice && invoice !== null) {
-            if (invoice?.idClient !== idClient) {
-              invoice = null;
-              conform = "idClient";
-            }
-          }
-        }
-      } else {
-        let id = mongoose.Types.ObjectId("" + factures[i].idClient);
-        console.log('id', id);
-        client = await Client.findById({ _id: id });
-      }
-
-      if (invoice && invoice !== null) {
-        if (type && type !== " " && type === "all") {
-          invoices.push({
-            invoice,
-            user: client
-          });
-        }
-
-        if (type && type !== " " && type === "paid") {
-          if (invoice?.facturePay === true) {
-            invoices.push({
-              invoice,
-              user: client
-            });
-          }
-        }
-
-        if (type && type !== " " && type === "unpaid") {
-          if (invoice?.facturePay === false) {
-            invoices.push({
-              invoice,
-              user: client
-            });
-          }
-        }
-      }
-
-      if (invoice == null && conform === "start check") {
-        if (type && type !== " " && type === "all") {
-          let id = mongoose.Types.ObjectId("" + factures[i].idClient);
-          console.log('id', id);
-          client = await Client.findById({ _id: id });
-
-          invoices.push({
-            invoice: factures[i],
-            user: client
-          });
+      for (let j = 0; j < customers.length; j++) {
+        const user = customers[j];
+        if (facture.idClient + '' === user._id + '') {
+          goodBills.push(facture);
         }
       }
     }
+  } else {
+    goodBills = factures;
   }
 
-  res
-    .status(200)
-    .json({ status: 200, result: generatePaginnation(invoices.slice((page - 1), (page - 1) + limit), invoices, limit, page) });
+  if (type === "all") {
+    res
+      .status(200)
+      .json({ status: 200, result: generatePaginnation(goodBills.slice((page - 1), (page - 1) + limit), goodBills, limit, page) });
+  }
+
+  if (type === "paid") {
+    let invoices = goodBills.filter(x => x.montantImpaye = 0);
+    res
+      .status(200)
+      .json({ status: 200, result: generatePaginnation(invoices.slice((page - 1), (page - 1) + limit), invoices, limit, page) });
+  }
+
+  if (type === "unpaid") {
+    let invoices = goodBills.filter(x => x.montantImpaye > 0);
+
+    res
+      .status(200)
+      .json({ status: 200, result: generatePaginnation(invoices.slice((page - 1), (page - 1) + limit), invoices, limit, page) });
+  }
+
 
 });
 

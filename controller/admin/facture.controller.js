@@ -350,7 +350,21 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
     .sort({ name: 0 })
     .then(async (customers) => {
       for (let i = 0; i < customers.length; i++) {
-        let factures = await Facture.find({ idClient: customers[i]["_id"] });
+
+        let factures = await Facture.find({
+          $expr: {
+            $and: [
+
+              { idClient: customers[i]["_id"] },
+
+              { $eq: [{ $month: "$createdAt" }, new Date().getMonth()] },
+
+              { $eq: [{ $year: "$createdAt" }, new Date().getFullYear()] }
+
+            ]
+          }
+        });
+
         let hasAtLeastOneInvoice = factures.length > 0 ? true : false;
 
         let invoiceCustomer = await Facture.aggregate([
@@ -789,7 +803,7 @@ const searchInvoice = catchAsync(async (req, res) => {
     client = await Client.findOne({ name: username });
     idClient = client?._id;
   }
-  console.log('client:', client);
+
   let factures = await Facture.find().sort({ createdAt: 1 });
   if (factures.length > 0) {
     for (let i = 0; i < factures.length; i++) {

@@ -358,9 +358,9 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
 
               { idClient: customers[i]["_id"] },
 
-              { $eq: [{ $month: "$dateReleveNewIndex" }, new Date(req.params.date).getMonth()] },
+              { $eq: [{ $month: "$createdAt" }, new Date(req.params.date).getMonth()] },
 
-              { $eq: [{ $year: "$dateReleveNewIndex" }, new Date(req.params.date).getFullYear()] }
+              { $eq: [{ $year: "$createdAt" }, new Date(req.params.date).getFullYear()] }
 
             ]
           }
@@ -372,9 +372,9 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
 
               { idClient: customers[i]["_id"] },
 
-              { $eq: [{ $month: "$dateReleveNewIndex" }, (dateUnpaidMonth + 1)] },
+              { $eq: [{ $month: "$createdAt" }, (dateUnpaidMonth + 1)] },
 
-              { $eq: [{ $year: "$dateReleveNewIndex" }, new Date(req.params.date).getFullYear()] }
+              { $eq: [{ $year: "$createdAt" }, new Date(req.params.date).getFullYear()] }
 
             ]
           }

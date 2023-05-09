@@ -408,6 +408,7 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
             idCompteur: customers[i]?.idCompteur,
             hasAtLeastOneInvoice,
             hasDirectNextInvoice,
+            oldIndex: hasAtLeastOneInvoice ? factures[0].newIndex : 0,
             newIndex: hasDirectNextInvoice ? bills[0].oldIndex : 0,
           });
         } else {
@@ -438,6 +439,7 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
                       idCompteur: [idCompteur],
                       hasAtLeastOneInvoice,
                       hasDirectNextInvoice,
+                      oldIndex: hasAtLeastOneInvoice ? factures[0].newIndex : 0,
                       newIndex: hasDirectNextInvoice ? bills[0].oldIndex : 0,
                     });
                   }

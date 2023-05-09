@@ -17,153 +17,64 @@ const addFacture = catchAsync(async (req, res) => {
     } else {
       const idClient = req.params.idClient;
       const idAdmin = decodedToken.id;
+
       const newIndex = req.body.newIndex;
+      const oldIndex = req.body.oldIndex ? req.body.oldIndex : 0;
       const idCompteur = req.body.idCompteur;
-      // const montantVerse = req.body.montantVerse;
+
       const dateReleveNewIndex = new Date(req.body.dateReleveNewIndex);
-      let oldIndex = req.body.oldIndex ? req.body.oldIndex : 0;
       const monthDate = dateReleveNewIndex.getMonth() + 1;
       const yearDate = dateReleveNewIndex.getFullYear();
+
       let doFacture = true;
       let surplus = 0;
 
-      // for pre-create invoice
-      let indexFacture = null;
-      let isprecreate = false;
-      let idFacturePre = null;
-      console.log(idClient);
-      await Facture.find({ idClient, idCompteur })
-        .sort({ dateReleveNewIndex: -1 })
-        .then(async (factures) => {
-          if (factures.length > 0) {
-            for (let i = 0; i < factures.length; i++) {
-              const dateBilling = new Date(factures[i].dateReleveNewIndex);
-              if (
-                dateBilling.getMonth() + 1 == monthDate &&
-                dateBilling.getFullYear() == yearDate &&
-                factures[i].preCreate == false
-              ) {
-                doFacture = false;
-                break;
-              } else if (factures[i].preCreate == false) {
-                indexFacture = i;
-                isprecreate = false;
-                idFacturePre = factures[i]._id;
-              } else if (
-                dateBilling.getMonth() == monthDate &&
-                dateBilling.getFullYear() == yearDate &&
-                factures[i].preCreate == true
-              ) {
-                indexFacture = i;
-                isprecreate = true;
-                idFacturePre = factures[i]._id;
-              }
-            }
-          }
-          if (factures.length >= 1) {
-            oldIndex = factures[0].newIndex;
-            surplus = factures[0].surplus;
-          }
+      if (oldIndex > newIndex) {
+        res
+          .status(500)
+          .json({ status: 500, error: "This invoice old index cann't greater than new index" });
+      }
 
-          if (doFacture == true && isprecreate == false) {
-            console.log("Step 2");
-            await Admin.findById(decodedToken.id).then(async (admin) => {
-              if (admin) {
-                const static = await StaticInf.find().sort({ createdAt: 1 });
-                const prixUnitaire = static[0].prixUnitaire;
-                const fraisEntretien = static[0].fraisEntretien;
-                const consommation = newIndex - oldIndex;
-                const montantConsommation =
-                  consommation * prixUnitaire + fraisEntretien;
-                // const dateFacturation = new Date();
-                let montantImpaye = 0;
-                let facturePay = false;
-                if (montantConsommation - surplus >= 0) {
-                  montantImpaye = montantConsommation - surplus;
-                } else {
-                  surplus = (montantConsommation - surplus) * -1;
-                  facturePay = true;
-                }
-                const dataLimitePaid = new Date(
-                  dateReleveNewIndex.getFullYear(),
-                  dateReleveNewIndex.getMonth() + 1,
-                  static[0].limiteDay,
-                  dateReleveNewIndex.getHours() + 1,
-                  dateReleveNewIndex.getMinutes(),
-                  dateReleveNewIndex.getMilliseconds()
-                );
-                console.log("Step 3");
-                await Facture.create({
-                  idClient,
-                  idAdmin,
-                  surplus,
-                  facturePay,
-                  dateReleveNewIndex,
-                  newIndex,
-                  oldIndex,
-                  idCompteur,
-                  consommation,
-                  prixUnitaire,
-                  fraisEntretien,
-                  montantConsommation,
-                  dataLimitePaid,
-                  montantImpaye,
-                  facturePay,
-                  penalty: { montant: 0, date: dateReleveNewIndex },
-                }).then((resp) => {
-                  if (resp) {
-                    res.status(200).json({ status: 200, result: resp });
-                  } else {
-                    res
-                      .status(500)
-                      .json({ status: 500, error: "Error during the save" });
-                  }
-                });
-              } else {
-                res
-                  .status(500)
-                  .json({ status: 500, error: "Error during the save" });
-              }
-            });
-          } else if (doFacture == true && isprecreate == true) {
-            const static = await StaticInf.find().sort({ createdAt: 1 });
-            const prixUnitaire = static[0].prixUnitaire;
-            const fraisEntretien = static[0].fraisEntretien;
-            const new_Consommation = newIndex - oldIndex;
-            const old_Consommation =
-              factures[indexFacture].newIndex - factures[indexFacture].oldIndex;
-            const final_Consommation = new_Consommation + old_Consommation;
-            const montantConsommation =
-              final_Consommation * prixUnitaire + fraisEntretien - surplus;
-            const dataLimitePaid = new Date(
-              dateReleveNewIndex.getFullYear(),
-              dateReleveNewIndex.getMonth() + 2,
-              static[0].limiteDay,
-              dateReleveNewIndex.getHours() + 1,
-              dateReleveNewIndex.getMinutes(),
-              dateReleveNewIndex.getMilliseconds()
-            );
-            console.log("Step 4");
-            await Facture.findByIdAndUpdate(idFacturePre, {
-              idClient,
-              idAdmin,
-              dateReleveNewIndex,
-              newIndex: factures[indexFacture].newIndex,
-              oldIndex: factures[indexFacture].oldIndex,
-              consommation: final_Consommation,
-              montantConsommation,
-              dataLimitePaid,
-              preCreate: false,
-            });
-          } else {
-            res
-              .status(500)
-              .json({
-                status: 500,
-                error: "This customer already has an invoice for this month",
-              });
-          }
-        });
+      let admin = await Admin.findById(decodedToken.id);
+      const static = await StaticInf.find().sort({ createdAt: 1 });
+      const prixUnitaire = static[0].prixUnitaire;
+      const fraisEntretien = static[0].fraisEntretien;
+      const consommation = newIndex - oldIndex;
+      const montantConsommation = (consommation * prixUnitaire) + fraisEntretien;
+      const dataLimitePaid = new Date(
+        dateReleveNewIndex.getFullYear(),
+        dateReleveNewIndex.getMonth() + 1,
+        static[0].limiteDay,
+        dateReleveNewIndex.getHours() + 1,
+        dateReleveNewIndex.getMinutes(),
+        dateReleveNewIndex.getMilliseconds()
+      );
+
+      await Facture.create({
+        idClient,
+        idAdmin,
+        surplus,
+        facturePay: false,
+        dateReleveNewIndex,
+        newIndex,
+        oldIndex,
+        idCompteur,
+        consommation,
+        prixUnitaire,
+        fraisEntretien,
+        montantConsommation,
+        dataLimitePaid,
+        montantImpaye: montantConsommation,
+        penalty: { montant: 0, date: dateReleveNewIndex },
+      }).then((resp) => {
+        if (resp) {
+          res.status(200).json({ status: 200, result: resp });
+        } else {
+          res
+            .status(500)
+            .json({ status: 500, error: "Error during the save" });
+        }
+      });
     }
   });
 });

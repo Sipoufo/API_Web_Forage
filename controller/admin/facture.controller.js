@@ -850,7 +850,7 @@ const searchInvoice = catchAsync(async (req, res) => {
       for (let j = 0; j < customers.length; j++) {
         const user = customers[j];
         if (facture.idClient + '' === user._id + '') {
-          goodBills.push({ ...facture._doc, user });
+          goodBills.push({ invoice: facture, user });
         }
       }
     }
@@ -859,7 +859,8 @@ const searchInvoice = catchAsync(async (req, res) => {
       const facture = factures[index];
       let id = mongoose.Types.ObjectId("" + facture?.idClient);
       let user = await Client.findById({ _id: id });
-      goodBills.push({ ...facture._doc, user });
+      // goodBills.push({ ...facture._doc, user });
+      goodBills.push({ invoice: facture, user });
     }
   }
 
@@ -870,14 +871,15 @@ const searchInvoice = catchAsync(async (req, res) => {
   }
 
   if (type === "paid") {
-    let invoices = goodBills.filter(x => x.facturePay == true);
+    let invoices = goodBills.filter(x => x.invoice.facturePay == true);
     res
       .status(200)
       .json({ status: 200, result: generatePaginnation(invoices.slice((page - 1), (page - 1) + limit), invoices, limit, page) });
   }
 
   if (type === "unpaid") {
-    let invoices = goodBills.filter(x => x.facturePay == false);
+    console.log(goodBills);
+    let invoices = goodBills.filter(x => x.invoice.facturePay == false);
 
     res
       .status(200)

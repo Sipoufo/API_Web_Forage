@@ -578,7 +578,7 @@ router
 //if he don't have return user with all account
 /**
  * @swagger
- *  /admin/facture/userThatHaveNotPaidInvoiceWithDate/{date}/{limit}/{page}:
+ *  /admin/facture/userThatHaveNotPaidInvoiceWithDate/{date}/{page}/{limit}:
  *      post:
  *          summary: See unpaid invoice with date
  *          tags: [Facture_Admin]
@@ -625,7 +625,7 @@ router
 //if he don't have return user with all account
 /**
  * @swagger
- *  /admin/facture/userThatHaveNotPaidInvoiceWithDate/{date}/{limit}/{page}:
+ *  /admin/facture/userThatHaveNotPaidInvoiceWithDate/{date}/{page}/{limit}:
  *      get:
  *          summary: See unpaid invoice with date
  *          tags: [Facture_Admin]

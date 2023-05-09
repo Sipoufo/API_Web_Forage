@@ -338,6 +338,7 @@ const seeUnpaidInvoicewithDate = catchAsync(async (req, res) => {
 const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
   const dateUnpaidMonth = new Date(req.params.date).getMonth() + 1;
   const dateUnpaidYear = new Date(req.params.date).getFullYear();
+
   let results = [];
   let query = {};
   if (req.body?.username) {
@@ -357,9 +358,9 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
 
               { idClient: customers[i]["_id"] },
 
-              { $eq: [{ $month: "$createdAt" }, new Date(req.params.date).getMonth()] },
+              { $eq: [{ $month: "$dateReleveNewIndex" }, new Date(req.params.date).getMonth()] },
 
-              { $eq: [{ $year: "$createdAt" }, new Date(req.params.date).getFullYear()] }
+              { $eq: [{ $year: "$dateReleveNewIndex" }, new Date(req.params.date).getFullYear()] }
 
             ]
           }
@@ -371,17 +372,16 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
 
               { idClient: customers[i]["_id"] },
 
-              { $eq: [{ $month: "$createdAt" }, (dateUnpaidMonth + 1)] },
+              { $eq: [{ $month: "$dateReleveNewIndex" }, (dateUnpaidMonth + 1)] },
 
-              { $eq: [{ $year: "$createdAt" }, new Date(req.params.date).getFullYear()] }
+              { $eq: [{ $year: "$dateReleveNewIndex" }, new Date(req.params.date).getFullYear()] }
 
             ]
           }
         });
 
         let hasAtLeastOneInvoice = factures.length > 0 ? true : false;
-        let hasDirectNextInvoice = hasAtLeastOneInvoice ? false : (bills.length > 0 ? true : false);
-
+        let hasDirectNextInvoice = bills.length > 0 ? true : false;
 
         let invoiceCustomer = await Facture.aggregate([
           {
@@ -418,6 +418,7 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
           ) {
             for (let j = 0; j < invoiceCustomer.length; j++) {
               const element = invoiceCustomer[j]; //je recupère une facture
+              console.log('element: ', element);
 
               for (let x = 0; x < customers[i]?.idCompteur?.length; x++) {
                 const idCompteur = customers[i]?.idCompteur[x];

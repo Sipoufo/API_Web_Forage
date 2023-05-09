@@ -358,9 +358,9 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
 
               { idClient: customers[i]["_id"] },
 
-              { $eq: [{ $month: "$createdAt" }, new Date(req.params.date).getMonth()] },
+              { $eq: [{ $month: "$dateReleveNewIndex" }, (dateUnpaidMonth - 1)] },
 
-              { $eq: [{ $year: "$createdAt" }, new Date(req.params.date).getFullYear()] }
+              { $eq: [{ $year: "$dateReleveNewIndex" }, dateUnpaidYear] }
 
             ]
           }
@@ -372,9 +372,9 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
 
               { idClient: customers[i]["_id"] },
 
-              { $eq: [{ $month: "$createdAt" }, (dateUnpaidMonth + 1)] },
+              { $eq: [{ $month: "$dateReleveNewIndex" }, (dateUnpaidMonth + 1)] },
 
-              { $eq: [{ $year: "$createdAt" }, new Date(req.params.date).getFullYear()] }
+              { $eq: [{ $year: "$dateReleveNewIndex" }, dateUnpaidYear] }
 
             ]
           }
@@ -408,8 +408,8 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
             idCompteur: customers[i]?.idCompteur,
             hasAtLeastOneInvoice,
             hasDirectNextInvoice,
-            oldIndex: hasAtLeastOneInvoice ? factures[0].newIndex : 0,
-            newIndex: hasDirectNextInvoice ? bills[0].oldIndex : 0,
+            oldIndex: hasAtLeastOneInvoice ? factures[factures.length - 1].newIndex : 0,
+            newIndex: hasDirectNextInvoice ? bills[bills.length - 1].oldIndex : 0,
           });
         } else {
           //if user has bill
@@ -439,8 +439,8 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
                       idCompteur: [idCompteur],
                       hasAtLeastOneInvoice,
                       hasDirectNextInvoice,
-                      oldIndex: hasAtLeastOneInvoice ? factures[0].newIndex : 0,
-                      newIndex: hasDirectNextInvoice ? bills[0].oldIndex : 0,
+                      oldIndex: hasAtLeastOneInvoice ? factures[factures.length - 1].newIndex : 0,
+                      newIndex: hasDirectNextInvoice ? bills[bills.length - 1].oldIndex : 0,
                     });
                   }
                 }

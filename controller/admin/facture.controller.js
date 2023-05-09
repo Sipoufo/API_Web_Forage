@@ -351,34 +351,50 @@ const getUserThatHaveNotPaidInvoiceWithDate = catchAsync(async (req, res) => {
     .sort({ name: 0 })
     .then(async (customers) => {
       for (let i = 0; i < customers.length; i++) {
+        let factures = await Facture.aggregate([
+          {
+            $project: {
+              _id: 1,
+              client: "$idClient",
+              month: { $month: "$dateReleveNewIndex" },
+              year: { $year: "$dateReleveNewIndex" },
+              idCompteur: 1,
+              newIndex: 1,
+              oldIndex: 1
+            },
+          },
+          {
+            $match: {
+              month: dateUnpaidMonth - 1,
+              year: dateUnpaidYear,
+              client: customers[i]["_id"],
+            },
+          },
+        ]);
 
-        let factures = await Facture.find({
-          $expr: {
-            $and: [
+        console.log('factures: ', factures);
 
-              { idClient: customers[i]["_id"] },
-
-              { $eq: [{ $month: "$dateReleveNewIndex" }, (dateUnpaidMonth - 1)] },
-
-              { $eq: [{ $year: "$dateReleveNewIndex" }, dateUnpaidYear] }
-
-            ]
-          }
-        });
-
-        let bills = await Facture.find({
-          $expr: {
-            $and: [
-
-              { idClient: customers[i]["_id"] },
-
-              { $eq: [{ $month: "$dateReleveNewIndex" }, (dateUnpaidMonth + 1)] },
-
-              { $eq: [{ $year: "$dateReleveNewIndex" }, dateUnpaidYear] }
-
-            ]
-          }
-        });
+        let bills = await Facture.aggregate([
+          {
+            $project: {
+              _id: 1,
+              client: "$idClient",
+              month: { $month: "$dateReleveNewIndex" },
+              year: { $year: "$dateReleveNewIndex" },
+              idCompteur: 1,
+              newIndex: 1,
+              oldIndex: 1
+            },
+          },
+          {
+            $match: {
+              month: dateUnpaidMonth + 1,
+              year: dateUnpaidYear,
+              client: customers[i]["_id"],
+            },
+          },
+        ]);
+        console.log('bills: ', bills);
 
         let hasAtLeastOneInvoice = factures.length > 0 ? true : false;
         let hasDirectNextInvoice = bills.length > 0 ? true : false;

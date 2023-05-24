@@ -35,6 +35,53 @@ const addFacture = catchAsync(async (req, res) => {
           .json({ status: 500, error: "This invoice old index cann't greater than new index" });
       }
 
+      const factures = await Facture.find({
+        idClient,
+        dateReleveNewIndex: {
+          $gte: dateReleveNewIndex
+        }
+      });
+
+      // let invoices = await Facture.aggregate(
+      //   [
+      //     {
+      //       $project:
+      //       {
+      //         idCompteur: 1,
+      //         _id: 1,
+      //         oldIndex: 1,
+      //         newIndex: 1,
+      //         qty: 1,
+      //         dateReleveGteNewDateReleve: { $gte: ["$dateReleveNewIndex", dateReleveNewIndex] },
+      //         _id: 0
+      //       }
+      //     }
+      //   ]
+      // );
+      // console.log('invoices: ', invoices);
+      // let oldsIndex = invoices.filter(data => data.dateReleveGteNewDateReleve == true).map(v => v.oldIndex);
+      // if (oldsIndex > 0) {
+      //   for (let index = 0; index < oldsIndex.length; index++) {
+      //     const value = oldsIndex[index];
+      //     if (newIndex > value) {
+      //       res
+      //         .status(500)
+      //         .json({ status: 500, error: "the new index of this invoice can't  be greater than old index of invoice's next month " });
+      //     }
+      //   }
+      // }
+
+      if (factures.length > 0) {
+        for (let index = 0; index < factures.length; index++) {
+          const value = factures[index];
+          if (newIndex > value.oldIndex) {
+            res
+              .status(500)
+              .json({ status: 500, error: "the new index of this invoice can't  be greater than old index of invoice's next month " });
+          }
+        }
+      }
+
       let admin = await Admin.findById(decodedToken.id);
       const static = await StaticInf.find().sort({ createdAt: 1 });
       const prixUnitaire = static[0].prixUnitaire;

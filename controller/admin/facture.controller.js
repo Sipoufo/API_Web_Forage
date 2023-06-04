@@ -916,6 +916,9 @@ const getInfoForPrint = catchAsync(async (req, res) => {
       montantImpaye += unPaidInvoice.montantImpaye;
     }
   }
+
+  montantImpaye = montantImpaye - facture.montantImpaye;
+
   res
     .status(200)
     .json({
@@ -923,7 +926,6 @@ const getInfoForPrint = catchAsync(async (req, res) => {
         montantImpaye, client, admin, invoice: facture
       }
     });
-
 });
 
 const deleteAllInvoice = catchAsync(async (req, res) => {

@@ -2,8 +2,8 @@
 Customer management project for a drilling rig. This project enables our customer to manage its various users and manage billing, monitoring and control of water distribution.
  
 ## 🛠️ Tools
-- API: ![](https://img.shields.io/badge/Spring-informational?style=flat&logo=spring&color=236DB33F)
-- SGBD: ![](https://img.shields.io/badge/MongoDB-informational?style=flat&logo=mongodb&color=4EA94B)
+- API: ![](https://img.shields.io/badge/-Spring-informational?style=flat&logo=spring&color=236DB33F)
+- SGBD: ![](https://img.shields.io/badge/-MongoDB-informational?style=flat&logo=mongodb&color=4EA94B)
 
 ## 🚀 Functionnality
 - [x] Full authentication process
